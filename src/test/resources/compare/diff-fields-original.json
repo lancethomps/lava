@@ -1,0 +1,68 @@
+{
+	"diff_array_larger": [
+		"a",
+		"b",
+		"c",
+		"d"
+	],
+	"diff_array_objs": [
+		{
+			"diff_number_array": [
+				4,
+				5,
+				6
+			],
+			"diff_string": "aaa",
+			"nodiff_string": "x",
+			"nodiff_string_array": [
+				"x",
+				"y",
+				"z"
+			]
+		},
+		{
+			"nodiff_string": "x",
+			"nodiff_string_array": [
+				"x",
+				"y",
+				"z"
+			]
+		}
+	],
+	"diff_array_smaller": [
+		"a",
+		"b"
+	],
+	"diff_number": 7.25,
+	"diff_number_array": [
+		4,
+		8,
+		12
+	],
+	"diff_number_decrease": 7.25,
+	"diff_obj": {
+		"diff_string": "a",
+		"nodiff_string": "x"
+	},
+	"diff_string": "abc",
+	"diff_string_array": [
+		"abc",
+		"def",
+		"ghi"
+	],
+	"nodiff_number": 15,
+	"nodiff_number_array": [
+		77,
+		78,
+		79
+	],
+	"nodiff_obj": {
+		"nodiff_string": "xyz"
+	},
+	"nodiff_string": "Web Tools",
+	"nodiff_string_array": [
+		"x",
+		"y",
+		"z"
+	]
+}

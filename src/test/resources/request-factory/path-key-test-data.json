@@ -1,0 +1,10 @@
+{
+	"children": [
+		{
+			"name": "testChild",
+			"type": "PREFERENCE_CHILD"
+		}
+	],
+	"name": "test",
+	"type": "PREFERENCE"
+}

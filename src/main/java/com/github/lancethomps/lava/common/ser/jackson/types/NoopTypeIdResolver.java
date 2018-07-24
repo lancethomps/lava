@@ -1,0 +1,32 @@
+package com.github.lancethomps.lava.common.ser.jackson.types;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.jsontype.impl.ClassNameIdResolver;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+
+/**
+ * The Class NoopTypeIdResolver.
+ */
+public class NoopTypeIdResolver extends ClassNameIdResolver {
+
+	/**
+	 * Instantiates a new noop type id resolver.
+	 *
+	 * @param baseType the base type
+	 * @param typeFactory the type factory
+	 */
+	public NoopTypeIdResolver(JavaType baseType, TypeFactory typeFactory) {
+		super(baseType, typeFactory);
+	}
+
+	@Override
+	public String idFromValue(Object value) {
+		return null;
+	}
+
+	@Override
+	public String idFromValueAndType(Object value, Class<?> type) {
+		return null;
+	}
+
+}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration>
+
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out"/>
+
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- <param name="ConversionPattern" value="%d (%t) %-5p [%c] %m%n"/> -->
+			<!-- <param name="ConversionPattern" value="%d{HH:mm:ss.SSS} [%p] (%c) %m%n"/> -->
+			<param name="ConversionPattern" value="%d{HH:mm:ss.SSS} [%p] (%t) [%c] %m%n"/>
+		</layout>
+	</appender>
+
+	<category name="com.mchange">
+		<priority value="INFO"/>
+	</category>
+
+	<category name="org">
+		<priority value="INFO"/>
+	</category>
+
+	<category name="org.apache.commons.jcs.auxiliary.disk.jdbc.JDBCDiskCacheFactory">
+		<priority value="FATAL"/>
+	</category>
+
+	<category name="com.github.lancethomps.lava">
+		<priority value="DEBUG"/>
+	</category>
+
+	<category name="com.github.lancethomps.lava.common.date">
+		<priority value="INFO"/>
+	</category>
+
+	<root>
+		<level value="DEBUG"/>
+		<appender-ref ref="CONSOLE"/>
+	</root>
+
+</log4j:configuration>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Web Tools Platform" xmlns="http://maven.apache.org/DECORATION/1.7.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/DECORATION/1.7.0 http://maven.apache.org/xsd/decoration-1.7.0.xsd">
+
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-fluido-skin</artifactId>
+		<version>1.6</version>
+	</skin>
+
+
+	<custom>
+		<fluidoSkin>
+			<sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+			<!-- <sideBarEnabled>false</sideBarEnabled>
+			<topBarEnabled>true</topBarEnabled> -->
+		</fluidoSkin>
+	</custom>
+
+	<publishDate format="yyyy-MM-dd hh:mm a z" position="left" />
+
+	<body>
+		<links>
+			<item target="_blank" href="https://github.com/lancethomps/lava" name="GitHub" />
+		</links>
+		<menu ref="parent" inherit="top"/>
+		<menu ref="modules" inherit="top"/>
+		<menu ref="reports" inherit="top"/>
+		<footer></footer>
+	</body>
+
+</project>

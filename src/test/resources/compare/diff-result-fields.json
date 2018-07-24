@@ -1,0 +1,18 @@
+[
+	"diff_number_array[0]",
+	"diff_number_array[1]",
+	"diff_number_array[2]",
+	"diff_string_array[1]",
+	"diff_array_larger[2]",
+	"diff_array_larger[3]",
+	"diff_array_smaller[2]",
+	"diff_array_smaller[3]",
+	"diff_array_objs[0].diff_number_array[0]",
+	"diff_array_objs[0].diff_number_array[1]",
+	"diff_array_objs[0].diff_number_array[2]",
+	"diff_array_objs[0].diff_string",
+	"diff_obj.diff_string",
+	"diff_number",
+	"diff_number_decrease",
+	"diff_string"
+]
