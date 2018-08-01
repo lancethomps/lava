@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 /**
  * The Class StringBufferMixIn.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public abstract class StringBufferMixIn {
 

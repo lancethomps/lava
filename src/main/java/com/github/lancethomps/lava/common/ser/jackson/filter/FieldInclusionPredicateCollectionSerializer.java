@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ser.std.CollectionSerializer;
 /**
  * The Class FieldInclusionPredicateCollectionSerializer.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class FieldInclusionPredicateCollectionSerializer extends CollectionSerializer {
 

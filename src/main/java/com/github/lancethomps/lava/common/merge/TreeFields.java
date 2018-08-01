@@ -9,7 +9,7 @@ import com.github.lancethomps.lava.common.ser.ExternalizableBean;
 /**
  * The Class TreeFields.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class TreeFields extends ExternalizableBean {
 

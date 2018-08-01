@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * The Class MergesTestData.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class MergesTestData {
 

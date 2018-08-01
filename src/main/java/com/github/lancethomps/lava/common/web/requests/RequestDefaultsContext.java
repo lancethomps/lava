@@ -12,7 +12,7 @@ import com.github.lancethomps.lava.common.web.WebRequestContext;
 /**
  * The Class RequestDefaultsContext.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class RequestDefaultsContext extends ExprContextRootWithResult {
 

@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 /**
  * The Class CustomFunctionalSerializer.
  *
- * @author lathomps
+ * @author lancethomps
  * @param <T> the generic type
  */
 public class CustomFunctionalSerializer<T> extends StdScalarSerializer<T> {

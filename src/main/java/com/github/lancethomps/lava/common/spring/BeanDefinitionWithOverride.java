@@ -8,7 +8,7 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * The Class BeanDefinitionWithOverride.
  *
- * @author lathomps
+ * @author lancethomps
  * @param <T> the generic type
  */
 public class BeanDefinitionWithOverride<T> implements FactoryBean<T>, BeanFactoryAware {

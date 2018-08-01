@@ -13,7 +13,7 @@ import ua_parser.Client;
 /**
  * The Class UserAgent.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class UserAgent extends ExternalizableBean {
 

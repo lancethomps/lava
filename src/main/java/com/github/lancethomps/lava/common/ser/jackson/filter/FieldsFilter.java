@@ -30,7 +30,7 @@ import com.google.common.collect.Sets;
 /**
  * The Class FieldsFilter.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class FieldsFilter extends SimpleBeanPropertyFilter implements Serializable {
 

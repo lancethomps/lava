@@ -29,7 +29,7 @@ import eu.bitwalker.useragentutils.UserAgent;
 /**
  * The Class WebRequestContext.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class WebRequestContext extends ExternalizableBean implements TimerEnabledBean, RequestThrottleContext {
 

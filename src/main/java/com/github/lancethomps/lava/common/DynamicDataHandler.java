@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 /**
  * The Interface DynamicDataHandler.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @JsonIgnoreProperties(value = { "@type" })
 public interface DynamicDataHandler extends DynamicDataSetter {

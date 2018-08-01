@@ -7,7 +7,7 @@ import com.github.lancethomps.lava.common.string.OmittingToStringStyle;
 /**
  * The Class CommonConstants.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class CommonConstants {
 

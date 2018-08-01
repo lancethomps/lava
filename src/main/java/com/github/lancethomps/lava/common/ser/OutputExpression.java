@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * The Class OutputExpression.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @SuppressWarnings("serial")
 public class OutputExpression extends SimpleDomainObject {

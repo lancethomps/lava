@@ -3,7 +3,7 @@ package com.github.lancethomps.lava.common.web.throttle;
 /**
  * The Interface RequestThrottleContext.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public interface RequestThrottleContext {
 

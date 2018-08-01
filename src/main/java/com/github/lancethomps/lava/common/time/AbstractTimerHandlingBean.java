@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * The Class AbstractTimerHandlingBean.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public abstract class AbstractTimerHandlingBean implements TimerHandlingBean {
 

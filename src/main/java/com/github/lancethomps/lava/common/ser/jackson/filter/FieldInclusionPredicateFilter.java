@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 /**
  * The Class FieldInclusionPredicateFilter.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class FieldInclusionPredicateFilter extends SimpleBeanPropertyFilter {
 

@@ -49,7 +49,7 @@ import ua_parser.Parser;
 /**
  * The Class WebRequests.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class WebRequests {
 

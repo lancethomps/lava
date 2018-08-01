@@ -22,7 +22,7 @@ import com.github.lancethomps.lava.common.logging.Logs;
 /**
  * The Class ExprFactoryTest.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class ExprFactoryTest extends BaseTest {
 

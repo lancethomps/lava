@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 /**
  * The Class FieldInclusionPredicateSerializerModifier.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class FieldInclusionPredicateSerializerModifier extends BeanSerializerModifier {
 

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * The Class BaseTestControllerWithDefaultHandler.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @Controller
 public class BaseTestControllerWithDefaultHandler {

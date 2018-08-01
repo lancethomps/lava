@@ -10,7 +10,7 @@ import com.google.common.collect.Sets;
 /**
  * The Class BaseTest.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class BaseTest {
 

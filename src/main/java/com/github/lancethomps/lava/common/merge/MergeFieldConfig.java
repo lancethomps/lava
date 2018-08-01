@@ -16,7 +16,7 @@ import ognl.Node;
 /**
  * The Class MergeFieldConfig.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class MergeFieldConfig extends MergeConfig {
 

@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 /**
  * The Class SavedErrorMessage.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class SavedErrorMessage {
 

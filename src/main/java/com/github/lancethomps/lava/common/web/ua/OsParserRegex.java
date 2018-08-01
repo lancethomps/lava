@@ -3,7 +3,7 @@ package com.github.lancethomps.lava.common.web.ua;
 /**
  * The Class OsParserRegex.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class OsParserRegex extends AbstractUserAgentParserRegex {
 

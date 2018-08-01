@@ -8,7 +8,7 @@ import com.github.lancethomps.lava.common.ser.ExternalizableBean;
 /**
  * The Class AbstractUserAgentRegex.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public abstract class AbstractUserAgentParserRegex extends ExternalizableBean {
 

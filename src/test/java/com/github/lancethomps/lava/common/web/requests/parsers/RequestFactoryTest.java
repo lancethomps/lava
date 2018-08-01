@@ -18,7 +18,7 @@ import com.github.lancethomps.lava.common.ser.Serializer;
 /**
  * The Class RequestFactoryTest.
  *
- * @author lathomps
+ * @author lancethomps
  */
 // TODO: add test for fields with prefix
 public class RequestFactoryTest extends BaseTest {

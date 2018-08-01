@@ -15,7 +15,7 @@ import com.github.lancethomps.lava.common.ThreadNameTestWatcher;
 /**
  * The Class BaseSpringWebTest.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @ActiveProfiles("unit_test")
 @RunWith(SpringJUnit4ClassRunner.class)

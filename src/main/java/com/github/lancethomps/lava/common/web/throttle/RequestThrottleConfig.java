@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 /**
  * The Class RequestThrottleConfig.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class RequestThrottleConfig {
 

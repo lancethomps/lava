@@ -3,7 +3,7 @@ package com.github.lancethomps.lava.common.cache;
 /**
  * The Interface CacheManager.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public interface CacheManager {
 

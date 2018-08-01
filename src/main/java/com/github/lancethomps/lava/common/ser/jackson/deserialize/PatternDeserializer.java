@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
 /**
  * The Class PatternDeserializer.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @SuppressWarnings("serial")
 public class PatternDeserializer extends StdScalarDeserializer<Pattern> {

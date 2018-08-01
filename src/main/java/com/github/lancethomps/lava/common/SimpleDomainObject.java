@@ -11,7 +11,7 @@ import com.github.lancethomps.lava.common.ser.Serializer;
 /**
  * The Class SimpleDomainObject.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @SuppressWarnings("serial")
 public class SimpleDomainObject extends PostConstructor implements Serializable {

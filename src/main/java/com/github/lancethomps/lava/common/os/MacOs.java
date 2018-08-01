@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 /**
  * The Class MacOs.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class MacOs {
 

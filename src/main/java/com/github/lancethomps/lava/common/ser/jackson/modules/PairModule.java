@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ser.Serializers;
 /**
  * The Class PairModule.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class PairModule extends Module {
 
@@ -73,7 +73,7 @@ public class PairModule extends Module {
 	/**
 	 * The Class PairDeserializer.
 	 *
-	 * @author lathomps
+	 * @author lancethomps
 	 */
 	public static class PairDeserializer extends JsonDeserializer<Pair<?, ?>> {
 
@@ -155,7 +155,7 @@ public class PairModule extends Module {
 	/**
 	 * The Class PairDeserializerFinder.
 	 *
-	 * @author lathomps
+	 * @author lancethomps
 	 */
 	public static class PairDeserializerFinder extends Deserializers.Base {
 
@@ -177,7 +177,7 @@ public class PairModule extends Module {
 	/**
 	 * The Class PairKeyDeserializer.
 	 *
-	 * @author lathomps
+	 * @author lancethomps
 	 */
 	public static class PairKeyDeserializer extends KeyDeserializer {
 
@@ -226,7 +226,7 @@ public class PairModule extends Module {
 	/**
 	 * The Class PairKeySerializer.
 	 *
-	 * @author lathomps
+	 * @author lancethomps
 	 */
 	public static class PairKeySerializer extends JsonSerializer<Pair<?, ?>> {
 
@@ -276,7 +276,7 @@ public class PairModule extends Module {
 	/**
 	 * The Class PairSerializer.
 	 *
-	 * @author lathomps
+	 * @author lancethomps
 	 */
 	public static class PairSerializer extends JsonSerializer<Pair<?, ?>> {
 
@@ -312,7 +312,7 @@ public class PairModule extends Module {
 	/**
 	 * The Class PairsKeyDeserializerFinder.
 	 *
-	 * @author lathomps
+	 * @author lancethomps
 	 */
 	public static class PairsKeyDeserializerFinder implements KeyDeserializers {
 
@@ -335,7 +335,7 @@ public class PairModule extends Module {
 	/**
 	 * The Class PairsKeySerializerFinder.
 	 *
-	 * @author lathomps
+	 * @author lancethomps
 	 */
 	public static class PairsKeySerializerFinder extends Serializers.Base {
 
@@ -357,7 +357,7 @@ public class PairModule extends Module {
 	/**
 	 * The Class PairSserializerFinder.
 	 *
-	 * @author lathomps
+	 * @author lancethomps
 	 */
 	public static class PairsSerializerFinder extends Serializers.Base {
 

@@ -7,7 +7,7 @@ import com.github.lancethomps.lava.common.expr.ExprContextRootWithResult;
 /**
  * The Class OutputExpressionRoot.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class OutputExpressionRoot extends ExprContextRootWithResult {
 

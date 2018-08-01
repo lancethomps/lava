@@ -17,7 +17,7 @@ import com.github.lancethomps.lava.common.web.WebRequests;
 /**
  * The Class UserAgentParser.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class UserAgentParser {
 

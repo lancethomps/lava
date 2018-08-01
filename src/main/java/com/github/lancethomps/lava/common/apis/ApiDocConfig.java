@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * The Interface OpenApiIgnore.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @Target({ FIELD, TYPE })
 @Retention(RUNTIME)

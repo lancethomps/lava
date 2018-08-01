@@ -65,7 +65,7 @@ import com.google.common.collect.Sets;
 /**
  * The Class TestingUtil.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class Testing {
 

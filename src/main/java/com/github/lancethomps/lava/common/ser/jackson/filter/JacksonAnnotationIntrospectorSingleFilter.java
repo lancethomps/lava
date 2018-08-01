@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 /**
  * The Class JacksonAnnotationIntrospectorSingleFilter.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class JacksonAnnotationIntrospectorSingleFilter extends JacksonAnnotationIntrospector {
 

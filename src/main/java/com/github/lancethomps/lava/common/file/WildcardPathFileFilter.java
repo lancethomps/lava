@@ -10,7 +10,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 /**
  * The Class WildcardPathFileFilter.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class WildcardPathFileFilter extends WildcardFileFilter {
 

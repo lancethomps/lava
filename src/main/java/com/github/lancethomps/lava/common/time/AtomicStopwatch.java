@@ -3,7 +3,7 @@ package com.github.lancethomps.lava.common.time;
 /**
  * The Class AtomicStopwatch.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class AtomicStopwatch extends Stopwatch {
 

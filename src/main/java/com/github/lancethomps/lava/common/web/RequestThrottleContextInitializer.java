@@ -7,7 +7,7 @@ import com.github.lancethomps.lava.common.web.throttle.RequestThrottleContext;
 /**
  * The Interface RequestThrottleContextInitializer.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public interface RequestThrottleContextInitializer {
 

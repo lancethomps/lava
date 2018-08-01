@@ -35,7 +35,7 @@ import com.google.common.collect.Iterables;
 /**
  * The Class Checks.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class Checks {
 

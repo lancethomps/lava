@@ -5,7 +5,7 @@ import com.github.lancethomps.lava.common.SimpleDomainObject;
 /**
  * The Class ProcessResult.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class ProcessResult extends SimpleDomainObject {
 

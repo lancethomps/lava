@@ -18,7 +18,7 @@ import com.github.lancethomps.lava.common.time.Stopwatch;
 /**
  * The Class Processes.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class Processes {
 

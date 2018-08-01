@@ -36,7 +36,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * The Class Merges.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class Merges {
 

@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 /**
  * The Interface TimerHandlingBean.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @SuppressWarnings("unchecked")
 public interface TimerHandlingBean {

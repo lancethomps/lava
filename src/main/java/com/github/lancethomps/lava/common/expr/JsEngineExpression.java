@@ -7,7 +7,7 @@ import javax.script.CompiledScript;
 /**
  * The Class JsEngineExpression.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class JsEngineExpression extends ScriptEngineExpression {
 

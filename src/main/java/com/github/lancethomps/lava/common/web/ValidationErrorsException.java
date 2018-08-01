@@ -12,7 +12,7 @@ import com.github.lancethomps.lava.common.format.Formatting;
 /**
  * The Class ValidationErrorsException.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class ValidationErrorsException extends ServletException {
 

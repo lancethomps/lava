@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
 /**
  * The Class RequestThrottleTest.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class RequestThrottleTest extends BaseSpringTest {
 

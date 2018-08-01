@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 /**
  * The Class MergesTest.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class MergesTest extends BaseTest {
 

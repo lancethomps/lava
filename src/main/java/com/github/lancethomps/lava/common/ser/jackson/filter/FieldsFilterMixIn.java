@@ -7,7 +7,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * The Class FieldsFilterMixIn.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @ThreadSafe
 @JsonFilter(FieldsFilter.FIELDS_FILTER_ID)

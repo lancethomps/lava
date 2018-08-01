@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 /**
  * The Class RequestDefaultsConfig.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @SuppressWarnings("serial")
 public class RequestDefaultsConfig extends SimpleDomainObject {

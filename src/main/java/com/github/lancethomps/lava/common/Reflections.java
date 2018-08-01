@@ -54,7 +54,7 @@ import com.google.common.collect.Maps;
 /**
  * The Class Reflections.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class Reflections {
 

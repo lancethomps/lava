@@ -3,7 +3,7 @@ package com.github.lancethomps.lava.common.logging;
 /**
  * The Enum Severity.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public enum SavedErrorMessageSeverity {
 

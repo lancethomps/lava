@@ -20,7 +20,7 @@ import com.github.lancethomps.lava.common.TestingCommon;
 /**
  * The Class SerializerTest.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class SerializerTest extends BaseTest {
 

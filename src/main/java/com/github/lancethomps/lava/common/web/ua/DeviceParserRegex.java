@@ -3,7 +3,7 @@ package com.github.lancethomps.lava.common.web.ua;
 /**
  * The Class DeviceRegex.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class DeviceParserRegex extends AbstractUserAgentParserRegex {
 

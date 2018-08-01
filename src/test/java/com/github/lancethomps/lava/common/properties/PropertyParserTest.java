@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * The Class PropertyParserTest.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class PropertyParserTest extends com.github.lancethomps.lava.common.BaseTest {
 

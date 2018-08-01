@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * The Class AbstractTimerEnabledBean.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class GenericTimerEnabledBean implements TimerEnabledBean {
 

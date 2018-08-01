@@ -18,7 +18,7 @@ import com.github.lancethomps.lava.common.web.requests.MissingRequestParameter;
 /**
  * The Class AbstractApiResponse.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @SuppressWarnings("unchecked")
 public abstract class AbstractApiResponse extends ExternalizableBean implements TimerHandlingBean {

@@ -8,7 +8,7 @@ import com.github.lancethomps.lava.common.ser.ExternalizableBean;
 /**
  * The Class UserAgentParserConfig.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class UserAgentParserConfig extends ExternalizableBean {
 

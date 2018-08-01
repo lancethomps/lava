@@ -15,7 +15,7 @@ import com.github.lancethomps.lava.common.ser.OutputFormat;
 /**
  * The Class AcceptHeaderMediaType.
  *
- * @author lathomps
+ * @author lancethomps
  */
 public class AcceptHeaderMediaType extends ExternalizableBean implements Comparable<AcceptHeaderMediaType> {
 

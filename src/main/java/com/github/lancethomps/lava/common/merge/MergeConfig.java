@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.JavaType;
 /**
  * The Class MergeConfig.
  *
- * @author lathomps
+ * @author lancethomps
  */
 @SuppressWarnings({ "unchecked", "serial" })
 public class MergeConfig extends SimpleDomainObject {
