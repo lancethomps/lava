@@ -228,6 +228,11 @@ public class Dates {
 		.optionalEnd()
 		.toFormatter();
 
+	/** The Constant START_OF_CURRENT_QUARTER. */
+	public static final TemporalAdjuster START_OF_CURRENT_QUARTER = (temporal) -> temporal
+		.with(ChronoField.MONTH_OF_YEAR, ((int) Math.floor(((temporal.get(ChronoField.MONTH_OF_YEAR) - 1) / 3)) * 3) + 1)
+		.with(ChronoField.DAY_OF_MONTH, 1);
+
 	/** The Constant TIMESTAMP_FORMAT. */
 	public static final DateTimeFormatter TIMESTAMP_FORMAT = formatterFromPattern("yyyy_MM_dd_HH_mm_ss_SS");
 
@@ -412,6 +417,8 @@ public class Dates {
 				if (!dc.isBusinessDay(date.toLocalDate())) {
 					date = dc.changeByBusinessDays(date.toLocalDate(), -1L).atTime(date.toLocalTime());
 				}
+			} else if (type == RelativeDateType.q) {
+				return date.with(START_OF_CURRENT_QUARTER);
 			}
 			switch (unit) {
 			case YEARS:
@@ -433,6 +440,9 @@ public class Dates {
 			}
 			if (type == RelativeDateType.b) {
 				return changeByBusinessDays(date.toLocalDate(), (int) amount).atTime(date.toLocalTime());
+			} else if (type == RelativeDateType.q) {
+				amount *= 3;
+				unit = ChronoUnit.MONTHS;
 			}
 			return date.plus(amount, unit);
 		default:

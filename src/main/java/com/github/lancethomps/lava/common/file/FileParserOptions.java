@@ -1,9 +1,14 @@
 package com.github.lancethomps.lava.common.file;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import javax.annotation.Nonnull;
 
 import com.github.lancethomps.lava.common.expr.ExprFactory;
 import com.github.lancethomps.lava.common.ser.ExternalizableBean;
@@ -69,6 +74,10 @@ public class FileParserOptions extends ExternalizableBean {
 	@RequestField
 	private Set<Pattern> headersWhiteList;
 
+	/** The ignore fields. */
+	@RequestField
+	private Set<String> ignoreFields;
+
 	/** The keys as paths. */
 	@RequestField
 	private Boolean keysAsPaths;
@@ -125,6 +134,31 @@ public class FileParserOptions extends ExternalizableBean {
 	/** The use path keys. */
 	@RequestField
 	private Boolean usePathKeys;
+
+	/**
+	 * Adds the ignore fields.
+	 *
+	 * @param ignoreFields the ignore fields
+	 * @return the file parser options
+	 */
+	public FileParserOptions addIgnoreFields(@Nonnull Collection<String> ignoreFields) {
+		checkModificationsDisabled();
+		if (this.ignoreFields == null) {
+			this.ignoreFields = new LinkedHashSet<>();
+		}
+		this.ignoreFields.addAll(ignoreFields);
+		return this;
+	}
+
+	/**
+	 * Adds the ignore fields.
+	 *
+	 * @param ignoreFields the ignore fields
+	 * @return the file parser options
+	 */
+	public FileParserOptions addIgnoreFields(@Nonnull String... ignoreFields) {
+		return addIgnoreFields(Arrays.asList(ignoreFields));
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -283,6 +317,13 @@ public class FileParserOptions extends ExternalizableBean {
 	}
 
 	/**
+	 * @return the ignoreFields
+	 */
+	public Set<String> getIgnoreFields() {
+		return ignoreFields;
+	}
+
+	/**
 	 * Gets the keys as paths.
 	 *
 	 * @return the keysAsPaths
@@ -416,6 +457,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setAllowBlanks(Boolean allowBlanks) {
+		checkModificationsDisabled();
 		this.allowBlanks = allowBlanks;
 		return this;
 	}
@@ -439,6 +481,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setFieldConverter(CsvFieldConverter fieldConverter) {
+		checkModificationsDisabled();
 		this.fieldConverter = fieldConverter;
 		return this;
 	}
@@ -450,6 +493,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setFieldValuesBlackList(Set<Pattern> fieldValuesBlackList) {
+		checkModificationsDisabled();
 		this.fieldValuesBlackList = fieldValuesBlackList;
 		return this;
 	}
@@ -461,6 +505,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setFieldValuesBlackListByColumn(Map<String, Set<Pattern>> fieldValuesBlackListByColumn) {
+		checkModificationsDisabled();
 		this.fieldValuesBlackListByColumn = fieldValuesBlackListByColumn;
 		return this;
 	}
@@ -472,6 +517,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setFieldValuesWhiteList(Set<Pattern> fieldValuesWhiteList) {
+		checkModificationsDisabled();
 		this.fieldValuesWhiteList = fieldValuesWhiteList;
 		return this;
 	}
@@ -483,6 +529,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setFieldValuesWhiteListByColumn(Map<String, Set<Pattern>> fieldValuesWhiteListByColumn) {
+		checkModificationsDisabled();
 		this.fieldValuesWhiteListByColumn = fieldValuesWhiteListByColumn;
 		return this;
 	}
@@ -494,6 +541,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setFirstRowNum(Integer firstRowNum) {
+		checkModificationsDisabled();
 		this.firstRowNum = firstRowNum;
 		return this;
 	}
@@ -505,6 +553,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the first row num by sheet
 	 */
 	public FileParserOptions setFirstRowNumBySheet(Map<String, Integer> firstRowNumBySheet) {
+		checkModificationsDisabled();
 		this.firstRowNumBySheet = firstRowNumBySheet;
 		return this;
 	}
@@ -516,6 +565,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setHeaderConversions(Map<String, String> headerConversions) {
+		checkModificationsDisabled();
 		this.headerConversions = headerConversions;
 		return this;
 	}
@@ -527,6 +577,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setHeaderConverter(CsvFieldConverter headerConverter) {
+		checkModificationsDisabled();
 		this.headerConverter = headerConverter;
 		return this;
 	}
@@ -538,6 +589,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setHeaders(Map<String, Integer> headers) {
+		checkModificationsDisabled();
 		this.headers = headers;
 		return this;
 	}
@@ -549,6 +601,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setHeadersBlackList(Set<Pattern> headersBlackList) {
+		checkModificationsDisabled();
 		this.headersBlackList = headersBlackList;
 		return this;
 	}
@@ -560,7 +613,20 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setHeadersWhiteList(Set<Pattern> headersWhiteList) {
+		checkModificationsDisabled();
 		this.headersWhiteList = headersWhiteList;
+		return this;
+	}
+
+	/**
+	 * Sets the ignore fields.
+	 *
+	 * @param ignoreFields the ignoreFields to set
+	 * @return the file parser options
+	 */
+	public FileParserOptions setIgnoreFields(Set<String> ignoreFields) {
+		checkModificationsDisabled();
+		this.ignoreFields = ignoreFields;
 		return this;
 	}
 
@@ -571,6 +637,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setKeysAsPaths(Boolean keysAsPaths) {
+		checkModificationsDisabled();
 		this.keysAsPaths = keysAsPaths;
 		return this;
 	}
@@ -582,6 +649,7 @@ public class FileParserOptions extends ExternalizableBean {
 	 * @return the file parser options
 	 */
 	public FileParserOptions setMaxLines(Integer maxLines) {
+		checkModificationsDisabled();
 		this.maxLines = maxLines;
 		return this;
 	}

@@ -3,9 +3,11 @@ package com.github.lancethomps.lava.common.time;
 import static java.math.RoundingMode.HALF_UP;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -26,6 +28,46 @@ public class Timing {
 
 	/** The Constant ONE_MIN_MS. */
 	public static final long ONE_MIN_MS = 1000 * 60;
+
+	/**
+	 * Estimate completion time.
+	 *
+	 * @param startTime the start time
+	 * @param count the count
+	 * @param total the total
+	 * @return the local date time
+	 */
+	public static LocalDateTime estimateCompletionTime(@Nonnull LocalDateTime startTime, long count, long total) {
+		long millis = ChronoUnit.MILLIS.between(startTime, LocalDateTime.now());
+		long estimatedTotal = Double.valueOf(millis * ((double) total / (double) count)).longValue();
+		return startTime.plus(estimatedTotal, ChronoUnit.MILLIS);
+	}
+
+	/**
+	 * Estimate time remaining millis.
+	 *
+	 * @param startTime the start time
+	 * @param count the count
+	 * @param total the total
+	 * @return the long
+	 */
+	public static long estimateTimeRemainingMillis(@Nonnull LocalDateTime startTime, long count, long total) {
+		return ChronoUnit.MILLIS.between(LocalDateTime.now(), estimateCompletionTime(startTime, count, total));
+	}
+
+	/**
+	 * Estimate time remaining millis.
+	 *
+	 * @param watch the watch
+	 * @param count the count
+	 * @param total the total
+	 * @return the long
+	 */
+	public static long estimateTimeRemainingMillis(@Nonnull Stopwatch watch, long count, long total) {
+		long millis = watch.getTime();
+		long estimatedTotal = Double.valueOf(millis * ((double) total / (double) count)).longValue();
+		return estimatedTotal - millis;
+	}
 
 	/**
 	 * Format interval.

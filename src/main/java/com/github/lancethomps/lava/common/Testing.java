@@ -322,7 +322,17 @@ public class Testing {
 	 * @return the proj file
 	 */
 	public static File getProjFile(String relativePath) {
-		return new File(StringUtils.defaultIfBlank(Testing.getProjRootPath(), System.getenv("PROJ_DIR") + File.separatorChar) + relativePath);
+		String projRoot;
+		if (Checks.isNotBlank(Testing.projRootPath)) {
+			projRoot = Testing.projRootPath;
+		} else if (Checks.isNotBlank(System.getenv("PROJ_DIR")) && new File(System.getenv("PROJ_DIR")).isDirectory()) {
+			projRoot = System.getenv("PROJ_DIR") + File.separatorChar;
+			Logs.logDebug(Logger.getLogger(Testing.class), "Using PROJ_DIR env variable for project root: %s", projRoot);
+			setProjRootPath(projRoot);
+		} else {
+			projRoot = getProjRootPath();
+		}
+		return new File(projRoot, relativePath);
 	}
 
 	/**
@@ -334,8 +344,10 @@ public class Testing {
 		if (Testing.projRootPath == null) {
 			try {
 				URI rootUri = Testing.class.getResource("/").toURI();
-				File root = new File(rootUri).getParentFile().getParentFile().getParentFile().getParentFile();
-				Testing.setProjRootPath(root.getPath() + File.separatorChar);
+				File root = new File(rootUri).getParentFile().getParentFile().getParentFile();
+				String projRoot = root.getPath() + File.separatorChar;
+				Logs.logDebug(Logger.getLogger(Testing.class), "Guessed project root from Testing.class: %s", projRoot);
+				Testing.setProjRootPath(projRoot);
 			} catch (Throwable e) {
 				;
 			}
@@ -533,6 +545,21 @@ public class Testing {
 	 */
 	public static void printJson(Object obj) {
 		printJson(obj, (OutputParams) null);
+	}
+
+	/**
+	 * Prints the json.
+	 *
+	 * @param obj the obj
+	 * @param writeToFile the write to file
+	 * @param addParams the add params
+	 */
+	public static void printJson(Object obj, File writeToFile, OutputParams addParams) {
+		String json = getJson(obj, addParams);
+		if (writeToFile != null) {
+			FileUtil.writeFile(writeToFile, json);
+		}
+		println(json);
 	}
 
 	/**
@@ -1161,20 +1188,5 @@ public class Testing {
 	 */
 	private static void printJson(Object obj, File writeToFile) {
 		printJson(obj, writeToFile, null);
-	}
-
-	/**
-	 * Prints the json.
-	 *
-	 * @param obj the obj
-	 * @param writeToFile the write to file
-	 * @param addParams the add params
-	 */
-	private static void printJson(Object obj, File writeToFile, OutputParams addParams) {
-		String json = getJson(obj, addParams);
-		if (writeToFile != null) {
-			FileUtil.writeFile(writeToFile, json);
-		}
-		println(json);
 	}
 }

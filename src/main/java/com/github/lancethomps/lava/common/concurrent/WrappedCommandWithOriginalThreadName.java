@@ -17,8 +17,8 @@ public class WrappedCommandWithOriginalThreadName<T> implements Runnable, Callab
 	/** The runnable. */
 	private final Runnable runnable;
 
-	/** The thread name suffix. */
-	private final String threadNameSuffix;
+	/** The thread name prefix. */
+	private final String threadNamePrefix;
 
 	/**
 	 * Instantiates a new wrapped runnable with original thread name.
@@ -48,7 +48,7 @@ public class WrappedCommandWithOriginalThreadName<T> implements Runnable, Callab
 		super();
 		this.callable = callable;
 		this.runnable = runnable;
-		threadNameSuffix = Thread.currentThread().getName();
+		threadNamePrefix = Thread.currentThread().getName();
 	}
 
 	/*
@@ -57,12 +57,8 @@ public class WrappedCommandWithOriginalThreadName<T> implements Runnable, Callab
 	 */
 	@Override
 	public T call() throws Exception {
-		final String originalName = Thread.currentThread().getName();
-		Thread.currentThread().setName(Thread.currentThread().getName() + '#' + threadNameSuffix);
-		try {
+		try (TempThreadNamePrefixAdder threadNamePrefixAdder = new TempThreadNamePrefixAdder(threadNamePrefix)) {
 			return callable.call();
-		} finally {
-			Thread.currentThread().setName(originalName);
 		}
 	}
 
@@ -72,9 +68,7 @@ public class WrappedCommandWithOriginalThreadName<T> implements Runnable, Callab
 	 */
 	@Override
 	public void run() {
-		final String originalName = Thread.currentThread().getName();
-		Thread.currentThread().setName(Thread.currentThread().getName() + '#' + threadNameSuffix);
-		try {
+		try (TempThreadNamePrefixAdder threadNamePrefixAdder = new TempThreadNamePrefixAdder(threadNamePrefix)) {
 			if (callable != null) {
 				try {
 					callable.call();
@@ -84,8 +78,6 @@ public class WrappedCommandWithOriginalThreadName<T> implements Runnable, Callab
 			} else {
 				runnable.run();
 			}
-		} finally {
-			Thread.currentThread().setName(originalName);
 		}
 	}
 

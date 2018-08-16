@@ -39,10 +39,15 @@ public class CommonConstants {
 	public static final String UNKNOWN_USER = UNKNOWN;
 
 	static {
-		DEFAULT_TO_STRING_STYLE.setUseIdentityHashCode(false);
-		DEFAULT_TO_STRING_STYLE.setUseShortClassName(true);
-		DEFAULT_TO_STRING_STYLE.setNullText("null");
-		DEFAULT_TO_STRING_STYLE.setFieldSeparator(", ");
+		try {
+			DEFAULT_TO_STRING_STYLE.setUseIdentityHashCode(false);
+			DEFAULT_TO_STRING_STYLE.setUseShortClassName(true);
+			DEFAULT_TO_STRING_STYLE.setNullText("null");
+			DEFAULT_TO_STRING_STYLE.setFieldSeparator(", ");
+		} catch (Throwable e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 }

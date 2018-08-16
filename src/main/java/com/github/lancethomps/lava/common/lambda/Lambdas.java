@@ -14,6 +14,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -27,6 +28,7 @@ import com.github.lancethomps.lava.common.Checks;
 import com.github.lancethomps.lava.common.Exceptions;
 import com.github.lancethomps.lava.common.concurrent.ExecutorFactory;
 import com.github.lancethomps.lava.common.logging.Logs;
+import com.github.lancethomps.lava.common.math.BigDecimalSummaryStatistics;
 
 /**
  * A factory for creating Lambda objects.
@@ -592,6 +594,22 @@ public class Lambdas {
 		return stream.filter(Checks::nonNull).reduce(
 			BigDecimal.ZERO,
 			(a, b) -> a.add(b, MathContext.DECIMAL128)
+		);
+	}
+
+	/**
+	 * Summarizing big decimal.
+	 *
+	 * @param <T> the generic type
+	 * @param function the function
+	 * @return the collector
+	 */
+	public static <T> Collector<T, ?, BigDecimalSummaryStatistics> summarizingBigDecimal(Function<? super T, BigDecimal> function) {
+		return Collector.of(
+			BigDecimalSummaryStatistics::new,
+			(stats, each) -> stats.accept(function.apply(each)),
+			BigDecimalSummaryStatistics::merge,
+			Collector.Characteristics.UNORDERED
 		);
 	}
 }

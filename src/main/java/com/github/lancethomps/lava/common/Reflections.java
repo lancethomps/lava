@@ -17,6 +17,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -112,6 +113,16 @@ public class Reflections {
 		} else {
 			return (Class<?>) type;
 		}
+	}
+
+	/**
+	 * Find class loaded from location.
+	 *
+	 * @param type the type
+	 * @return the url
+	 */
+	public static URL findClassLoadedFromLocation(@Nonnull Class<?> type) {
+		return type.getResource('/' + type.getName().replace('.', '/') + ".class");
 	}
 
 	/**

@@ -205,7 +205,9 @@ public class TestingCommon {
 				waitForUpdates(waitIncrement, "performAction");
 				return performActionAndWaitIfNeeded(action, waitLongerTest, waitRemaining, waitIncrement);
 			}
-			Logs.logError(LOG, new TimeoutException(), "Cannot wait any longer for action.");
+			TimeoutException e = new TimeoutException();
+			Logs.logError(LOG, e, "Cannot wait any longer for action.");
+			throw e;
 		}
 		return result;
 	}

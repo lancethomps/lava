@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -892,8 +893,28 @@ public class FileUtil {
 	 * @param paths the paths
 	 * @return the path with default
 	 */
-	public static String getFirstAvailableDir(List<String> paths) {
-		return StringUtils.removeEnd(paths.stream().map(File::new).filter(File::isDirectory).map(File::getPath).findFirst().orElse(null), "/");
+	public static File getFirstAvailableDir(List<String> paths) {
+		return paths.stream().filter(Checks::isNotBlank).map(File::new).filter(File::isDirectory).findFirst().orElse(null);
+	}
+
+	/**
+	 * Gets the first available dir.
+	 *
+	 * @param paths the paths
+	 * @return the first available dir
+	 */
+	public static File getFirstAvailableDir(String... paths) {
+		return Stream.of(paths).filter(Checks::isNotBlank).map(File::new).filter(File::isDirectory).findFirst().orElse(null);
+	}
+
+	/**
+	 * Gets the first available dir path.
+	 *
+	 * @param paths the paths
+	 * @return the first available dir path
+	 */
+	public static String getFirstAvailableDirPath(List<String> paths) {
+		return StringUtils.removeEnd(Optional.ofNullable(getFirstAvailableDir(paths)).map(File::getPath).orElse(null), "/");
 	}
 
 	/**
@@ -913,7 +934,7 @@ public class FileUtil {
 	 * @return the first available file
 	 */
 	public static File getFirstAvailableFile(String... paths) {
-		return Stream.of(paths).map(File::new).filter(File::isFile).findFirst().orElse(null);
+		return Stream.of(paths).filter(Checks::isNotBlank).map(File::new).filter(File::isFile).findFirst().orElse(null);
 	}
 
 	/**

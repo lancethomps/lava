@@ -313,21 +313,12 @@ public class ExprFactory {
 			return null;
 		}
 		expressions.removeIf(expr -> {
-			if (requirePath && isBlank(expr.getPath())) {
+			try {
+				return compileCreateExpression(expr, sandbox, requirePath, verbose, getDefaultExprParser()) == null;
+			} catch (MissingRequiredFieldException | ScriptException | ExpressionEvalException e) {
+				Logs.logError(LOG, e, "Error compiling expression: %s", expr);
 				return true;
-			} else if (isBlank(expr.getExpression())) {
-				return true;
 			}
-			if (expr.getType() == null) {
-				expr.setType(ExprFactory.getDefaultExprParser());
-			}
-			if (isBlank(expr.getPath())) {
-				expr.setPath('"' + expr.getExpression() + '"');
-			}
-			if (expr.getCompiledExpression() == null) {
-				expr.setCompiledExpression(ExprFactory.compileExpr(expr.getType(), sandbox, expr.getExpression(), verbose));
-			}
-			return expr.getCompiledExpression() == null;
 		});
 		return expressions;
 	}

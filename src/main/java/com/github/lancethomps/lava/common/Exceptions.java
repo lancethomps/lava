@@ -7,12 +7,28 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
+import javax.annotation.Nonnull;
+
 import com.github.lancethomps.lava.common.format.Formatting;
 
 /**
  * The Class Exceptions.
  */
 public class Exceptions {
+
+	/**
+	 * Find root cause.
+	 *
+	 * @param exception the exception
+	 * @return the throwable
+	 */
+	public static Throwable findRootCause(@Nonnull Throwable exception) {
+		Throwable root = exception;
+		while (root.getCause() != null) {
+			root = root.getCause();
+		}
+		return root;
+	}
 
 	/**
 	 * Gets the stack trace.

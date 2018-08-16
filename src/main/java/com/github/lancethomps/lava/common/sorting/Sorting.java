@@ -182,9 +182,22 @@ public class Sorting {
 	 * @param list the list
 	 * @return the list
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	public static <T extends Comparable> List<T> sortAndReturn(List<T> list) {
-		Collections.sort(list);
+		return sortAndReturn(list, null);
+	}
+
+	/**
+	 * Sort and return.
+	 *
+	 * @param <T> the generic type
+	 * @param list the list
+	 * @param comparator the comparator
+	 * @return the list
+	 */
+	@SuppressWarnings({ "rawtypes" })
+	public static <T extends Comparable> List<T> sortAndReturn(List<T> list, Comparator<? super T> comparator) {
+		Collections.sort(list, comparator);
 		return list;
 	}
 

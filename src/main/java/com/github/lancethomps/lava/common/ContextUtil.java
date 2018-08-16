@@ -26,6 +26,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -100,20 +101,6 @@ public final class ContextUtil {
 			}
 		}
 		ContextUtil.adminUserIds = adminUserIds;
-	}
-
-	/**
-	 * Append and get original thread name.
-	 *
-	 * @param threadNameSuffix the thread name suffix
-	 * @return the string
-	 */
-	public static String appendSuffixAndGetOriginalThreadName(String threadNameSuffix) {
-		String original = Thread.currentThread().getName();
-		if ((threadNameSuffix != null) && !original.equals(threadNameSuffix)) {
-			Thread.currentThread().setName(original + '#' + threadNameSuffix);
-		}
-		return original;
 	}
 
 	/**
@@ -348,6 +335,52 @@ public final class ContextUtil {
 	 */
 	public static boolean getSystemBoolean(String key, String defaultValue) {
 		return parseBoolean(getProperty(key, defaultValue));
+	}
+
+	/**
+	 * Gets the thread name and add prefix.
+	 *
+	 * @param prefix the prefix
+	 * @return the thread name and add prefix
+	 */
+	public static String getThreadNameAndAddPrefix(@Nonnull String prefix) {
+		return getThreadNameAndAddPrefix(prefix, Thread.currentThread());
+	}
+
+	/**
+	 * Gets the thread name and add prefix.
+	 *
+	 * @param prefix the prefix
+	 * @param thread the thread
+	 * @return the thread name and add prefix
+	 */
+	public static String getThreadNameAndAddPrefix(@Nonnull String prefix, @Nonnull Thread thread) {
+		String currentName = thread.getName();
+		thread.setName(prefix + currentName);
+		return currentName;
+	}
+
+	/**
+	 * Gets the thread name and append suffix.
+	 *
+	 * @param suffix the suffix
+	 * @return the thread name and append suffix
+	 */
+	public static String getThreadNameAndAppendSuffix(@Nonnull String suffix) {
+		return getThreadNameAndAppendSuffix(suffix, Thread.currentThread());
+	}
+
+	/**
+	 * Gets the thread name and append suffix.
+	 *
+	 * @param suffix the suffix
+	 * @param thread the thread
+	 * @return the thread name and append suffix
+	 */
+	public static String getThreadNameAndAppendSuffix(@Nonnull String suffix, @Nonnull Thread thread) {
+		String currentName = thread.getName();
+		thread.setName(currentName + suffix);
+		return currentName;
 	}
 
 	/**

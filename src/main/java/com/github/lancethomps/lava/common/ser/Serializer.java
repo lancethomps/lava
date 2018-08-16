@@ -778,6 +778,19 @@ public class Serializer {
 	 * @param <T> the generic type
 	 * @param src the src
 	 * @param target the target
+	 * @param fields the fields
+	 * @return the t
+	 */
+	public static <T> T copySpecificProperties(Object src, T target, Collection<String> fields) {
+		return copySpecificProperties(src, target, Stream.of(BeanUtils.getPropertyDescriptors(src.getClass())).filter(pd -> fields.contains(pd.getName())).collect(Collectors.toList()));
+	}
+
+	/**
+	 * Copy specific properties.
+	 *
+	 * @param <T> the generic type
+	 * @param src the src
+	 * @param target the target
 	 * @param pds the pds
 	 * @return the t
 	 */

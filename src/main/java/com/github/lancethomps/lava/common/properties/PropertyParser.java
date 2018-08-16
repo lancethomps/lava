@@ -328,6 +328,7 @@ public class PropertyParser {
 	public static String getPropertyValue(final String type, final String propKey, String defaultValue, PropertyResolverConfig config) {
 		String resolved = null;
 		if ((type != null) && (propKey != null)) {
+			String previousRootDir = config.getRootDir();
 			BiFunction<String, PropertyResolverConfig, String> resolver = PROPERTY_REPLACERS.get(type);
 			if (resolver != null) {
 				resolved = resolver.apply(propKey, config);
@@ -341,6 +342,7 @@ public class PropertyParser {
 			} else if (config.isRecursively()) {
 				resolved = parseAndReplaceWithProps(resolved, config);
 			}
+			config.setRootDir(previousRootDir);
 		}
 		return resolved == null ? EMPTY : resolved;
 	}
@@ -661,7 +663,7 @@ public class PropertyParser {
 				md = config.getHelper().getMarkdown(config.getRootDir() + File.separatorChar + propKey, locale);
 			}
 			if ((md != null) && (md.getLeft() != null)) {
-				config = config.copyWithNewRootDir(md.getRight() == null ? config.getRootDir() : FileUtil.fullPath(md.getRight().getParentFile()));
+				config.setRootDir(md.getRight() == null ? config.getRootDir() : FileUtil.fullPath(md.getRight().getParentFile()));
 				return md.getLeft();
 			}
 		}

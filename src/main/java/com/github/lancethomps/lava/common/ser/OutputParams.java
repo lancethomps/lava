@@ -34,6 +34,10 @@ public class OutputParams extends ExternalizableBean {
 	@RequestField(additionalParameterNames = "out.createExprs")
 	private List<OutputExpression> createExpressions;
 
+	/** The csv always quote. */
+	@RequestField
+	private Boolean csvAlwaysQuote;
+
 	/** The csv as flat objs. */
 	@RequestField
 	private Boolean csvAsFlatObjs;
@@ -379,6 +383,13 @@ public class OutputParams extends ExternalizableBean {
 	 */
 	public List<OutputExpression> getCreateExpressions() {
 		return createExpressions;
+	}
+
+	/**
+	 * @return the csvAlwaysQuote
+	 */
+	public Boolean getCsvAlwaysQuote() {
+		return csvAlwaysQuote;
 	}
 
 	/**
@@ -789,6 +800,18 @@ public class OutputParams extends ExternalizableBean {
 	public OutputParams setCreateExpressions(List<OutputExpression> createExpressions) {
 		checkModificationsDisabled();
 		this.createExpressions = createExpressions;
+		return this;
+	}
+
+	/**
+	 * Sets the csv always quote.
+	 *
+	 * @param csvAlwaysQuote the csvAlwaysQuote to set
+	 * @return the output params
+	 */
+	public OutputParams setCsvAlwaysQuote(Boolean csvAlwaysQuote) {
+		checkModificationsDisabled();
+		this.csvAlwaysQuote = csvAlwaysQuote;
 		return this;
 	}
 
@@ -1293,6 +1316,15 @@ public class OutputParams extends ExternalizableBean {
 		checkModificationsDisabled();
 		this.transpose = transpose;
 		return this;
+	}
+
+	/**
+	 * Test csv always quote.
+	 *
+	 * @return true, if successful
+	 */
+	public boolean testCsvAlwaysQuote() {
+		return (csvAlwaysQuote != null) && csvAlwaysQuote.booleanValue();
 	}
 
 	/**

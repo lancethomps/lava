@@ -26,6 +26,6 @@ public class ThreadNameTestWatcher extends TestWatcher {
 	 */
 	@Override
 	protected void starting(Description description) {
-		originalThreadName = ContextUtil.appendSuffixAndGetOriginalThreadName(description.getDisplayName());
+		originalThreadName = ContextUtil.getThreadNameAndAppendSuffix(description.getDisplayName());
 	}
 }

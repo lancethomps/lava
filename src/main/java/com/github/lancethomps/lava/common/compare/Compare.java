@@ -79,13 +79,26 @@ public class Compare {
 	 * @return the compare result
 	 */
 	public static CompareResult compare(@Nullable final Object original, @Nullable final Object revised, @Nullable final CompareConfig config) {
+		return compare(original, revised, config, false);
+	}
+
+	/**
+	 * Compare.
+	 *
+	 * @param original the original
+	 * @param revised the revised
+	 * @param config the config
+	 * @param generateDifferences the generate differences
+	 * @return the compare result
+	 */
+	public static CompareResult compare(@Nullable final Object original, @Nullable final Object revised, @Nullable final CompareConfig config, final boolean generateDifferences) {
 		final CompareResult result = getFieldsWithDifferences(
 			original,
 			revised,
 			config == null ? DEFAULT_COMPARE_CONFIG : config,
 			CompareResult.createAndInitialize(),
 			"",
-			false,
+			generateDifferences,
 			getOrCreateDiffOutputParams(config),
 			null
 		);

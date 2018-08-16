@@ -34,6 +34,9 @@ public enum RelativeDateType {
 	/** The n. */
 	n(ChronoUnit.NANOS),
 
+	/** The quarter (ex Jan 1, Apr 1, July 1, Oct 1). */
+	q(null),
+
 	/** The s. */
 	s(ChronoUnit.SECONDS),
 

@@ -6,7 +6,6 @@ import static com.github.lancethomps.lava.common.ser.OutputFormat.xls;
 import static com.github.lancethomps.lava.common.ser.OutputFormat.xlsx;
 import static com.github.lancethomps.lava.common.ser.Serializer.toMapViaJson;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeCsv;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -14,6 +13,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.removeStart;
+import static org.apache.commons.text.StringEscapeUtils.escapeCsv;
 
 import java.time.temporal.Temporal;
 import java.util.Arrays;
@@ -31,8 +31,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -82,7 +82,7 @@ public class CsvSerializer {
 	private static final Logger LOG = Logger.getLogger(CsvSerializer.class);
 
 	/** The Constant SIMPLE_OUTPUT_CLASSES. */
-	private static final Set<String> SIMPLE_OUTPUT_CLASSES = Sets.newHashSet();
+		private static final Set<String> SIMPLE_OUTPUT_CLASSES = Sets.newHashSet();
 
 	/** The as flattened objects. */
 	private boolean asFlattenedObjects;
@@ -832,7 +832,11 @@ public class CsvSerializer {
 				} else if (asHtml) {
 					cell = StringEscapeUtils.escapeXml11(cell);
 				} else if (!cell.startsWith("=")) {
-					cell = escapeCsv(cell);
+					if (params.testCsvAlwaysQuote()) {
+						cell = "\"" + StringUtils.replace(cell, "\"", "\"\"") + "\"";
+					} else {
+						cell = escapeCsv(cell);
+					}
 				}
 				rowData.add(cell);
 			}

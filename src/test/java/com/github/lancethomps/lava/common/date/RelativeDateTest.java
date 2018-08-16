@@ -47,7 +47,7 @@ public class RelativeDateTest extends BaseTest {
 				.mapToObj(i -> {
 					RelativeDateType type = Randoms.createRandomEnum(RelativeDateType.class);
 					RelativeDateOperator op;
-					if (type.getUnit() == null) {
+					if ((type.getUnit() == null) && (type != RelativeDateType.q)) {
 						op = RelativeDateOperator.SETTING;
 					} else {
 						op = Randoms.getRandomFromCollection(validRandomOps);

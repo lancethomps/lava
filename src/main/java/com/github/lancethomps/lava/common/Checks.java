@@ -671,6 +671,16 @@ public class Checks {
 	}
 
 	/**
+	 * Checks if is null.
+	 *
+	 * @param obj the obj
+	 * @return true, if is null
+	 */
+	public static boolean isNull(Object obj) {
+		return obj == null;
+	}
+
+	/**
 	 * Non null.
 	 *
 	 * @param obj the obj

@@ -60,6 +60,7 @@ import com.github.lancethomps.lava.common.Checks;
 import com.github.lancethomps.lava.common.Collect;
 import com.github.lancethomps.lava.common.CompressionUtil;
 import com.github.lancethomps.lava.common.Enums;
+import com.github.lancethomps.lava.common.Exceptions;
 import com.github.lancethomps.lava.common.Reflections;
 import com.github.lancethomps.lava.common.collections.FastHashMap;
 import com.github.lancethomps.lava.common.collections.MapUtil;
@@ -1115,7 +1116,7 @@ public class RequestFactory {
 		final Class<E> elementType,
 		final ThrowingFunction<String, E> constructor
 	) {
-		return getCollectionParam(request, paramName, collectionType, elementType, constructor, ',');
+		return getCollectionParam(request, paramName, collectionType, elementType, constructor, null);
 	}
 
 	/**
@@ -1128,6 +1129,31 @@ public class RequestFactory {
 	 * @param collectionType the collection type
 	 * @param elementType the element type
 	 * @param constructor the constructor
+	 * @param multiValueConstructor the multi value constructor
+	 * @return the collection param
+	 */
+	public static <T extends Collection<E>, E> T getCollectionParam(
+		Map<String, String[]> request,
+		String paramName,
+		final Class<T> collectionType,
+		final Class<E> elementType,
+		final ThrowingFunction<String, E> constructor,
+		@Nullable final ThrowingFunction<String, Collection<E>> multiValueConstructor
+	) {
+		return getCollectionParam(request, paramName, collectionType, elementType, constructor, multiValueConstructor, ',');
+	}
+
+	/**
+	 * Gets the collection param.
+	 *
+	 * @param <T> the generic type
+	 * @param <E> the element type
+	 * @param request the request
+	 * @param paramName the param name
+	 * @param collectionType the collection type
+	 * @param elementType the element type
+	 * @param constructor the constructor
+	 * @param multiValueConstructor the multi value constructor
 	 * @param sep the sep
 	 * @return the collection param
 	 */
@@ -1137,6 +1163,7 @@ public class RequestFactory {
 		final Class<T> collectionType,
 		final Class<E> elementType,
 		final ThrowingFunction<String, E> constructor,
+		@Nullable final ThrowingFunction<String, Collection<E>> multiValueConstructor,
 		final char sep
 	) {
 		T coll;
@@ -1155,14 +1182,24 @@ public class RequestFactory {
 				} else if (Serializer.isJsonMap(paramVal)) {
 					Lambdas.consumeIfNonNull(Serializer.fromJson(paramVal, elementType), coll::add);
 				} else {
-					Arrays.stream(Collect.splitCsv(paramVal, sep)).map(t -> {
+					for (String paramValSection : Collect.splitCsv(paramVal, sep)) {
 						try {
-							return constructor.apply(t);
+							if (multiValueConstructor != null) {
+								Collection<E> vals = multiValueConstructor.apply(paramValSection);
+								if (vals != null) {
+									coll.addAll(vals);
+								}
+							}
+							if (constructor != null) {
+								E val = constructor.apply(paramValSection);
+								if (val != null) {
+									coll.add(val);
+								}
+							}
 						} catch (Exception e) {
-							Logs.logError(LOG, e, "Issue applying collection element constructor for value [%s]!", t);
-							return null;
+							Exceptions.sneakyThrow(e);
 						}
-					}).filter(Objects::nonNull).forEach(coll::add);
+					}
 				}
 			}
 		}
@@ -1175,9 +1212,20 @@ public class RequestFactory {
 					Lambdas.consumeIfNonNull(Serializer.fromJson(paramVal, elementType), coll::add);
 				} else {
 					try {
-						coll.add(constructor.apply(paramVal));
+						if (multiValueConstructor != null) {
+							Collection<E> vals = multiValueConstructor.apply(paramVal);
+							if (vals != null) {
+								coll.addAll(vals);
+							}
+						}
+						if (constructor != null) {
+							E val = constructor.apply(paramVal);
+							if (val != null) {
+								coll.add(val);
+							}
+						}
 					} catch (Exception e) {
-						Logs.logError(LOG, e, "Could not create a new instance of element type [%s] from value [%s]!", elementType, paramVal);
+						Exceptions.sneakyThrow(e);
 					}
 				}
 			}
@@ -1270,7 +1318,16 @@ public class RequestFactory {
 	 * @return the enum list param
 	 */
 	public static <T extends Enum<T>> List<T> getEnumListParam(Map<String, String[]> request, String paramName, Class<T> type) {
-		return getCollectionParam(request, paramName, ArrayList.class, type, str -> Enums.fromString(type, str));
+		return getCollectionParam(request, paramName, ArrayList.class, type, null, str -> {
+			if ("*".equals(str)) {
+				return Arrays.asList(type.getEnumConstants());
+			}
+			T val = Enums.fromString(type, str);
+			if (val == null) {
+				return null;
+			}
+			return Arrays.asList(val);
+		});
 	}
 
 	/**
@@ -1310,7 +1367,16 @@ public class RequestFactory {
 	 * @return the enum set param
 	 */
 	public static <T extends Enum<T>> Set<T> getEnumSetParam(Map<String, String[]> request, String paramName, Class<T> type) {
-		return getCollectionParam(request, paramName, LinkedHashSet.class, type, str -> Enums.fromString(type, str));
+		return getCollectionParam(request, paramName, LinkedHashSet.class, type, null, str -> {
+			if ("*".equals(str)) {
+				return Arrays.asList(type.getEnumConstants());
+			}
+			T val = Enums.fromString(type, str);
+			if (val == null) {
+				return null;
+			}
+			return Arrays.asList(val);
+		});
 	}
 
 	/**
@@ -1940,15 +2006,12 @@ public class RequestFactory {
 	 *
 	 * @param request the request
 	 * @param paramName the param name
-	 * @return the merge config
+			String type = "Date";
 	 * @throws RequestParsingException the request parsing exception
 	 */
 	public static MergeConfig getMergeConfig(Map<String, String[]> request, String paramName) throws RequestParsingException {
 		return getJsonOrPathKeyParam(request, paramName, MergeConfig.class);
 	}
-
-	/**
-	 * Gets the method args.
 	 *
 	 * @param httpRequest the http request
 	 * @param method the method
@@ -2005,12 +2068,15 @@ public class RequestFactory {
 		String param = getRequestParam(request, paramName);
 		Object val = defaultValue;
 		if (isNotBlank(param)) {
-			String type = "Date";
+			String type = "BFMDate";
 			if (StringUtils.contains(param, '~')) {
 				type = StringUtils.substringBefore(param, "~");
 			}
 			try {
 				switch (type) {
+				case "BFMDate":
+					val = BfmDates.parseBfmDateString(param);
+					break;
 				case "Integer":
 					val = NumberUtils.toInt(param, (Integer) defaultValue);
 					break;

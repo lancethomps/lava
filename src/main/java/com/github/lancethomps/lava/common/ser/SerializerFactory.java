@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.springframework.util.ReflectionUtils;
 
 import com.github.lancethomps.lava.common.Checks;
-import com.github.lancethomps.lava.common.Reflections;
 import com.github.lancethomps.lava.common.collections.FastHashMap;
 import com.github.lancethomps.lava.common.date.Dates;
 import com.github.lancethomps.lava.common.lambda.Lambdas;
@@ -1093,7 +1092,13 @@ public class SerializerFactory {
 	 */
 	public static void setJsonCharLimit(int jsonCharLimit) {
 		SerializerFactory.jsonCharLimit = jsonCharLimit;
-		Reflections.getStaticFieldsForClass(Serializer.class, LimitedObjectMapper.class).values().forEach(mapper -> mapper.setLimit(jsonCharLimit));
+		synchronized (REGISTERED_MAPPERS) {
+			REGISTERED_MAPPERS
+				.stream()
+				.filter(LimitedObjectMapper.class::isInstance)
+				.map(LimitedObjectMapper.class::cast)
+				.forEach(mapper -> mapper.setLimit(jsonCharLimit));
+		}
 	}
 
 	/**

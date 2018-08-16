@@ -376,16 +376,24 @@ public class FileParser<T> {
 			}
 			headers = convertedHeaders;
 		}
-		if (Checks.isNotEmpty(options.getHeadersBlackList()) || Checks.isNotEmpty(options.getHeadersWhiteList())) {
+		final boolean hasIgnoreFields = Checks.isNotEmpty(options.getIgnoreFields());
+		final boolean hasHeadersWhiteAndBlackList = Checks.isNotEmpty(options.getHeadersBlackList()) || Checks.isNotEmpty(options.getHeadersWhiteList());
+		if (hasIgnoreFields || hasHeadersWhiteAndBlackList) {
 			for (String key : new ArrayList<>(headers.keySet())) {
-				Pair<Boolean, Pattern> checkResult = Checks.passesWhiteAndBlackListCheck(key, options.getHeadersWhiteList(), options.getHeadersBlackList(), true);
-				if (!checkResult.getLeft()) {
-					String message = String.format("Found disallowed column: key=%s pattern=%s ", key, checkResult.getRight());
-					if (options.testStrict()) {
-						throw new FileParsingException(message);
-					}
-					Logs.logWarn(LOG, message);
+				if (hasIgnoreFields && options.getIgnoreFields().contains(key)) {
 					headers.remove(key);
+					continue;
+				}
+				if (hasHeadersWhiteAndBlackList) {
+					Pair<Boolean, Pattern> checkResult = Checks.passesWhiteAndBlackListCheck(key, options.getHeadersWhiteList(), options.getHeadersBlackList(), true);
+					if (!checkResult.getLeft()) {
+						String message = String.format("Found disallowed column: key=%s pattern=%s ", key, checkResult.getRight());
+						if (options.testStrict()) {
+							throw new FileParsingException(message);
+						}
+						Logs.logWarn(LOG, message);
+						headers.remove(key);
+					}
 				}
 			}
 		}
