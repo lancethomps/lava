@@ -82,6 +82,9 @@ public class Statistics {
 	 * @return the big decimal
 	 */
 	public static BigDecimal calculateCorrelation(@Nonnull double[] xArray, @Nonnull double[] yArray) {
+		if (xArray.length <= 1) {
+			return null;
+		}
 		double corr = CORRELATION.correlation(xArray, yArray);
 		if (Double.isFinite(corr)) {
 			return BigDecimal.valueOf(corr);
@@ -137,7 +140,7 @@ public class Statistics {
 				return BigDecimal.ONE;
 			}
 			BigDecimal powExp = BigDecimal.ONE.divide(new BigDecimal(numPeriods), MC);
-			return Numbers.pow(portTotal, powExp).subtract(BigDecimal.ONE).divide(Numbers.pow(benchTotal, powExp).subtract(BigDecimal.ONE), MC).movePointRight(2);
+			return Numbers.pow(portTotal, powExp).subtract(BigDecimal.ONE).divide(Numbers.pow(benchTotal, powExp).subtract(BigDecimal.ONE), MC);
 			//			BigDecimal benchTotal = BigDecimal.ZERO;
 			//			BigDecimal portTotal = BigDecimal.ZERO;
 			//			for (int idx = 0; idx < benchmarkReturns.length; idx++) {

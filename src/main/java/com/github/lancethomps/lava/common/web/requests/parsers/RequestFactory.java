@@ -2006,12 +2006,15 @@ public class RequestFactory {
 	 *
 	 * @param request the request
 	 * @param paramName the param name
-			String type = "Date";
+	 * @return the merge config
 	 * @throws RequestParsingException the request parsing exception
 	 */
 	public static MergeConfig getMergeConfig(Map<String, String[]> request, String paramName) throws RequestParsingException {
 		return getJsonOrPathKeyParam(request, paramName, MergeConfig.class);
 	}
+
+	/**
+	 * Gets the method args.
 	 *
 	 * @param httpRequest the http request
 	 * @param method the method
@@ -2068,15 +2071,12 @@ public class RequestFactory {
 		String param = getRequestParam(request, paramName);
 		Object val = defaultValue;
 		if (isNotBlank(param)) {
-			String type = "BFMDate";
+			String type = "Date";
 			if (StringUtils.contains(param, '~')) {
 				type = StringUtils.substringBefore(param, "~");
 			}
 			try {
 				switch (type) {
-				case "BFMDate":
-					val = BfmDates.parseBfmDateString(param);
-					break;
 				case "Integer":
 					val = NumberUtils.toInt(param, (Integer) defaultValue);
 					break;
