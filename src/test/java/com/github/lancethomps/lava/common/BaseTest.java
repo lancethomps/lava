@@ -22,7 +22,7 @@ public class BaseTest {
 		try {
 			if (System.getProperty("PROJ_DIR") != null) {
 				Testing.setProjRootPath(System.getProperty("PROJ_DIR") + File.separatorChar);
-			EnvParser.ensurePropEnvOverridesSet();
+			}
 			if (Checks.isEmpty(CustomDeserializationProblemHandler.getIgnoreProperties())) {
 				CustomDeserializationProblemHandler.setIgnoreProperties(Sets.newHashSet("@type"));
 			}
