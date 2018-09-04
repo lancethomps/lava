@@ -1127,7 +1127,7 @@ public final class Logs {
 	 * @param formatArgs the format args
 	 */
 	public static void println(final Object message, final Object... formatArgs) {
-		System.out.println(Checks.defaultIfNull(systemOutPrefix, "") + getMessage(message.toString(), formatArgs));
+		System.out.println(Checks.defaultIfNull(systemOutPrefix, "") + getMessage(message == null ? null : message.toString(), formatArgs));
 	}
 
 	/**

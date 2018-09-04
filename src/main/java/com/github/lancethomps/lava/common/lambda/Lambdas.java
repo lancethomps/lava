@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -345,7 +346,7 @@ public class Lambdas {
 	@SafeVarargs
 	public static <T> List<T> flattenRecursively(@Nonnull Collection<T> docs, @Nonnull Function<T, Collection<T>>... childrenGetters) {
 		List<T> flattened = new ArrayList<>();
-		modifyRecursively(docs, flattened::add, childrenGetters);
+		modifyRecursively(docs, (val, level) -> flattened.add(val), childrenGetters);
 		return flattened;
 	}
 
@@ -520,6 +521,19 @@ public class Lambdas {
 	 * @param modifier the modifier
 	 * @param childrenGetters the children getters
 	 */
+	@SafeVarargs
+	public static <T> void modifyRecursively(@Nonnull Collection<T> docs, @Nonnull BiConsumer<T, Integer> modifier, @Nonnull Function<T, Collection<T>>... childrenGetters) {
+		modifyRecursively(docs, modifier, 0, childrenGetters);
+	}
+
+	/**
+	 * Modify recursively.
+	 *
+	 * @param <T> the generic type
+	 * @param docs the docs
+	 * @param modifier the modifier
+	 * @param childrenGetters the children getters
+	 */
 	public static <T> void modifyRecursively(@Nonnull Collection<T> docs, @Nonnull Consumer<T> modifier, @Nonnull Collection<Function<T, Collection<T>>> childrenGetters) {
 		for (T doc : docs) {
 			modifier.accept(doc);
@@ -542,15 +556,22 @@ public class Lambdas {
 	 */
 	@SafeVarargs
 	public static <T> void modifyRecursively(@Nonnull Collection<T> docs, @Nonnull Consumer<T> modifier, @Nonnull Function<T, Collection<T>>... childrenGetters) {
-		for (T doc : docs) {
-			modifier.accept(doc);
-			for (Function<T, Collection<T>> childrenGetter : childrenGetters) {
-				Collection<T> children = childrenGetter.apply(doc);
-				if (children != null) {
-					modifyRecursively(children, modifier, childrenGetters);
-				}
-			}
-		}
+		modifyRecursively(docs, (val, level) -> modifier.accept(val), childrenGetters);
+	}
+
+	/**
+	 * Modify recursively.
+	 *
+	 * @param <T> the generic type
+	 * @param doc the doc
+	 * @param modifier the modifier
+	 * @param childrenGetters the children getters
+	 * @return the t
+	 */
+	@SafeVarargs
+	public static <T> T modifyRecursively(@Nonnull T doc, @Nonnull BiConsumer<T, Integer> modifier, @Nonnull Function<T, Collection<T>>... childrenGetters) {
+		modifyRecursively(Arrays.asList(doc), modifier, childrenGetters);
+		return doc;
 	}
 
 	/**
@@ -611,5 +632,32 @@ public class Lambdas {
 			BigDecimalSummaryStatistics::merge,
 			Collector.Characteristics.UNORDERED
 		);
+	}
+
+	/**
+	 * Modify recursively.
+	 *
+	 * @param <T> the generic type
+	 * @param docs the docs
+	 * @param modifier the modifier
+	 * @param level the level
+	 * @param childrenGetters the children getters
+	 */
+	@SafeVarargs
+	private static <T> void modifyRecursively(
+		@Nonnull Collection<T> docs,
+		@Nonnull BiConsumer<T, Integer> modifier,
+		@Nonnull Integer level,
+		@Nonnull Function<T, Collection<T>>... childrenGetters
+	) {
+		for (T doc : docs) {
+			modifier.accept(doc, level);
+			for (Function<T, Collection<T>> childrenGetter : childrenGetters) {
+				Collection<T> children = childrenGetter.apply(doc);
+				if (children != null) {
+					modifyRecursively(children, modifier, level + 1, childrenGetters);
+				}
+			}
+		}
 	}
 }

@@ -82,7 +82,7 @@ public class Statistics {
 	 * @return the big decimal
 	 */
 	public static BigDecimal calculateCorrelation(@Nonnull double[] xArray, @Nonnull double[] yArray) {
-		if (xArray.length <= 1) {
+		if ((xArray.length <= 1) || (xArray.length != yArray.length)) {
 			return null;
 		}
 		double corr = CORRELATION.correlation(xArray, yArray);

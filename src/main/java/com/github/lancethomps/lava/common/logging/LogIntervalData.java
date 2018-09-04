@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nonnull;
 
+import com.github.lancethomps.lava.common.Checks;
 import com.github.lancethomps.lava.common.time.Stopwatch;
 import com.github.lancethomps.lava.common.time.TimerEnabledBean;
 import com.github.lancethomps.lava.common.time.TimerHandlingBean;
@@ -145,6 +146,26 @@ public class LogIntervalData implements TimerEnabledBean, TimerHandlingBean {
 			counts = new LinkedHashMap<>();
 		}
 		counts.computeIfAbsent(key, k -> new AtomicLong(0)).addAndGet(delta);
+		return this;
+	}
+
+	/**
+	 * Adds the to counts.
+	 *
+	 * @param <T> the generic type
+	 * @param otherCounts the other counts
+	 * @return the log interval data
+	 */
+	public <T extends Number> LogIntervalData addToCounts(@Nonnull Map<String, T> otherCounts) {
+		if (Checks.isNotEmpty(otherCounts)) {
+			if (counts == null) {
+				counts = new LinkedHashMap<>();
+			}
+			otherCounts.forEach((key, val) -> counts.merge(key, val instanceof AtomicLong ? (AtomicLong) val : new AtomicLong(val.longValue()), (curr, add) -> {
+				curr.addAndGet(add.get());
+				return curr;
+			}));
+		}
 		return this;
 	}
 

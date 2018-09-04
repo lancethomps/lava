@@ -75,6 +75,7 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -353,7 +354,11 @@ public class Serializer {
 							innerList.add(Maps.newTreeMap());
 						}
 						if (pos < innerList.size()) {
-							innerListMap = (Map<String, Object>) ((List<Object>) innerList).get(pos);
+							if (innerList instanceof List) {
+								innerListMap = (Map<String, Object>) ((List<Object>) innerList).get(pos);
+							} else {
+								innerListMap = (Map<String, Object>) IteratorUtils.get(innerList.iterator(), pos);
+							}
 						}
 						previous = innerListMap;
 					} else if (innerList instanceof List) {
