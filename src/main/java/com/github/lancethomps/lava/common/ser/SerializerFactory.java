@@ -1,11 +1,11 @@
 package com.github.lancethomps.lava.common.ser;
 
+import static com.fasterxml.jackson.core.JsonParser.NumberType.DOUBLE;
 import static com.github.lancethomps.lava.common.Checks.isNotEmpty;
 import static com.github.lancethomps.lava.common.logging.Logs.logError;
 import static com.github.lancethomps.lava.common.logging.Logs.logWarn;
 import static com.github.lancethomps.lava.common.ser.Serializer.CSV_MAPPER;
 import static com.github.lancethomps.lava.common.ser.jackson.filter.FieldsFilter.FIELDS_FILTER_ID;
-import static com.fasterxml.jackson.core.JsonParser.NumberType.DOUBLE;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.lang.reflect.Field;
@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -38,9 +39,51 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.util.ReflectionUtils;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonGenerator.Feature;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.PrettyPrinter;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.deser.DeserializerCache;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.DecimalNode;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.databind.ser.PropertyWriter;
+import com.fasterxml.jackson.databind.ser.SerializerCache;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.LRUMap;
+import com.fasterxml.jackson.databind.util.NameTransformer;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.fasterxml.jackson.dataformat.smile.SmileFactory;
+import com.fasterxml.jackson.dataformat.smile.SmileGenerator;
+import com.fasterxml.jackson.dataformat.smile.SmileParser;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import com.github.lancethomps.lava.common.Checks;
 import com.github.lancethomps.lava.common.collections.FastHashMap;
 import com.github.lancethomps.lava.common.date.Dates;
@@ -83,47 +126,6 @@ import com.github.lancethomps.lava.common.ser.jackson.serialize.TemporalAccessor
 import com.github.lancethomps.lava.common.ser.jackson.types.CustomTypeResolver;
 import com.github.lancethomps.lava.common.ser.jackson.types.NoopTypeAnnotationIntrospector;
 import com.github.lancethomps.lava.common.time.Stopwatch;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonGenerator.Feature;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.PrettyPrinter;
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.deser.DeserializerCache;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.DecimalNode;
-import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
-import com.fasterxml.jackson.databind.ser.PropertyWriter;
-import com.fasterxml.jackson.databind.ser.SerializerCache;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.databind.util.LRUMap;
-import com.fasterxml.jackson.databind.util.NameTransformer;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.fasterxml.jackson.dataformat.smile.SmileFactory;
-import com.fasterxml.jackson.dataformat.smile.SmileGenerator;
-import com.fasterxml.jackson.dataformat.smile.SmileParser;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 import io.dropwizard.metrics5.json.MetricsModule;
 
@@ -201,15 +203,8 @@ public class SerializerFactory {
 	 * @return the object mapper
 	 */
 	public static ObjectMapper addFieldInclusionPredicateFilter(ObjectMapper mapper, final Map<Class<?>, BiPredicate<Object, Object>> predicateByType) {
-		SimpleFilterProvider filter = new SimpleFilterProvider().setFailOnUnknownId(false);
-		FieldsFilter currFilter = mapper.getSerializationConfig().getFilterProvider() == null ? null
-			: (FieldsFilter) ((SimpleFilterProvider) mapper.getSerializationConfig().getFilterProvider()).setFailOnUnknownId(false).findPropertyFilter(FIELDS_FILTER_ID, null);
-		FieldsFilter oneTimeFilter = currFilter != null ? currFilter.copy().addFieldInclusionPredicateFilter(predicateByType)
-			: new FieldsFilter().addFieldInclusionPredicateFilter(predicateByType);
-		filter.addFilter(FIELDS_FILTER_ID, oneTimeFilter);
-		mapper.setFilterProvider(filter);
-		mapper.registerModule(new SimpleModule("WTPFieldInclusionPredicateModule").setSerializerModifier(new FieldInclusionPredicateSerializerModifier(predicateByType)));
-		return configureMapperWithFilterId(mapper, FIELDS_FILTER_ID);
+		return addFieldsFilterConfig(mapper, predicateByType, FieldsFilter::addFieldInclusionPredicateFilter, config -> new FieldsFilter().addFieldInclusionPredicateFilter(config))
+				.registerModule(new SimpleModule("WTPFieldInclusionPredicateModule").setSerializerModifier(new FieldInclusionPredicateSerializerModifier(predicateByType)));
 	}
 
 	/**
@@ -221,13 +216,12 @@ public class SerializerFactory {
 	 * @return the object mapper
 	 */
 	public static ObjectMapper addFieldsWhiteAndBlackList(ObjectMapper mapper, @Nullable final Collection<Pattern> whiteList, @Nullable final Collection<Pattern> blackList) {
-		SimpleFilterProvider filter = new SimpleFilterProvider().setFailOnUnknownId(false);
-		FieldsFilter currFilter = mapper.getSerializationConfig().getFilterProvider() == null ? null
-			: (FieldsFilter) ((SimpleFilterProvider) mapper.getSerializationConfig().getFilterProvider()).setFailOnUnknownId(false).findPropertyFilter(FIELDS_FILTER_ID, null);
-		FieldsFilter oneTimeFilter = currFilter != null ? currFilter.copy().addFilter(whiteList, blackList) : new FieldsFilter(whiteList, blackList);
-		filter.addFilter(FIELDS_FILTER_ID, oneTimeFilter);
-		mapper.setFilterProvider(filter);
-		return configureMapperWithFilterId(mapper, FIELDS_FILTER_ID);
+		return addFieldsFilterConfig(
+				mapper,
+				Pair.of(whiteList, blackList),
+				(curr, config) -> curr.addFilter(config.getLeft(), config.getRight()),
+				(config) -> new FieldsFilter(config.getLeft(), config.getRight())
+		);
 	}
 
 	/**
@@ -238,13 +232,7 @@ public class SerializerFactory {
 	 * @return the object mapper
 	 */
 	public static ObjectMapper addGraphFilter(ObjectMapper mapper, String graphFilter) {
-		SimpleFilterProvider filter = new SimpleFilterProvider().setFailOnUnknownId(false);
-		FieldsFilter currFilter = mapper.getSerializationConfig().getFilterProvider() == null ? null
-			: (FieldsFilter) ((SimpleFilterProvider) mapper.getSerializationConfig().getFilterProvider()).setFailOnUnknownId(false).findPropertyFilter(FIELDS_FILTER_ID, null);
-		FieldsFilter oneTimeFilter = currFilter != null ? currFilter.copy().addGraphFilter(graphFilter) : new FieldsFilter(graphFilter);
-		filter.addFilter(FIELDS_FILTER_ID, oneTimeFilter);
-		mapper.setFilterProvider(filter);
-		return configureMapperWithFilterId(mapper, FIELDS_FILTER_ID);
+		return addFieldsFilterConfig(mapper, graphFilter, FieldsFilter::addGraphFilter, FieldsFilter::new);
 	}
 
 	/**
@@ -319,13 +307,7 @@ public class SerializerFactory {
 	 * @return the object mapper
 	 */
 	public static ObjectMapper addOneTimeOnlyFields(ObjectMapper mapper, Set<String> onlyFields) {
-		SimpleFilterProvider filter = new SimpleFilterProvider().setFailOnUnknownId(false);
-		FieldsFilter currFilter = mapper.getSerializationConfig().getFilterProvider() == null ? null
-			: (FieldsFilter) ((SimpleFilterProvider) mapper.getSerializationConfig().getFilterProvider()).setFailOnUnknownId(false).findPropertyFilter(FIELDS_FILTER_ID, null);
-		FieldsFilter oneTimeFilter = currFilter != null ? currFilter.copy().addOnlyFilter(onlyFields) : FieldsFilter.fromOnlyFields(onlyFields);
-		filter.addFilter(FIELDS_FILTER_ID, oneTimeFilter);
-		mapper.setFilterProvider(filter);
-		return configureMapperWithFilterId(mapper, FIELDS_FILTER_ID);
+		return addFieldsFilterConfig(mapper, onlyFields, FieldsFilter::addOnlyFilter, FieldsFilter::fromOnlyFields);
 	}
 
 	/**
@@ -336,13 +318,7 @@ public class SerializerFactory {
 	 * @return the object mapper
 	 */
 	public static ObjectMapper addOneTimeSkipFields(ObjectMapper mapper, Map<Class<?>, Set<String>> ignoreFieldsByType) {
-		SimpleFilterProvider filter = new SimpleFilterProvider().setFailOnUnknownId(false);
-		FieldsFilter currFilter = mapper.getSerializationConfig().getFilterProvider() == null ? null
-			: (FieldsFilter) ((SimpleFilterProvider) mapper.getSerializationConfig().getFilterProvider()).setFailOnUnknownId(false).findPropertyFilter(FIELDS_FILTER_ID, null);
-		FieldsFilter oneTimeFilter = currFilter != null ? currFilter.copy().addFilter(ignoreFieldsByType) : new FieldsFilter(ignoreFieldsByType);
-		filter.addFilter(FIELDS_FILTER_ID, oneTimeFilter);
-		mapper.setFilterProvider(filter);
-		return configureMapperWithFilterId(mapper, FIELDS_FILTER_ID);
+		return addFieldsFilterConfig(mapper, ignoreFieldsByType, FieldsFilter::addFilter, FieldsFilter::new);
 	}
 
 	/**
@@ -353,13 +329,7 @@ public class SerializerFactory {
 	 * @return the object mapper
 	 */
 	public static ObjectMapper addOneTimeSkipFields(ObjectMapper mapper, Set<String> ignoreFields) {
-		SimpleFilterProvider filter = new SimpleFilterProvider().setFailOnUnknownId(false);
-		FieldsFilter currFilter = mapper.getSerializationConfig().getFilterProvider() == null ? null
-			: (FieldsFilter) ((SimpleFilterProvider) mapper.getSerializationConfig().getFilterProvider()).setFailOnUnknownId(false).findPropertyFilter(FIELDS_FILTER_ID, null);
-		FieldsFilter oneTimeFilter = currFilter != null ? currFilter.copy().addFilter(ignoreFields) : new FieldsFilter(ignoreFields);
-		filter.addFilter(FIELDS_FILTER_ID, oneTimeFilter);
-		mapper.setFilterProvider(filter);
-		return configureMapperWithFilterId(mapper, FIELDS_FILTER_ID);
+		return addFieldsFilterConfig(mapper, ignoreFields, FieldsFilter::addFilter, FieldsFilter::new);
 	}
 
 	/**
@@ -1119,6 +1089,34 @@ public class SerializerFactory {
 	 */
 	public static void setUseObjectMapperCache(boolean useObjectMapperCache) {
 		SerializerFactory.useObjectMapperCache = useObjectMapperCache;
+	}
+
+	/**
+	 * @param mapper           the mapper
+	 * @param config           the config
+	 * @param existingConsumer the consumer
+	 * @param supplier         the supplier
+	 * @param <T>              the T
+	 * @return the mapper
+	 */
+	private static <T> ObjectMapper addFieldsFilterConfig(
+			ObjectMapper mapper, T config, BiConsumer<FieldsFilter, T> existingConsumer, Function<T, FieldsFilter> supplier) {
+		SimpleFilterProvider filter = new SimpleFilterProvider().setFailOnUnknownId(false);
+		FieldsFilter currFilter = mapper.getSerializationConfig().getFilterProvider() == null ? null
+				: (FieldsFilter) ((SimpleFilterProvider) mapper.getSerializationConfig().getFilterProvider())
+				.setFailOnUnknownId(false).findPropertyFilter(FIELDS_FILTER_ID, null);
+
+		FieldsFilter oneTimeFilter;
+		if (currFilter != null) {
+			oneTimeFilter = currFilter.copy();
+			existingConsumer.accept(oneTimeFilter, config);
+		} else {
+			oneTimeFilter = supplier.apply(config);
+		}
+
+		filter.addFilter(FIELDS_FILTER_ID, oneTimeFilter);
+		mapper.setFilterProvider(filter);
+		return configureMapperWithFilterId(mapper, FIELDS_FILTER_ID);
 	}
 
 	/**
