@@ -73,10 +73,10 @@ public class Testing {
 	public static final OutputParams DEFAULT_DIFF_AS_JSON_PARAMS = new OutputParams().setOutputFormat(json).setPrettifyJson(true).setOrderKeys(true).disableModifications();
 
 	/** The Constant DEFAULT_SPEED_ITERATIONS. */
-	public static final long DEFAULT_SPEED_ITERATIONS = 100000;
+	public static final long DEFAULT_SPEED_ITERATIONS = 100_000;
 
 	/** The Constant DEFAULT_SPEED_WARMUP. */
-	public static final long DEFAULT_SPEED_WARMUP = 10000;
+	public static final long DEFAULT_SPEED_WARMUP = 10_000;
 
 	/** The Constant PRETTY_JSON_PARAMS. */
 	public static final OutputParams PRETTY_JSON_PARAMS = new OutputParams().setOutputFormat(json).setPrettifyJson(true).setOrderKeys(true).setDatesAsStrings(true).disableModifications();
