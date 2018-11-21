@@ -9,6 +9,7 @@ out/
 *.ipr
 *.iws
 *.iml
+checkstyle-cachefile
 
 # Eclipse
 .checkstyle
