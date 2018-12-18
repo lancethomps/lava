@@ -226,6 +226,9 @@ public class Dates {
 		.optionalStart()
 		.appendPattern(" HH:mm:ss")
 		.optionalEnd()
+		.optionalStart()
+		.appendPattern(".SSS")
+		.optionalEnd()
 		.toFormatter();
 
 	/** The Constant START_OF_CURRENT_QUARTER. */
