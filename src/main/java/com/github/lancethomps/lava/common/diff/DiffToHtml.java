@@ -7,6 +7,7 @@ import static com.github.lancethomps.lava.common.collections.MapUtil.addToMap;
 import static com.github.lancethomps.lava.common.diff.domain.DiffOutputFormat.JSON;
 import static com.github.lancethomps.lava.common.ser.Serializer.toPrettyJson;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
@@ -31,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -56,176 +58,121 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import com.google.common.collect.Lists;
 
-/**
- * The Class DiffToHtml.
- */
 public class DiffToHtml {
 
-	/** The Constant DMP. */
 	public static final DiffMatchPatch DMP = new DiffMatchPatch();
 
-	/** The Constant LINE_TYPE. */
 	public static final Map<String, String> LINE_TYPE = Collections
 		.unmodifiableMap(Arrays.stream(DiffLineType.values()).collect(Collectors.toMap(DiffLineType::name, DiffLineType::getValue)));
 
-	/** The Constant COMBINED_DELETED_FILE. */
 	private static final Pattern COMBINED_DELETED_FILE = Pattern.compile("^deleted file mode (\\d{6}),(\\d{6})");
 
-	/** The Constant COMBINED_INDEX. */
 	private static final Pattern COMBINED_INDEX = Pattern.compile("^index ([0-9a-z]+),([0-9a-z]+)\\.\\.([0-9a-z]+)");
 
-	/** The Constant COMBINED_MODE. */
 	private static final Pattern COMBINED_MODE = Pattern.compile("^mode (\\d{6}),(\\d{6})\\.\\.(\\d{6})");
 
-	/** The Constant COMBINED_NEW_FILE. */
 	private static final Pattern COMBINED_NEW_FILE = Pattern.compile("^new file mode (\\d{6})");
 
-	/** The Constant COMBINED_REGEX. */
 	private static final Pattern COMBINED_REGEX = Pattern.compile("^@@@ -(\\d+)(?:,\\d+)? -(\\d+)(?:,\\d+)? \\+(\\d+)(?:,\\d+)? @@@.*");
 
-	/** The Constant COPY_FROM. */
 	private static final Pattern COPY_FROM = Pattern.compile("^copy from \"?(.+)\"?");
 
-	/** The Constant COPY_TO. */
 	private static final Pattern COPY_TO = Pattern.compile("^copy to \"?(.+)\"?");
 
-	/** The Constant DEL_REGEX. */
 	private static final Pattern DEL_REGEX = Pattern.compile("(<del[^>]*>((.|\\n)*?)<\\/del>)");
 
-	/** The Constant DELETED_FILE_MODE. */
 	private static final Pattern DELETED_FILE_MODE = Pattern.compile("^deleted file mode (\\d{6})");
 
-	/** The Constant DEST_FILE_PREFIX. */
 	private static final String DEST_FILE_PREFIX = "+++";
 
-	/** The Constant DEST_FILE_PREFIXES. */
 	private static final List<String> DEST_FILE_PREFIXES = Lists.newArrayList("b/", "i/", "w/", "c/", "o/");
 
-	/** The Constant DISSIMILARITY_INDEX. */
 	private static final Pattern DISSIMILARITY_INDEX = Pattern.compile("^dissimilarity index (\\d+)%");
 
-	/** The Constant INDEX. */
 	private static final Pattern INDEX = Pattern.compile("^index ([0-9a-z]+)\\.\\.([0-9a-z]+)\\s*(\\d{6})?");
 
-	/** The Constant INS_REGEX. */
 	private static final Pattern INS_REGEX = Pattern.compile("(<ins[^>]*>((.|\\n)*?)<\\/ins>)");
 
-	/** The Constant LOG. */
 	private static final Logger LOG = Logger.getLogger(DiffToHtml.class);
 
-	/** The Constant MUSTACHE. */
 	private static final MustacheFactory MUSTACHE = new DefaultMustacheFactory();
 
-	/** The mustache templates. */
 	private static ConcurrentHashMap<String, Mustache> mustacheTemplates = new ConcurrentHashMap<>();
 
-	/** The Constant NEW_FILE_MODE. */
 	private static final Pattern NEW_FILE_MODE = Pattern.compile("^new file mode (\\d{6})");
 
-	/** The Constant NEW_MODE. */
 	private static final Pattern NEW_MODE = Pattern.compile("^new mode (\\d{6})");
 
-	/** The Constant NON_COMBINED_REGEX. */
 	private static final Pattern NON_COMBINED_REGEX = Pattern.compile("^@@ -(\\d+)(?:,\\d+)? \\+(\\d+)(?:,\\d+)? @@.*");
 
-	/** The Constant OLD_MODE. */
 	private static final Pattern OLD_MODE = Pattern.compile("^old mode (\\d{6})");
 
-	/** The Constant RENAME_FROM. */
 	private static final Pattern RENAME_FROM = Pattern.compile("^rename from \"?(.+)\"?");
 
-	/** The Constant RENAME_TO. */
 	private static final Pattern RENAME_TO = Pattern.compile("^rename to \"?(.+)\"?");
 
-	/** The Constant SIMILARITY_INDEX. */
 	private static final Pattern SIMILARITY_INDEX = Pattern.compile("^similarity index (\\d+)%");
 
-	/** The Constant SRC_FILE_PREFIX. */
 	private static final String SRC_FILE_PREFIX = "---";
 
-	/** The Constant SRC_FILE_PREFIXES. */
 	private static final List<String> SRC_FILE_PREFIXES = Lists.newArrayList("a/", "i/", "w/", "c/", "o/");
 
-	/** The Constant TEMPLATES_ROOT. */
-	private static final String TEMPLATES_ROOT = "config/tools/templates/";
+	private static final String TEMPLATES_ROOT = "templates/d2h/";
 
-	/** The char by char. */
 	private boolean charByChar;
 
-	/** The combined. */
 	private boolean combined;
 
-	/** The current block. */
 	private DiffBlock currentBlock;
 
-	/** The current file. */
 	private DiffFile currentFile;
 
-	/** The files. */
 	private List<DiffFile> diffFiles = Lists.newArrayList();
 
-	/** The diff output. */
 	private String diffInput;
 
-	/** The diff output destination. */
 	private DiffOutputDestination diffOutputDestination = DiffOutputDestination.PREVIEW;
 
-	/** The diff output. */
 	private String diffOutputFile;
 
-	/** The diff output format. */
 	private DiffOutputFormat diffOutputFormat = DiffOutputFormat.HTML;
 
-	/** The html. */
 	private String html;
 
-	/** The html title. */
 	private String htmlTitle;
 
-	/** The ignore additions. */
 	private boolean ignoreAdditions;
 
-	/** The ignore deletions. */
 	private boolean ignoreDeletions;
 
-	/** The matching. */
 	private String matching;
 
-	/** The max line length for highlight. */
 	private int maxLineLengthForHighlight = Integer.MAX_VALUE;
 
-	/** The new line. */
 	private AtomicInteger newLine;
 
-	/** The old line. */
 	private AtomicInteger oldLine;
 
-	/** The parsed. */
 	private boolean parsed;
 
-	/** The single line context html. */
 	private String singleLineContextHtml;
 
-	/** The unwrapped html. */
 	private boolean unwrappedHtml;
 
-	/**
-	 * Gets the mustache template.
-	 *
-	 * @param relativePath the relative path
-	 * @return the mustache template
-	 */
 	public static Mustache getMustacheTemplate(String relativePath) {
 		String path = TEMPLATES_ROOT + relativePath;
 		return mustacheTemplates.computeIfAbsent(
 			path,
 			k -> {
 				File file = getCpFile(path);
-				if ((file == null) || !file.isFile()) {
-					file = getCpFile("shared/" + path);
-				}
 				try {
-					return MUSTACHE.compile(new StringReader(readFileToString(file, StandardCharsets.UTF_8)), path);
+					String fileContents;
+					if (file != null && file.isFile()) {
+						fileContents = readFileToString(file, UTF_8);
+					} else {
+						fileContents = IOUtils.toString(DiffToHtml.class.getResourceAsStream('/' + path), UTF_8);
+					}
+					return MUSTACHE.compile(new StringReader(fileContents), path);
 				} catch (Throwable e) {
 					throw new IllegalArgumentException(String.format("Error reading template file: relativePath=%s file=%s", relativePath, FileUtil.fullPath(file)), e);
 				}
@@ -233,26 +180,10 @@ public class DiffToHtml {
 		);
 	}
 
-	/**
-	 * Gets the resource file.
-	 *
-	 * @param relativePath the relative path
-	 * @return the resource file
-	 */
 	public static String getResourceFile(String relativePath) {
-		String contents = FileUtil.getFileContentsWithImports(CommonConstants.CLASSPATH_PREFIX + TEMPLATES_ROOT + relativePath);
-		if (StringUtils.isBlank(contents)) {
-			return FileUtil.getFileContentsWithImports(CommonConstants.CLASSPATH_PREFIX + "shared/" + TEMPLATES_ROOT + relativePath);
-		}
-		return contents;
+		return FileUtil.getFileContentsWithImports(CommonConstants.CLASSPATH_PREFIX + TEMPLATES_ROOT + relativePath);
 	}
 
-	/**
-	 * Gets the html.
-	 *
-	 * @return the html
-	 * @throws Exception the exception
-	 */
 	public DiffToHtml generateHtml() throws Exception {
 		if (!parsed) {
 			parseDiff();
@@ -277,8 +208,8 @@ public class DiffToHtml {
 		String diffOutput = StringUtils.join(diffHtml, System.lineSeparator());
 		String rawHtml = renderTemplate("file-summary", "wrapper", of("filesNumber", diffFiles.size()), of("files", filesContent)) +
 			renderTemplate("generic", "wrapper", of("content", diffOutput));
-		String css = getResourceFile("css/diff2html.css");
-		String js = StringUtils.replace(getResourceFile("js/diff2html.js"), "</script", "</scr\\ipt");
+		String css = getResourceFile("diff2html.css");
+		String js = StringUtils.replace(getResourceFile("diff2html.js"), "</script", "</scr\\ipt");
 		html = renderTemplate(
 			"diff2html",
 			unwrappedHtml ? "unwrapped" : null,
@@ -291,73 +222,38 @@ public class DiffToHtml {
 		return this;
 	}
 
-	/**
-	 * Gets the diff files.
-	 *
-	 * @return the files
-	 */
 	public List<DiffFile> getDiffFiles() {
 		return diffFiles;
 	}
 
-	/**
-	 * Gets the diff input.
-	 *
-	 * @return the diffInput
-	 */
 	public String getDiffInput() {
 		return diffInput;
 	}
 
-	/**
-	 * @return the diffOutputDestination
-	 */
 	public DiffOutputDestination getDiffOutputDestination() {
 		return diffOutputDestination;
 	}
 
-	/**
-	 * @return the diffOutput
-	 */
 	public String getDiffOutputFile() {
 		return diffOutputFile;
 	}
 
-	/**
-	 * @return the diffOutputFormat
-	 */
 	public DiffOutputFormat getDiffOutputFormat() {
 		return diffOutputFormat;
 	}
 
-	/**
-	 * Gets the html.
-	 *
-	 * @return the html
-	 */
 	public String getHtml() {
 		return html;
 	}
 
-	/**
-	 * @return the htmlTitle
-	 */
 	public String getHtmlTitle() {
 		return htmlTitle;
 	}
 
-	/**
-	 * Gets the matching.
-	 *
-	 * @return the matching
-	 */
 	public String getMatching() {
 		return matching;
 	}
 
-	/**
-	 * @return the singleLineContextHtml
-	 */
 	public String getSingleLineContextHtml() {
 		if (singleLineContextHtml == null) {
 			singleLineContextHtml = renderTemplate(
@@ -377,60 +273,30 @@ public class DiffToHtml {
 		return singleLineContextHtml;
 	}
 
-	/**
-	 * Checks if is char by char.
-	 *
-	 * @return the charByChar
-	 */
 	public boolean isCharByChar() {
 		return charByChar;
 	}
 
-	/**
-	 * Checks if is combined.
-	 *
-	 * @return the combined
-	 */
 	public boolean isCombined() {
 		return combined;
 	}
 
-	/**
-	 * @return the ignoreAdditions
-	 */
 	public boolean isIgnoreAdditions() {
 		return ignoreAdditions;
 	}
 
-	/**
-	 * @return the ignoreDeletions
-	 */
 	public boolean isIgnoreDeletions() {
 		return ignoreDeletions;
 	}
 
-	/**
-	 * Checks if is parsed.
-	 *
-	 * @return the parsed
-	 */
 	public boolean isParsed() {
 		return parsed;
 	}
 
-	/**
-	 * @return the unwrappedHtml
-	 */
 	public boolean isUnwrappedHtml() {
 		return unwrappedHtml;
 	}
 
-	/**
-	 * Parses the diff.
-	 *
-	 * @return the diff to html
-	 * @throws Exception the exception
-	 */
 	public DiffToHtml parseDiff() throws Exception {
 		List<String> diffLines = StringUtil.splitLines(StringUtils.replace(diffInput, " No newline at end of file", ""));
 		for (String line : diffLines) {
@@ -521,17 +387,12 @@ public class DiffToHtml {
 		return this;
 	}
 
-	/**
-	 * Run.
-	 *
-	 */
 	public void run() {
 		try {
 			parseDiff();
 			String output = diffOutputFormat == DiffOutputFormat.DEBUG ? toPrettyJson(generateHtml()) : diffOutputFormat == JSON ? toPrettyJson(getDiffFiles()) : generateHtml().getHtml();
 			if (diffOutputDestination == DiffOutputDestination.PREVIEW) {
 				boolean openOutput = true;
-				// openOutput = isNotBlank(diffOutputFile);
 				if (isBlank(diffOutputFile)) {
 					diffOutputFile = File.createTempFile("d2h-", diffOutputFormat == DiffOutputFormat.HTML ? ".html" : ".json").getPath();
 				}
@@ -550,121 +411,56 @@ public class DiffToHtml {
 		}
 	}
 
-	/**
-	 * Sets the char by char.
-	 *
-	 * @param charByChar the charByChar to set
-	 * @return the diff to html
-	 */
 	public DiffToHtml setCharByChar(boolean charByChar) {
 		this.charByChar = charByChar;
 		return this;
 	}
 
-	/**
-	 * Sets the diff input.
-	 *
-	 * @param diffInput the diffInput to set
-	 * @return the diff to html
-	 */
 	public DiffToHtml setDiffInput(String diffInput) {
 		this.diffInput = diffInput;
 		return this;
 	}
 
-	/**
-	 * Sets the diff output destination.
-	 *
-	 * @param diffOutputDestination the diffOutputDestination to set
-	 * @return the diff to html
-	 */
 	public DiffToHtml setDiffOutputDestination(DiffOutputDestination diffOutputDestination) {
 		this.diffOutputDestination = diffOutputDestination;
 		return this;
 	}
 
-	/**
-	 * Sets the diff output file.
-	 *
-	 * @param diffOutput the diffOutput to set
-	 * @return the diff to html
-	 */
 	public DiffToHtml setDiffOutputFile(String diffOutput) {
 		diffOutputFile = diffOutput;
 		return this;
 	}
 
-	/**
-	 * Sets the diff output format.
-	 *
-	 * @param diffOutputFormat the diffOutputFormat to set
-	 * @return the diff to html
-	 */
 	public DiffToHtml setDiffOutputFormat(DiffOutputFormat diffOutputFormat) {
 		this.diffOutputFormat = diffOutputFormat;
 		return this;
 	}
 
-	/**
-	 * Sets the html title.
-	 *
-	 * @param htmlTitle the htmlTitle to set
-	 * @return the diff to html
-	 */
 	public DiffToHtml setHtmlTitle(String htmlTitle) {
 		this.htmlTitle = htmlTitle;
 		return this;
 	}
 
-	/**
-	 * Sets the ignore additions.
-	 *
-	 * @param ignoreAdditions the ignoreAdditions to set
-	 * @return the diff to html
-	 */
 	public DiffToHtml setIgnoreAdditions(boolean ignoreAdditions) {
 		this.ignoreAdditions = ignoreAdditions;
 		return this;
 	}
 
-	/**
-	 * Sets the ignore deletions.
-	 *
-	 * @param ignoreDeletions the ignoreDeletions to set
-	 * @return the diff to html
-	 */
 	public DiffToHtml setIgnoreDeletions(boolean ignoreDeletions) {
 		this.ignoreDeletions = ignoreDeletions;
 		return this;
 	}
 
-	/**
-	 * Sets the matching.
-	 *
-	 * @param matching the matching to set
-	 * @return the diff to html
-	 */
 	public DiffToHtml setMatching(String matching) {
 		this.matching = matching;
 		return this;
 	}
 
-	/**
-	 * Sets the unwrapped html.
-	 *
-	 * @param unwrappedHtml the unwrappedHtml to set
-	 * @return the diff to html
-	 */
 	public DiffToHtml setUnwrappedHtml(boolean unwrappedHtml) {
 		this.unwrappedHtml = unwrappedHtml;
 		return this;
 	}
 
-	/**
-	 * Creates the line.
-	 *
-	 * @param line the line
-	 */
 	private void createLine(String line) {
 		DiffLine currentLine = new DiffLine();
 		currentLine.setContent(line);
@@ -672,7 +468,6 @@ public class DiffToHtml {
 		List<String> newLinePrefixes = !currentFile.isCombined() ? Lists.newArrayList("+") : Lists.newArrayList("+", " +");
 		List<String> delLinePrefixes = !currentFile.isCombined() ? Lists.newArrayList("-") : Lists.newArrayList("-", " -");
 
-		/* Fill the line data */
 		if (newLinePrefixes.stream().anyMatch(line::startsWith)) {
 			currentBlock.getAddedLines().incrementAndGet();
 			currentFile.getAddedLines().incrementAndGet();
@@ -687,13 +482,6 @@ public class DiffToHtml {
 		currentBlock.getLines().add(currentLine);
 	}
 
-	/**
-	 * Diff highlight.
-	 *
-	 * @param diffLine1 the diff line1
-	 * @param diffLine2 the diff line2
-	 * @return the diff highlight
-	 */
 	private DiffHighlight diffHighlight(String diffLine1, String diffLine2) {
 		int prefixSize = 1;
 		if (combined) {
@@ -717,7 +505,6 @@ public class DiffToHtml {
 			StringBuilder nonDel = new StringBuilder();
 			List<String> changedWords = Lists.newArrayList();
 			if (!charByChar) {
-				// TODO: fix
 				double threshold = 0.25;
 			}
 			for (DiffMatchPatch.Diff part : diff) {
@@ -758,33 +545,15 @@ public class DiffToHtml {
 		}
 	}
 
-	/**
-	 * Escape html.
-	 *
-	 * @param str the str
-	 * @return the string
-	 */
 	private String escapeHtml(String str) {
 		return StringUtils.replaceEach(str, new String[] { "&", "<", ">", "\t" }, new String[] { "&amp;", "&lt;", "&gt;", "    " });
 	}
 
-	/**
-	 * Generate block html.
-	 *
-	 * @param templateData the template data
-	 * @param blockHeader the block header
-	 * @return the string
-	 */
 	private String generateBlockHtml(Map<String, Object> templateData, String blockHeader) {
 		templateData.put("blockHeader", blockHeader);
 		return renderTemplate("generic", "column-line-number", templateData);
 	}
 
-	/**
-	 * Generate empty diff.
-	 *
-	 * @return the diff file html
-	 */
 	private DiffFileHtml generateEmptyDiff() {
 		DiffFileHtml fileHtml = new DiffFileHtml();
 		fileHtml.setRight("");
@@ -803,12 +572,6 @@ public class DiffToHtml {
 		return fileHtml;
 	}
 
-	/**
-	 * Generate side by side file html.
-	 *
-	 * @param file the file
-	 * @return the diff file html
-	 */
 	private DiffFileHtml generateSideBySideFileHtml(DiffFile file) {
 		DiffFileHtml fileHtml = new DiffFileHtml();
 		StringBuilder left = new StringBuilder();
@@ -849,27 +612,11 @@ public class DiffToHtml {
 		return fileHtml;
 	}
 
-	/**
-	 * Generate single line html.
-	 *
-	 * @param templateData the template data
-	 * @param number the number
-	 * @return the string
-	 */
 	private String generateSingleLineHtml(Map<String, Object> templateData, Integer number) {
 		templateData.put("lineNumber", number == null ? "" : number.toString());
 		return renderTemplate("generic", "line", templateData);
 	}
 
-	/**
-	 * Generate single line html.
-	 *
-	 * @param type the type
-	 * @param number the number
-	 * @param content the content
-	 * @param prefix the prefix
-	 * @return the string
-	 */
 	private String generateSingleLineHtml(String type, Integer number, String content, String prefix) {
 		return renderTemplate(
 			"generic",
@@ -883,12 +630,6 @@ public class DiffToHtml {
 		);
 	}
 
-	/**
-	 * Gets the diff name.
-	 *
-	 * @param file the file
-	 * @return the diff name
-	 */
 	private String getDiffName(DiffFile file) {
 		String oldFilename = StringUtils.replace(file.getOldName(), "\\", "/");
 		String newFilename = StringUtils.replace(file.getNewName(), "\\", "/");
@@ -953,14 +694,6 @@ public class DiffToHtml {
 		return "unknown/file/path";
 	}
 
-	/**
-	 * Gets the filename.
-	 *
-	 * @param linePrefix the line prefix
-	 * @param line the line
-	 * @param prefixes the prefixes
-	 * @return the filename
-	 */
 	private String getFilename(String linePrefix, String line, List<String> prefixes) {
 		Pattern regex = Pattern.compile('^' + Pattern.quote(linePrefix) + " \"?(.+?)\"?$");
 		String filename = null;
@@ -972,12 +705,6 @@ public class DiffToHtml {
 		return filename;
 	}
 
-	/**
-	 * Gets the file type icon.
-	 *
-	 * @param file the file
-	 * @return the file type icon
-	 */
 	private String getFileTypeIcon(DiffFile file) {
 		String templateName = "file-changed";
 
@@ -996,23 +723,10 @@ public class DiffToHtml {
 		return templateName;
 	}
 
-	/**
-	 * Gets the html id.
-	 *
-	 * @param file the file
-	 * @return the html id
-	 */
 	private String getHtmlId(DiffFile file) {
 		return "d2h-" + StringUtils.substring(String.valueOf(getDiffName(file).hashCode()), -6);
 	}
 
-	/**
-	 * Gets the template file.
-	 *
-	 * @param base the base
-	 * @param name the name
-	 * @return the template file
-	 */
 	private Mustache getTemplate(String base, String name) {
 		List<String> pathParts = Lists.newArrayList();
 		if (isNotBlank(base)) {
@@ -1021,17 +735,10 @@ public class DiffToHtml {
 		if (isNotBlank(name)) {
 			pathParts.add(name);
 		}
-		String path = "html/diff/" + join(pathParts, "-") + ".html";
+		String path = join(pathParts, "-") + ".html";
 		return getMustacheTemplate(path);
 	}
 
-	/**
-	 * Gets the template data for file.
-	 *
-	 * @param file the file
-	 * @return the template data for file
-	 * @throws Exception the exception
-	 */
 	private Map<String, Object> getTemplateDataForFile(DiffFile file) throws Exception {
 		Map<String, Object> templateData = file.getTemplateData();
 		String fileTypeName = getFileTypeIcon(file);
@@ -1046,19 +753,10 @@ public class DiffToHtml {
 		templateData.put("fileHtmlId", getHtmlId(file));
 		templateData.put("fileTag", renderTemplate("tag", getFileTypeIcon(file)));
 
-		// These need the current templateData to render properly
 		templateData.put("filePath", renderTemplate("generic", "file-path", templateData));
 		return templateData;
 	}
 
-	/**
-	 * Gets the template data for line.
-	 *
-	 * @param file the file
-	 * @param line the line
-	 * @param sharedTemplateData the shared template data
-	 * @return the template data for line
-	 */
 	private Map<String, Object> getTemplateDataForLine(DiffFile file, DiffLine line, Map<String, Object> sharedTemplateData) {
 		Map<String, Object> templateData = new HashMap<>();
 		templateData.putAll(sharedTemplateData);
@@ -1072,15 +770,6 @@ public class DiffToHtml {
 		return templateData;
 	}
 
-	/**
-	 * Process change block.
-	 *
-	 * @param file the file
-	 * @param left the left
-	 * @param right the right
-	 * @param oldLines the old lines
-	 * @param newLines the new lines
-	 */
 	private void processChangeBlock(DiffFile file, StringBuilder left, StringBuilder right, List<DiffLine> oldLines, List<DiffLine> newLines) {
 		List<List<List<DiffLine>>> matches;
 		String insertType;
@@ -1095,7 +784,6 @@ public class DiffToHtml {
 		inner.add(oldLines);
 		inner.add(newLines);
 		if (doMatching) {
-			// TODO:fix using Rematch
 			matches = Lists.newArrayList();
 			matches.add(inner);
 			insertType = DiffLineType.INSERT_CHANGES.getValue();
@@ -1155,13 +843,6 @@ public class DiffToHtml {
 		newLines.clear();
 	}
 
-	/**
-	 * Process lines.
-	 *
-	 * @param oldLines the old lines
-	 * @param newLines the new lines
-	 * @return the diff file html
-	 */
 	private DiffFileHtml processLines(List<DiffLine> oldLines, List<DiffLine> newLines) {
 		DiffFileHtml fileHtml = new DiffFileHtml();
 		StringBuilder left = new StringBuilder();
@@ -1203,45 +884,19 @@ public class DiffToHtml {
 		return fileHtml;
 	}
 
-	/**
-	 * Render template.
-	 *
-	 * @param base the base
-	 * @param name the name
-	 * @return the string
-	 */
 	private String renderTemplate(String base, String name) {
 		return getTemplate(base, name).execute(new StringWriter(), new HashMap<>()).toString();
 	}
 
-	/**
-	 * Render template.
-	 *
-	 * @param base the base
-	 * @param name the name
-	 * @param data the data
-	 * @return the string
-	 */
 	private String renderTemplate(String base, String name, Map<String, Object> data) {
 		return getTemplate(base, name).execute(new StringWriter(), data).toString();
 	}
 
-	/**
-	 * Render template.
-	 *
-	 * @param base the base
-	 * @param name the name
-	 * @param pairs the pairs
-	 * @return the string
-	 */
 	@SafeVarargs
 	private final String renderTemplate(String base, String name, final Pair<String, Object>... pairs) {
 		return getTemplate(base, name).execute(new StringWriter(), addToMap(new HashMap<>(), pairs)).toString();
 	}
 
-	/**
-	 * Save block.
-	 */
 	private void saveBlock() {
 		if (currentBlock != null) {
 			if (ignoreAdditions && (currentBlock.getDeletedLines().get() <= 0)) {
@@ -1255,9 +910,6 @@ public class DiffToHtml {
 		}
 	}
 
-	/**
-	 * Save file.
-	 */
 	private void saveFile() {
 		if ((currentFile != null) && (currentFile.getNewName() != null)) {
 			diffFiles.add(currentFile);
@@ -1265,11 +917,6 @@ public class DiffToHtml {
 		}
 	}
 
-	/**
-	 * Start block.
-	 *
-	 * @param line the line
-	 */
 	private void startBlock(String line) {
 		saveBlock();
 
@@ -1294,9 +941,6 @@ public class DiffToHtml {
 		currentBlock = new DiffBlock().setOldStartLine(oldLine.get()).setOldStartLine2(oldLine2).setNewStartLine(newLine.get()).setHeader(line);
 	}
 
-	/**
-	 * Start file.
-	 */
 	private void startFile() {
 		saveBlock();
 		saveFile();

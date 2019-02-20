@@ -54,7 +54,7 @@ public final class ContextUtil {
 	public static final DateTimeFormatter INTRADAY_FORMAT = Dates.formatterFromPattern("yyyyMMdd-HH-mm-ss-SSS");
 
 	/** The Constant SERVER_TYPE. */
-	public static final String SERVER_TYPE = getProperty("webtools.serverType", isNotBlank(System.getenv("CATALINA_BASE")) ? "tomcat" : "wildfly");
+	public static final String SERVER_TYPE = "tomcat";
 
 	/** The Constant UNKNOWN_USER. */
 	public static final String UNKNOWN_USER = "Unknown";

@@ -2,11 +2,13 @@
 package com.github.lancethomps.lava.common.file;
 
 import static com.github.lancethomps.lava.common.Checks.isNotEmpty;
+import static com.github.lancethomps.lava.common.ContextUtil.CLASSPATH_PREFIX;
 import static com.github.lancethomps.lava.common.ContextUtil.getFile;
 import static com.github.lancethomps.lava.common.logging.Logs.logError;
 import static com.github.lancethomps.lava.common.logging.Logs.logTrace;
 import static com.github.lancethomps.lava.common.ser.Serializer.fromCsv;
 import static java.io.File.separator;
+import static java.io.File.separatorChar;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
@@ -517,7 +519,6 @@ public class FileUtil {
 		try {
 			success = dir.mkdirs();
 		} catch (Throwable e) {
-			success = false;
 			error = e;
 		}
 		if (!success) {
@@ -749,10 +750,22 @@ public class FileUtil {
 	public static String getFileContentsWithImports(String path) {
 		String data = null;
 		try {
+			String fileContents;
+			String basePath;
 			File file = ContextUtil.getFile(path);
 			if ((file != null) && file.isFile()) {
-				String basePath = fullPath(file.getParentFile()) + File.separatorChar;
-				Matcher imports = IMPORTS_REGEX.matcher(FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+				basePath = fullPath(file.getParentFile()) + File.separatorChar;
+				fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+			} else if (path != null && path.toLowerCase().startsWith(CLASSPATH_PREFIX.toLowerCase())) {
+				String pathWithoutPrefix = StringUtils.removeStartIgnoreCase(path, CLASSPATH_PREFIX);
+				basePath = CLASSPATH_PREFIX + new File(separatorChar + pathWithoutPrefix).getParentFile().getPath().substring(1) + separatorChar;
+				fileContents = IOUtils.toString(FileUtil.class.getResourceAsStream(separatorChar + pathWithoutPrefix), UTF_8);
+			} else {
+				basePath = null;
+				fileContents = null;
+			}
+			if (Checks.isNotBlank(fileContents)) {
+				Matcher imports = IMPORTS_REGEX.matcher(fileContents);
 				StringBuffer sb = new StringBuffer();
 				while (imports.find()) {
 					String importData = Collect.splitCsvAsList(imports.group(1)).stream().map(basePath::concat).map(FileUtil::getFileContentsWithImports).reduce("", String::concat);
