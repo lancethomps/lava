@@ -20,7 +20,6 @@ import static org.apache.commons.lang3.tuple.Pair.of;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;

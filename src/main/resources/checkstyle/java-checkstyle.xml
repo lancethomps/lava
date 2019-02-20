@@ -76,12 +76,11 @@
 			<property name="file" value="${samedir}/import-control.xml"/>
 		</module>
 		<!-- <module name="InnerAssignment"/> -->
-		<module name="JavadocMethod">
+		<!--<module name="JavadocMethod">
 			<property name="suppressLoadErrors" value="true"/>
 			<message key="javadoc.missing" value="Missing a Javadoc method comment - use JAutodoc or supply manually."/>
 		</module>
 		<module name="JavadocStyle">
-			<!-- <property name="checkEmptyJavadoc" value="true"/> -->
 			<property name="checkFirstSentence" value="false"/>
 			<message key="javadoc.missing" value="Missing a Javadoc comment - use JAutodoc or supply manually."/>
 		</module>
@@ -90,7 +89,7 @@
 		</module>
 		<module name="JavadocVariable">
 			<message key="javadoc.missing" value="Missing a Javadoc variable comment - use JAutodoc or supply manually."/>
-		</module>
+		</module>-->
 		<module name="LineLength">
 			<property name="ignorePattern" value="^ *\* *[^ ]+$"/>
 			<property name="max" value="201"/>
