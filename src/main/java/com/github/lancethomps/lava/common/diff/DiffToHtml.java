@@ -102,6 +102,8 @@ public class DiffToHtml {
 
   private static final Pattern NEW_MODE = Pattern.compile("^new mode (\\d{6})");
 
+  private static final Pattern NO_NEWLINE_REGEX = Pattern.compile("\\\\? No newline at end of file\\n?");
+
   private static final Pattern NON_COMBINED_REGEX = Pattern.compile("^@@ -(\\d+)(?:,\\d+)? \\+(\\d+)(?:,\\d+)? @@.*");
 
   private static final Pattern OLD_MODE = Pattern.compile("^old mode (\\d{6})");
@@ -307,7 +309,7 @@ public class DiffToHtml {
   }
 
   public DiffToHtml parseDiff() throws Exception {
-    List<String> diffLines = StringUtil.splitLines(StringUtils.replace(diffInput, " No newline at end of file", ""));
+    List<String> diffLines = StringUtil.splitLines(NO_NEWLINE_REGEX.matcher(diffInput).replaceAll(""));
     for (String line : diffLines) {
       if (StringUtils.isBlank(line) || line.startsWith("*")) {
         continue;
