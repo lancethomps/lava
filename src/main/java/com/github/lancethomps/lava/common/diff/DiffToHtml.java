@@ -1,3 +1,4 @@
+// CHECKSTYLE.OFF: .*
 package com.github.lancethomps.lava.common.diff;
 
 import static com.github.lancethomps.lava.common.Checks.isEmpty;
