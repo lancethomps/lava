@@ -293,6 +293,10 @@ public class PropertyParser {
 		return propEnvOverrides;
 	}
 
+	public static Pattern getPropReplaceRegex() {
+		return propReplaceRegex;
+	}
+
 	/**
 	 * Gets the property value.
 	 *
