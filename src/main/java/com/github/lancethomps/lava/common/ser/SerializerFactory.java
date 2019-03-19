@@ -53,7 +53,6 @@ import com.fasterxml.jackson.core.JsonGenerator.Feature;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -96,6 +95,7 @@ import com.github.lancethomps.lava.common.ser.csv.CsvPropertyFilter;
 import com.github.lancethomps.lava.common.ser.jackson.CustomBeanDeserializerModifier;
 import com.github.lancethomps.lava.common.ser.jackson.CustomDeserializationProblemHandler;
 import com.github.lancethomps.lava.common.ser.jackson.CustomHandlerInstantiator;
+import com.github.lancethomps.lava.common.ser.jackson.CustomPrettyPrinter;
 import com.github.lancethomps.lava.common.ser.jackson.CustomTreeMapCaseInsensitive;
 import com.github.lancethomps.lava.common.ser.jackson.LimitedObjectMapper;
 import com.github.lancethomps.lava.common.ser.jackson.deserialize.BooleanDeserializer;
@@ -722,9 +722,11 @@ public class SerializerFactory {
 	 * @return the pretty printer
 	 */
 	public static PrettyPrinter getPrettyPrinter() {
-		DefaultPrettyPrinter pp = new DefaultPrettyPrinter();
+		CustomPrettyPrinter pp = new CustomPrettyPrinter();
 		DefaultIndenter indenter = new DefaultIndenter("\t", DefaultIndenter.SYS_LF);
-		return pp.withObjectIndenter(indenter).withArrayIndenter(indenter);
+		return pp
+				.withObjectIndenter(indenter)
+				.withArrayIndenter(indenter);
 	}
 
 	/**
