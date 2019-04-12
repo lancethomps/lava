@@ -15,15 +15,22 @@
 	</module>
 
 	<module name="RegexpSingleline">
-		<property name="format" value="^[\t]*[ ]+[\t]*" />
-		<property name="message" value="Use tabs for indentation - not spaces" />
+		<property name="id" value="SpaceIndentation"/>
+		<property name="format" value="^ *\t"/>
+		<property name="message" value="Use spaces for indentation - not tabs" />
 	</module>
+	<!--<module name="RegexpSingleline">
+		<property name="id" value="TabIndentation"/>
+		<property name="format" value="^\t* "/>
+		<property name="message" value="Use tabs for indentation - not spaces" />
+	</module>-->
 	<module name="RegexpSingleline">
 		<property name="format" value="[^\t ]+[\t ]+$" />
 		<property name="message" value="Trailing whitespace" />
 	</module>
 
 	<module name="TreeWalker">
+		<property name="tabWidth" value="2"/>
 
 		<module name="SuppressionCommentFilter">
 			<property name="offCommentFormat" value="CHECKSTYLE\.OFF\: ([\w\|\.\*]+)"/>

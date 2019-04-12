@@ -25,7 +25,7 @@
 	</module>
 
 	<module name="TreeWalker">
-		<property name="tabWidth" value="4"/>
+		<property name="tabWidth" value="2"/>
 
 		<module name="SuppressionCommentFilter">
 			<property name="offCommentFormat" value="CHECKSTYLE\.OFF\: ([\w\|\.\*]+)"/>
@@ -188,11 +188,17 @@
 			<property name="ignoreComments" value="true"/>
 		</module>
 		<module name="RegexpSinglelineJava">
-			<property name="id" value="TabIndentation"/>
-			<property name="format" value="^\t* "/>
-			<property name="message" value="Indent must use tab characters"/>
+			<property name="id" value="SpaceIndentation"/>
+			<property name="format" value="^ *\t"/>
+			<property name="message" value="Use spaces for indentation - not tabs" />
 			<property name="ignoreComments" value="true"/>
 		</module>
+		<!--<module name="RegexpSinglelineJava">
+			<property name="id" value="TabIndentation"/>
+			<property name="format" value="^\t* "/>
+			<property name="message" value="Use tabs for indentation - not spaces" />
+			<property name="ignoreComments" value="true"/>
+		</module>-->
 		<module name="RegexpSinglelineJava">
 			<property name="id" value="SingleQuotesForSingleChar"/>
 			<property name="severity" value="error"/>
