@@ -2,46 +2,28 @@ package com.github.lancethomps.lava.common.date;
 
 import com.github.lancethomps.lava.common.Enums;
 
-/**
- * The Enum RelativeDateOperator.
- */
 public enum RelativeDateOperator {
 
-	/** The minus. */
-	MINUS("-"),
+  MINUS("-"),
 
-	/** The plus. */
-	PLUS("+"),
+  PLUS("+"),
 
-	/** The round. */
-	ROUND("/"),
+  ROUND("/"),
 
-	/** The setting. */
-	SETTING(":");
+  SETTING(":");
 
-	/** The symbol. */
-	private final String symbol;
+  static {
+    Enums.createStringToTypeMap(RelativeDateOperator.class, null, RelativeDateOperator::getSymbol);
+  }
 
-	/**
-	 * Instantiates a new relative date operator.
-	 *
-	 * @param symbol the symbol
-	 */
-	RelativeDateOperator(String symbol) {
-		this.symbol = symbol;
-	}
+  private final String symbol;
 
-	static {
-		Enums.createStringToTypeMap(RelativeDateOperator.class, null, RelativeDateOperator::getSymbol);
-	}
+  RelativeDateOperator(String symbol) {
+    this.symbol = symbol;
+  }
 
-	/**
-	 * Gets the symbol.
-	 *
-	 * @return the symbol
-	 */
-	public String getSymbol() {
-		return symbol;
-	}
+  public String getSymbol() {
+    return symbol;
+  }
 
 }

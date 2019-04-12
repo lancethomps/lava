@@ -6,26 +6,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/**
- * The Class BaseTestControllerWithDefaultHandler.
- *
- * @author lancethomps
- */
 @Controller
 public class BaseTestControllerWithDefaultHandler {
 
-	/**
-	 * Handle default.
-	 *
-	 * @param request the request
-	 * @param response the response
-	 * @return the data view
-	 * @throws Exception the exception
-	 */
-	@RequestMapping(value = "/*")
-	public DataView handleDefault(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		DataView view = new DataView("test");
-		return view;
-	}
+  @RequestMapping(value = "/*")
+  public DataView handleDefault(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    DataView view = new DataView("test");
+    return view;
+  }
 
 }

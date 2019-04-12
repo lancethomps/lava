@@ -20,119 +20,90 @@ import io.dropwizard.metrics5.Metric;
 import io.dropwizard.metrics5.MetricName;
 import io.dropwizard.metrics5.MetricSet;
 
-/**
- * The Class JcsCacheMetricSet.
- */
 public class JcsCacheMetricSet implements MetricSet {
 
-	/** The Constant LOG. */
-	private static final Logger LOG = Logger.getLogger(JcsCacheMetricSet.class);
+  private static final Logger LOG = Logger.getLogger(JcsCacheMetricSet.class);
 
-	/**
-	 * Gets the cache region.
-	 *
-	 * @param cacheName the cache name
-	 * @return the cache region
-	 */
-	public static CacheRegionInfo getCacheRegion(String cacheName) {
-		if (cacheName != null) {
-			try {
-				JCSAdminBean jcs = new JCSAdminBean();
-				CompositeCache<?, ?> cache = CompositeCacheManager.getInstance().getCache(cacheName);
-				CacheRegionInfo regionInfo = new CacheRegionInfo(
-					cache.getCacheName(),
-					cache.getSize(),
-					cache.getStatus().toString(),
-					cache.getStats(),
-					cache.getHitCountRam(),
-					cache.getHitCountAux(),
-					cache.getMissCountNotFound(),
-					cache.getMissCountExpired(),
-					jcs.getByteCount(cache)
-				);
-				return regionInfo;
-			} catch (Throwable e) {
-				Logs.logError(LOG, e, "Error getting JCS cache region info for [%s]", cacheName);
-			}
-		}
-		return null;
-	}
+  public static CacheRegionInfo getCacheRegion(String cacheName) {
+    if (cacheName != null) {
+      try {
+        JCSAdminBean jcs = new JCSAdminBean();
+        CompositeCache<?, ?> cache = CompositeCacheManager.getInstance().getCache(cacheName);
+        CacheRegionInfo regionInfo = new CacheRegionInfo(
+          cache.getCacheName(),
+          cache.getSize(),
+          cache.getStatus().toString(),
+          cache.getStats(),
+          cache.getHitCountRam(),
+          cache.getHitCountAux(),
+          cache.getMissCountNotFound(),
+          cache.getMissCountExpired(),
+          jcs.getByteCount(cache)
+        );
+        return regionInfo;
+      } catch (Throwable e) {
+        Logs.logError(LOG, e, "Error getting JCS cache region info for [%s]", cacheName);
+      }
+    }
+    return null;
+  }
 
-	/**
-	 * Gets the statistics.
-	 *
-	 * @param cacheName the cache name
-	 * @return the statistics
-	 */
-	public static ICacheStats getStatistics(String cacheName) {
-		return JCS.getInstance(cacheName).getStatistics();
-	}
+  public static ICacheStats getStatistics(String cacheName) {
+    return JCS.getInstance(cacheName).getStatistics();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * @see io.dropwizard.metrics5.MetricSet#getMetrics()
-	 */
-	@Override
-	public Map<MetricName, Metric> getMetrics() {
+  @Override
+  public Map<MetricName, Metric> getMetrics() {
 
-		try {
-			JCSAdminBean jcs = new JCSAdminBean();
-			CacheRegionInfo[] regions = jcs.buildCacheInfo();
+    try {
+      JCSAdminBean jcs = new JCSAdminBean();
+      CacheRegionInfo[] regions = jcs.buildCacheInfo();
 
-			Map<MetricName, Metric> gauges = new HashMap<>(regions.length * 5);
+      Map<MetricName, Metric> gauges = new HashMap<>(regions.length * 5);
 
-			for (CacheRegionInfo region : regions) {
-				String cacheName = region.getCacheName();
-				gauges.put(MetricName.build(cacheName), new CacheRegionMetrics(cacheName));
-			}
+      for (CacheRegionInfo region : regions) {
+        String cacheName = region.getCacheName();
+        gauges.put(MetricName.build(cacheName), new CacheRegionMetrics(cacheName));
+      }
 
-			return Collections.unmodifiableMap(gauges);
-		} catch (Exception e) {
-			Logs.logError(LOG, e, "Issue initializing JCS metrics.");
-			return Collections.emptyMap();
-		}
-	}
+      return Collections.unmodifiableMap(gauges);
+    } catch (Exception e) {
+      Logs.logError(LOG, e, "Issue initializing JCS metrics.");
+      return Collections.emptyMap();
+    }
+  }
 
-	/**
-	 * The Class CacheHitRatio.
-	 */
-	public static class CacheRegionMetrics implements Gauge<Map<String, Object>> {
+  public static class CacheRegionMetrics implements Gauge<Map<String, Object>> {
 
-		/** The region. */
-		private final String regionName;
+    private final String regionName;
 
-		/**
-		 * Instantiates a new cache region metrics.
-		 *
-		 * @param regionName the region name
-		 */
-		public CacheRegionMetrics(String regionName) {
-			super();
-			this.regionName = regionName;
-		}
+    public CacheRegionMetrics(String regionName) {
+      super();
+      this.regionName = regionName;
+    }
 
-		@Override
-		public Map<String, Object> getValue() {
-			Map<String, Object> value = new TreeMap<>();
-			CacheRegionInfo region = getCacheRegion(regionName);
-			if (region != null) {
-				int hits = region.getHitCountAux() + region.getHitCountRam();
-				int misses = region.getMissCountExpired() + region.getMissCountNotFound();
-				int all = hits + misses;
-				double hitRatio = all == 0 ? 0d : ((double) hits / (double) all);
-				value.put("cache_size", region.getCacheSize());
-				value.put("byte_count", region.getByteCount());
-				value.put("hit_count", hits);
-				value.put("hit_count_aux", region.getHitCountAux());
-				value.put("hit_count_ram", region.getHitCountRam());
-				value.put("miss_count", misses);
-				value.put("miss_count_expired", region.getMissCountExpired());
-				value.put("miss_count_not_found", region.getMissCountNotFound());
-				value.put("hit_ratio", hitRatio);
-			}
-			return value;
-		}
+    @Override
+    public Map<String, Object> getValue() {
+      Map<String, Object> value = new TreeMap<>();
+      CacheRegionInfo region = getCacheRegion(regionName);
+      if (region != null) {
+        int hits = region.getHitCountAux() + region.getHitCountRam();
+        int misses = region.getMissCountExpired() + region.getMissCountNotFound();
+        int all = hits + misses;
+        double hitRatio = all == 0 ? 0d : ((double) hits / (double) all);
+        value.put("cache_size", region.getCacheSize());
+        value.put("byte_count", region.getByteCount());
+        value.put("hit_count", hits);
+        value.put("hit_count_aux", region.getHitCountAux());
+        value.put("hit_count_ram", region.getHitCountRam());
+        value.put("miss_count", misses);
+        value.put("miss_count_expired", region.getMissCountExpired());
+        value.put("miss_count_not_found", region.getMissCountNotFound());
+        value.put("hit_ratio", hitRatio);
+      }
+      return value;
+    }
 
-	}
+  }
 
 }

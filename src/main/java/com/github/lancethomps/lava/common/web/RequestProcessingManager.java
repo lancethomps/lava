@@ -38,349 +38,294 @@ import com.github.lancethomps.lava.common.web.config.RequestProcessingLocationTy
 import com.github.lancethomps.lava.common.web.config.RequestProcessingRule;
 import com.github.lancethomps.lava.common.web.config.ResponseHeaderConfig;
 
-/**
- * The Class RequestProcessingManager.
- */
 public class RequestProcessingManager extends AbstractFileListener {
 
-	/** The Constant LOG. */
-	private static final Logger LOG = Logger.getLogger(RequestProcessingManager.class);
+  private static final Logger LOG = Logger.getLogger(RequestProcessingManager.class);
 
-	/** The configs. */
-	private final List<RequestProcessingConfig> configs = new CopyOnWriteArrayList<>();
+  private final List<RequestProcessingConfig> configs = new CopyOnWriteArrayList<>();
 
-	/** The root dir. */
-	private String rootDir = "config/requests/processing/";
+  private String rootDir = "config/requests/processing/";
 
-	/**
-	 * Does location match.
-	 *
-	 * @param uri the uri
-	 * @param location the location
-	 * @return true, if successful
-	 */
-	public static boolean doesLocationMatch(@Nonnull final String uri, @Nonnull final RequestProcessingLocation location) {
-		switch (location.getType()) {
-		case CASE_INSENSITIVE_REGEX:
-		case CASE_SENSITIVE_REGEX:
-			return location.getRegex().matcher(uri).matches();
-		case EXACT_MATCH:
-			return uri.equals(location.getLocation());
-		case PREFIX_MATCH:
-		case PREFIX_MATCH_SKIP_REGEX:
-			return StringUtils.startsWith(uri, location.getLocation());
-		default:
-			throw new IllegalArgumentException("this_should_not_happen");
-		}
-	}
+  public static boolean doesLocationMatch(@Nonnull final String uri, @Nonnull final RequestProcessingLocation location) {
+    switch (location.getType()) {
+      case CASE_INSENSITIVE_REGEX:
+      case CASE_SENSITIVE_REGEX:
+        return location.getRegex().matcher(uri).matches();
+      case EXACT_MATCH:
+        return uri.equals(location.getLocation());
+      case PREFIX_MATCH:
+      case PREFIX_MATCH_SKIP_REGEX:
+        return StringUtils.startsWith(uri, location.getLocation());
+      default:
+        throw new IllegalArgumentException("this_should_not_happen");
+    }
+  }
 
-	/**
-	 * Find best location match.
-	 *
-	 * @param request the request
-	 * @param context the context
-	 * @param locations the locations
-	 * @return the request processing location
-	 */
-	public static RequestProcessingLocation findBestLocationMatch(@Nonnull HttpServletRequest request, @Nullable WebRequestContext context,
-		@Nonnull Collection<RequestProcessingLocation> locations) {
-		final String uri = defaultIfBlank(defaultIfBlank(context != null ? context.getResourcePath() : null, request.getRequestURI()), "/");
-		RequestProcessingLocation bestPrefixMatch = null;
-		for (RequestProcessingLocation location : locations) {
-			if (!location.getType().isRegex() && doesLocationMatch(uri, location)) {
-				if (location.getType() == RequestProcessingLocationType.EXACT_MATCH) {
-					return location;
-				}
-				if ((bestPrefixMatch == null) || (location.getLocation().length() > bestPrefixMatch.getLocation().length())) {
-					bestPrefixMatch = location;
-				}
-			}
-		}
-		if ((bestPrefixMatch != null) && (bestPrefixMatch.getType() == RequestProcessingLocationType.PREFIX_MATCH_SKIP_REGEX)) {
-			return bestPrefixMatch;
-		}
-		if ((bestPrefixMatch != null) && (bestPrefixMatch.getConfig().getLocations() != null)) {
-			for (RequestProcessingLocation location : bestPrefixMatch.getConfig().getLocations()) {
-				if (location.getType().isRegex() && doesLocationMatch(uri, location)) {
-					return location;
-				}
-			}
-		}
-		for (RequestProcessingLocation location : locations) {
-			if (location.getType().isRegex() && doesLocationMatch(uri, location)) {
-				return location;
-			}
-		}
-		return bestPrefixMatch;
-	}
+  public static RequestProcessingLocation findBestLocationMatch(
+    @Nonnull HttpServletRequest request, @Nullable WebRequestContext context,
+    @Nonnull Collection<RequestProcessingLocation> locations
+  ) {
+    final String uri = defaultIfBlank(defaultIfBlank(context != null ? context.getResourcePath() : null, request.getRequestURI()), "/");
+    RequestProcessingLocation bestPrefixMatch = null;
+    for (RequestProcessingLocation location : locations) {
+      if (!location.getType().isRegex() && doesLocationMatch(uri, location)) {
+        if (location.getType() == RequestProcessingLocationType.EXACT_MATCH) {
+          return location;
+        }
+        if ((bestPrefixMatch == null) || (location.getLocation().length() > bestPrefixMatch.getLocation().length())) {
+          bestPrefixMatch = location;
+        }
+      }
+    }
+    if ((bestPrefixMatch != null) && (bestPrefixMatch.getType() == RequestProcessingLocationType.PREFIX_MATCH_SKIP_REGEX)) {
+      return bestPrefixMatch;
+    }
+    if ((bestPrefixMatch != null) && (bestPrefixMatch.getConfig().getLocations() != null)) {
+      for (RequestProcessingLocation location : bestPrefixMatch.getConfig().getLocations()) {
+        if (location.getType().isRegex() && doesLocationMatch(uri, location)) {
+          return location;
+        }
+      }
+    }
+    for (RequestProcessingLocation location : locations) {
+      if (location.getType().isRegex() && doesLocationMatch(uri, location)) {
+        return location;
+      }
+    }
+    return bestPrefixMatch;
+  }
 
-	/**
-	 * Gets the response header value.
-	 *
-	 * @param value the value
-	 * @return the response header value
-	 */
-	public static String getResponseHeaderValue(@Nonnull Object value) {
-		if (value instanceof TemporalAccessor) {
-			return DateTimeFormatter.RFC_1123_DATE_TIME.format((TemporalAccessor) value);
-		}
-		return value.toString();
-	}
+  public static String getResponseHeaderValue(@Nonnull Object value) {
+    if (value instanceof TemporalAccessor) {
+      return DateTimeFormatter.RFC_1123_DATE_TIME.format((TemporalAccessor) value);
+    }
+    return value.toString();
+  }
 
-	/**
-	 * Adds the config.
-	 *
-	 * @param id the id
-	 * @param config the config
-	 */
-	public void addConfig(@Nonnull String id, @Nonnull RequestProcessingConfig config) {
-		removeConfig(id);
-		config.setId(id);
-		config.deriveInfoRecursively();
-		configs.add(config);
-		Logs.logTrace(LOG, "Added config for ID [%s].", id);
-	}
+  public void addConfig(@Nonnull String id, @Nonnull RequestProcessingConfig config) {
+    removeConfig(id);
+    config.setId(id);
+    config.deriveInfoRecursively();
+    configs.add(config);
+    Logs.logTrace(LOG, "Added config for ID [%s].", id);
+  }
 
-	@Override
-	public void afterBaseDirSet() throws Exception {
-		loadAllFilesInDir(ContextUtil.getCpFile(rootDir));
-		loadAllFilesInDir(new File(getBaseDir()));
-	}
+  @Override
+  public void afterBaseDirSet() throws Exception {
+    loadAllFilesInDir(ContextUtil.getCpFile(rootDir));
+    loadAllFilesInDir(new File(getBaseDir()));
+  }
 
-	/**
-	 * Gets the configs.
-	 *
-	 * @return the configs
-	 */
-	public List<RequestProcessingConfig> getConfigs() {
-		return new ArrayList<>(configs);
-	}
+  public List<RequestProcessingConfig> getConfigs() {
+    return new ArrayList<>(configs);
+  }
 
-	/**
-	 * @return the rootDir
-	 */
-	public String getRootDir() {
-		return rootDir;
-	}
+  public String getRootDir() {
+    return rootDir;
+  }
 
-	@Override
-	public void handleFileDelete(File file) {
-		removeConfig(FilenameUtils.getBaseName(file.getName()));
-	}
+  public void setRootDir(String rootDir) {
+    this.rootDir = rootDir;
+  }
 
-	@Override
-	public void handleFileLoad(File origFile) {
-		File file = null;
-		try {
-			file = getBaseDir() == null ? origFile : ContextUtil.getConfigFile(origFile.getName(), getBaseDir(), rootDir);
-			String id = FilenameUtils.getBaseName(file.getName());
-			RequestProcessingConfig config = Serializer.fromUnknown(file, RequestProcessingConfig.class);
-			if (config == null) {
-				Logs.logError(LOG, new SerializationException("Deserialization failed."), "Deserialization error when parsing request processing file [%s] mapped to best file [%s]", origFile, file);
-			} else {
-				addConfig(id, config);
-			}
-		} catch (Throwable e) {
-			Logs.logError(LOG, e, "Error deserializing request processing file [%s] mapped to best file [%s]", origFile, file);
-		}
-	}
+  @Override
+  public void handleFileDelete(File file) {
+    removeConfig(FilenameUtils.getBaseName(file.getName()));
+  }
 
-	/**
-	 * Post process.
-	 *
-	 * @param request the request
-	 * @param response the response
-	 * @param context the context
-	 * @param userInfo the user info
-	 * @return true, if successful
-	 */
-	public boolean process(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nullable WebRequestContext context, @Nullable Object userInfo) {
-		boolean valid = true;
-		if (Checks.isEmpty(configs)) {
-			return valid;
-		}
-		RequestProcessingContext exprContext = new RequestProcessingContext(request, response, context, userInfo);
-		for (RequestProcessingConfig config : configs) {
-			if (!addConfigToResponse(request, response, config, exprContext)) {
-				valid = false;
-			}
-		}
-		return valid;
-	}
+  @Override
+  public void handleFileLoad(File origFile) {
+    File file = null;
+    try {
+      file = getBaseDir() == null ? origFile : ContextUtil.getConfigFile(origFile.getName(), getBaseDir(), rootDir);
+      String id = FilenameUtils.getBaseName(file.getName());
+      RequestProcessingConfig config = Serializer.fromUnknown(file, RequestProcessingConfig.class);
+      if (config == null) {
+        Logs.logError(
+          LOG,
+          new SerializationException("Deserialization failed."),
+          "Deserialization error when parsing request processing file [%s] mapped to best file [%s]",
+          origFile,
+          file
+        );
+      } else {
+        addConfig(id, config);
+      }
+    } catch (Throwable e) {
+      Logs.logError(LOG, e, "Error deserializing request processing file [%s] mapped to best file [%s]", origFile, file);
+    }
+  }
 
-	/**
-	 * Removes the config.
-	 *
-	 * @param id the id
-	 * @return true, if successful
-	 */
-	public boolean removeConfig(@Nonnull String id) {
-		boolean removed = configs.removeIf(config -> id.equals(config.getId()));
-		Logs.logTrace(LOG, "Remove config result for ID [%s]: %s", id, removed);
-		return removed;
-	}
+  public boolean process(
+    @Nonnull HttpServletRequest request,
+    @Nonnull HttpServletResponse response,
+    @Nullable WebRequestContext context,
+    @Nullable Object userInfo
+  ) {
+    boolean valid = true;
+    if (Checks.isEmpty(configs)) {
+      return valid;
+    }
+    RequestProcessingContext exprContext = new RequestProcessingContext(request, response, context, userInfo);
+    for (RequestProcessingConfig config : configs) {
+      if (!addConfigToResponse(request, response, config, exprContext)) {
+        valid = false;
+      }
+    }
+    return valid;
+  }
 
-	/**
-	 * @param rootDir the rootDir to set
-	 */
-	public void setRootDir(String rootDir) {
-		this.rootDir = rootDir;
-	}
+  public boolean removeConfig(@Nonnull String id) {
+    boolean removed = configs.removeIf(config -> id.equals(config.getId()));
+    Logs.logTrace(LOG, "Remove config result for ID [%s]: %s", id, removed);
+    return removed;
+  }
 
-	/**
-	 * Adds the config to response.
-	 *
-	 * @param request the request
-	 * @param response the response
-	 * @param config the config
-	 * @param exprContext the expr context
-	 * @return true, if successful
-	 */
-	private boolean addConfigToResponse(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, RequestProcessingConfig config,
-		@Nonnull RequestProcessingContext exprContext) {
-		boolean valid = true;
-		if (config == null) {
-			return valid;
-		}
-		if (config.getClearHeaders() != null) {
-			final ResponseWrapper responseWrapper = SpringUtil.getResponseWrapper(response);
-			if (responseWrapper != null) {
-				for (ResponseHeaderConfig header : config.getClearHeaders()) {
-					responseWrapper.ignoreHeader(header.getName());
-				}
-			} else {
-				Logs.logWarn(LOG, "Could not find ResponseWrapper on HttpServletResponse - clearHeaders cannot be applied without using the ResponseWrapper type.");
-			}
-		}
-		if (!processConfigRules(request, response, config, exprContext)) {
-			valid = false;
-			exprContext.setValid(false);
-		}
-		if (config.getAddHeaders() != null) {
-			for (ResponseHeaderConfig header : config.getAddHeaders()) {
-				Object value;
-				if (header.getValueExpression() != null) {
-					value = ExprFactory.evalOutputExpression(header.getValueExpression(), exprContext);
-				} else {
-					value = header.getValue();
-				}
-				if (value != null) {
-					response.addHeader(header.getName(), getResponseHeaderValue(value));
-				}
-			}
-		}
-		if (config.getSetHeaders() != null) {
-			for (ResponseHeaderConfig header : config.getSetHeaders()) {
-				Object value;
-				if (header.getValueExpression() != null) {
-					value = ExprFactory.evalOutputExpression(header.getValueExpression(), exprContext);
-				} else {
-					value = header.getValue();
-				}
-				if (value != null) {
-					response.setHeader(header.getName(), getResponseHeaderValue(value));
-				}
-			}
-		}
-		RequestProcessingLocation locationMatch;
-		if ((config.getLocations() != null) && ((locationMatch = findBestLocationMatch(request, exprContext.getContext(), config.getLocations())) != null)) {
-			if (!addConfigToResponse(request, response, locationMatch.getConfig(), exprContext)) {
-				valid = false;
-				exprContext.setValid(false);
-			}
-		}
-		return valid;
-	}
+  private boolean addConfigToResponse(
+    @Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, RequestProcessingConfig config,
+    @Nonnull RequestProcessingContext exprContext
+  ) {
+    boolean valid = true;
+    if (config == null) {
+      return valid;
+    }
+    if (config.getClearHeaders() != null) {
+      final ResponseWrapper responseWrapper = SpringUtil.getResponseWrapper(response);
+      if (responseWrapper != null) {
+        for (ResponseHeaderConfig header : config.getClearHeaders()) {
+          responseWrapper.ignoreHeader(header.getName());
+        }
+      } else {
+        Logs.logWarn(
+          LOG,
+          "Could not find ResponseWrapper on HttpServletResponse - clearHeaders cannot be applied without using the ResponseWrapper type."
+        );
+      }
+    }
+    if (!processConfigRules(request, response, config, exprContext)) {
+      valid = false;
+      exprContext.setValid(false);
+    }
+    if (config.getAddHeaders() != null) {
+      for (ResponseHeaderConfig header : config.getAddHeaders()) {
+        Object value;
+        if (header.getValueExpression() != null) {
+          value = ExprFactory.evalOutputExpression(header.getValueExpression(), exprContext);
+        } else {
+          value = header.getValue();
+        }
+        if (value != null) {
+          response.addHeader(header.getName(), getResponseHeaderValue(value));
+        }
+      }
+    }
+    if (config.getSetHeaders() != null) {
+      for (ResponseHeaderConfig header : config.getSetHeaders()) {
+        Object value;
+        if (header.getValueExpression() != null) {
+          value = ExprFactory.evalOutputExpression(header.getValueExpression(), exprContext);
+        } else {
+          value = header.getValue();
+        }
+        if (value != null) {
+          response.setHeader(header.getName(), getResponseHeaderValue(value));
+        }
+      }
+    }
+    RequestProcessingLocation locationMatch;
+    if ((config.getLocations() != null) &&
+      ((locationMatch = findBestLocationMatch(request, exprContext.getContext(), config.getLocations())) != null)) {
+      if (!addConfigToResponse(request, response, locationMatch.getConfig(), exprContext)) {
+        valid = false;
+        exprContext.setValid(false);
+      }
+    }
+    return valid;
+  }
 
-	/**
-	 * Process config rules.
-	 *
-	 * @param request the request
-	 * @param response the response
-	 * @param config the config
-	 * @param exprContext the expr context
-	 * @return true, if successful
-	 */
-	private boolean processConfigRules(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull RequestProcessingConfig config,
-		@Nonnull RequestProcessingContext exprContext) {
-		boolean valid = true;
-		if (config.getFailWith() != null) {
-			if (exprContext.testValid()) {
-				try {
-					if (config.getFailStatusMessage() != null) {
-						response.sendError(config.getFailWith(), config.getFailStatusMessage());
-					} else {
-						response.sendError(config.getFailWith());
-					}
-					exprContext.setValid(false);
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			}
-			Logs.logForSplunk(LOG, "REQUEST_PROCESSING_FOUND_FAILURE", "%s|%s", config.getFailWith(), config.getInfo());
-			Logs.logTrace(LOG, "Request processing failure with status code [%s] for config with ID [%s] and info [%s] during request: %s",
-				config.getFailWith(), config.getId(), config.getInfo(), exprContext.getContext());
-			valid = false;
-		}
-		if (config.getCookieRules() != null) {
-			for (Entry<String, List<RequestProcessingRule>> entry : config.getCookieRules().entrySet()) {
-				Cookie cookie = WebUtils.getCookie(request, entry.getKey());
-				if (cookie != null) {
-					String value = cookie.getValue();
-					for (RequestProcessingRule rule : entry.getValue()) {
-						if (!Checks.passesWhiteAndBlackListCheck(value, rule.getWhiteList(), rule.getBlackList(), true).getLeft()) {
-							if (!addConfigToResponse(request, response, rule.getConfig(), exprContext)) {
-								valid = false;
-							}
-						}
-					}
-				}
-			}
-		}
-		if (config.getHeaderRules() != null) {
-			for (Entry<String, List<RequestProcessingRule>> entry : config.getHeaderRules().entrySet()) {
-				Enumeration<String> values = request.getHeaders(entry.getKey());
-				if (values != null) {
-					while (values.hasMoreElements()) {
-						String value = values.nextElement();
-						for (RequestProcessingRule rule : entry.getValue()) {
-							if (!Checks.passesWhiteAndBlackListCheck(value, rule.getWhiteList(), rule.getBlackList(), true).getLeft()) {
-								if (!addConfigToResponse(request, response, rule.getConfig(), exprContext)) {
-									valid = false;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if (config.getParameterRules() != null) {
-			for (Entry<String, List<RequestProcessingRule>> entry : config.getParameterRules().entrySet()) {
-				String[] values = request.getParameterValues(entry.getKey());
-				if (Checks.isNotEmpty(values)) {
-					for (String value : values) {
-						for (RequestProcessingRule rule : entry.getValue()) {
-							if (!Checks.passesWhiteAndBlackListCheck(value, rule.getWhiteList(), rule.getBlackList(), true).getLeft()) {
-								if (!addConfigToResponse(request, response, rule.getConfig(), exprContext)) {
-									valid = false;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if (config.getContextRules() != null) {
-			for (RequestProcessingRule rule : config.getContextRules()) {
-				Object exprOutput = ExprFactory.evalOutputExpression(rule.getMatchExpression(), exprContext);
-				if ((exprOutput != null) && (exprOutput instanceof Boolean) && ((Boolean) exprOutput).booleanValue()) {
-					if (!addConfigToResponse(request, response, rule.getConfig(), exprContext)) {
-						valid = false;
-					}
-				}
-			}
-		}
-		return valid;
-	}
+  private boolean processConfigRules(
+    @Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull RequestProcessingConfig config,
+    @Nonnull RequestProcessingContext exprContext
+  ) {
+    boolean valid = true;
+    if (config.getFailWith() != null) {
+      if (exprContext.testValid()) {
+        try {
+          if (config.getFailStatusMessage() != null) {
+            response.sendError(config.getFailWith(), config.getFailStatusMessage());
+          } else {
+            response.sendError(config.getFailWith());
+          }
+          exprContext.setValid(false);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      Logs.logForSplunk(LOG, "REQUEST_PROCESSING_FOUND_FAILURE", "%s|%s", config.getFailWith(), config.getInfo());
+      Logs.logTrace(LOG, "Request processing failure with status code [%s] for config with ID [%s] and info [%s] during request: %s",
+        config.getFailWith(), config.getId(), config.getInfo(), exprContext.getContext()
+      );
+      valid = false;
+    }
+    if (config.getCookieRules() != null) {
+      for (Entry<String, List<RequestProcessingRule>> entry : config.getCookieRules().entrySet()) {
+        Cookie cookie = WebUtils.getCookie(request, entry.getKey());
+        if (cookie != null) {
+          String value = cookie.getValue();
+          for (RequestProcessingRule rule : entry.getValue()) {
+            if (!Checks.passesWhiteAndBlackListCheck(value, rule.getWhiteList(), rule.getBlackList(), true).getLeft()) {
+              if (!addConfigToResponse(request, response, rule.getConfig(), exprContext)) {
+                valid = false;
+              }
+            }
+          }
+        }
+      }
+    }
+    if (config.getHeaderRules() != null) {
+      for (Entry<String, List<RequestProcessingRule>> entry : config.getHeaderRules().entrySet()) {
+        Enumeration<String> values = request.getHeaders(entry.getKey());
+        if (values != null) {
+          while (values.hasMoreElements()) {
+            String value = values.nextElement();
+            for (RequestProcessingRule rule : entry.getValue()) {
+              if (!Checks.passesWhiteAndBlackListCheck(value, rule.getWhiteList(), rule.getBlackList(), true).getLeft()) {
+                if (!addConfigToResponse(request, response, rule.getConfig(), exprContext)) {
+                  valid = false;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (config.getParameterRules() != null) {
+      for (Entry<String, List<RequestProcessingRule>> entry : config.getParameterRules().entrySet()) {
+        String[] values = request.getParameterValues(entry.getKey());
+        if (Checks.isNotEmpty(values)) {
+          for (String value : values) {
+            for (RequestProcessingRule rule : entry.getValue()) {
+              if (!Checks.passesWhiteAndBlackListCheck(value, rule.getWhiteList(), rule.getBlackList(), true).getLeft()) {
+                if (!addConfigToResponse(request, response, rule.getConfig(), exprContext)) {
+                  valid = false;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (config.getContextRules() != null) {
+      for (RequestProcessingRule rule : config.getContextRules()) {
+        Object exprOutput = ExprFactory.evalOutputExpression(rule.getMatchExpression(), exprContext);
+        if ((exprOutput != null) && (exprOutput instanceof Boolean) && ((Boolean) exprOutput).booleanValue()) {
+          if (!addConfigToResponse(request, response, rule.getConfig(), exprContext)) {
+            valid = false;
+          }
+        }
+      }
+    }
+    return valid;
+  }
 
 }

@@ -14,112 +14,81 @@ import com.github.lancethomps.lava.common.logging.Logs;
 import com.github.lancethomps.lava.common.ser.Serializer;
 import com.github.lancethomps.lava.common.web.WebRequests;
 
-/**
- * The Class UserAgentParser.
- *
- * @author lancethomps
- */
 public class UserAgentParser {
 
-	/** The Constant LOG. */
-	private static final Logger LOG = Logger.getLogger(UserAgentParser.class);
+  private static final String DEFAULT_VALUE = "Other";
+  private static final Logger LOG = Logger.getLogger(UserAgentParser.class);
+  private UserAgentParserConfig config;
 
-	/** The Constant DEFAULT_VALUE. */
-	private static final String DEFAULT_VALUE = "Other";
+  public UserAgentParser() {
+    this(
+      Serializer.fromYaml(
+        WebRequests.findUaRegexesYaml(),
+        UserAgentParserConfig.class
+      )
+    );
+  }
 
-	/** The config. */
-	private UserAgentParserConfig config;
+  public UserAgentParser(UserAgentParserConfig config) {
+    super();
+    this.config = config;
+  }
 
-	/**
-	 * Instantiates a new user agent parser.
-	 */
-	public UserAgentParser() {
-		this(
-			Serializer.fromYaml(
-				WebRequests.findUaRegexesYaml(),
-				UserAgentParserConfig.class
-			)
-		);
-	}
+  public UserAgentParserConfig getConfig() {
+    return config;
+  }
 
-	/**
-	 * Instantiates a new user agent parser.
-	 *
-	 * @param config the config
-	 */
-	public UserAgentParser(UserAgentParserConfig config) {
-		super();
-		this.config = config;
-	}
+  public void setConfig(UserAgentParserConfig config) {
+    this.config = config;
+  }
 
-	/**
-	 * Gets the config.
-	 *
-	 * @return the config
-	 */
-	public UserAgentParserConfig getConfig() {
-		return config;
-	}
+  public UserAgent parse(String agentString) {
+    UserAgent ua = new UserAgent().setBrowser(DEFAULT_VALUE);
+    try {
+      for (UserAgentParserRegex parser : config.getUserAgentParsers()) {
+        Matcher matcher = parser.getParsedRegex().matcher(agentString);
 
-	/**
-	 * Parses the.
-	 *
-	 * @param agentString the agent string
-	 * @return the user agent
-	 */
-	public UserAgent parse(String agentString) {
-		UserAgent ua = new UserAgent().setBrowser(DEFAULT_VALUE);
-		try {
-			for (UserAgentParserRegex parser : config.getUserAgentParsers()) {
-				Matcher matcher = parser.getParsedRegex().matcher(agentString);
+        if (matcher.find()) {
+          ua.setBrowser(defaultIfBlank(Patterns.replace(matcher, defaultIfNull(parser.getFamilyReplacement(), "$1")), DEFAULT_VALUE));
+          ua.setBrowserVersionMajor(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getV1Replacement(), "$2"))));
+          ua.setBrowserVersionMinor(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getV2Replacement(), "$3"))));
+          ua.setBrowserVersionPatch(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getV3Replacement(), "$4"))));
+          break;
+        }
+      }
 
-				if (matcher.find()) {
-					ua.setBrowser(defaultIfBlank(Patterns.replace(matcher, defaultIfNull(parser.getFamilyReplacement(), "$1")), DEFAULT_VALUE));
-					ua.setBrowserVersionMajor(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getV1Replacement(), "$2"))));
-					ua.setBrowserVersionMinor(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getV2Replacement(), "$3"))));
-					ua.setBrowserVersionPatch(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getV3Replacement(), "$4"))));
-					break;
-				}
-			}
+      for (OsParserRegex parser : config.getOsParsers()) {
+        Matcher matcher = parser.getParsedRegex().matcher(agentString);
 
-			for (OsParserRegex parser : config.getOsParsers()) {
-				Matcher matcher = parser.getParsedRegex().matcher(agentString);
+        if (matcher.find()) {
+          ua.setOs(StringUtils.defaultIfBlank(Patterns.replace(matcher, Checks.defaultIfNull(parser.getOsReplacement(), "$1")), DEFAULT_VALUE));
+          ua.setOsVersionMajor(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getOsV1Replacement(), "$2"))));
+          ua.setOsVersionMinor(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getOsV2Replacement(), "$3"))));
+          ua.setOsVersionPatch(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getOsV3Replacement(), "$4"))));
+          ua.setOsVersionPatchMinor(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getOsV4Replacement(), "$5"))));
+          break;
+        }
+      }
 
-				if (matcher.find()) {
-					ua.setOs(StringUtils.defaultIfBlank(Patterns.replace(matcher, Checks.defaultIfNull(parser.getOsReplacement(), "$1")), DEFAULT_VALUE));
-					ua.setOsVersionMajor(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getOsV1Replacement(), "$2"))));
-					ua.setOsVersionMinor(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getOsV2Replacement(), "$3"))));
-					ua.setOsVersionPatch(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getOsV3Replacement(), "$4"))));
-					ua.setOsVersionPatchMinor(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getOsV4Replacement(), "$5"))));
-					break;
-				}
-			}
+      for (DeviceParserRegex parser : config.getDeviceParsers()) {
+        Matcher matcher = parser.getParsedRegex().matcher(agentString);
 
-			for (DeviceParserRegex parser : config.getDeviceParsers()) {
-				Matcher matcher = parser.getParsedRegex().matcher(agentString);
-
-				if (matcher.find()) {
-					ua.setDeviceFamily(StringUtils.defaultIfBlank(Patterns.replace(matcher, Checks.defaultIfNull(parser.getDeviceReplacement(), "$1")), DEFAULT_VALUE));
-					if (parser.getBrandReplacement() != null) {
-						ua.setDeviceBrand(StringUtils.trimToNull(Patterns.replace(matcher, parser.getBrandReplacement())));
-					}
-					ua.setDeviceModel(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getModelReplacement(), "$1"))));
-					break;
-				}
-			}
-		} catch (Throwable e) {
-			Logs.logError(LOG, e, "Issue while parsing User-Agent [%s]", agentString);
-		}
-		return ua;
-	}
-
-	/**
-	 * Sets the config.
-	 *
-	 * @param config the config to set
-	 */
-	public void setConfig(UserAgentParserConfig config) {
-		this.config = config;
-	}
+        if (matcher.find()) {
+          ua.setDeviceFamily(StringUtils.defaultIfBlank(
+            Patterns.replace(matcher, Checks.defaultIfNull(parser.getDeviceReplacement(), "$1")),
+            DEFAULT_VALUE
+          ));
+          if (parser.getBrandReplacement() != null) {
+            ua.setDeviceBrand(StringUtils.trimToNull(Patterns.replace(matcher, parser.getBrandReplacement())));
+          }
+          ua.setDeviceModel(StringUtils.trimToNull(Patterns.replace(matcher, Checks.defaultIfNull(parser.getModelReplacement(), "$1"))));
+          break;
+        }
+      }
+    } catch (Throwable e) {
+      Logs.logError(LOG, e, "Issue while parsing User-Agent [%s]", agentString);
+    }
+    return ua;
+  }
 
 }

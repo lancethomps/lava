@@ -7,58 +7,36 @@ import javax.servlet.WriteListener;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
-/**
- * The Class BufferedServletOutputStream.
- */
 public class BufferedServletOutputStream extends ServletOutputStream {
 
-	/** The bos. */
-	private ByteArrayOutputStream bos = new ByteArrayOutputStream();
+  private ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.io.OutputStream#write(int)
-	 */
-	@Override
-	public void write(int b) throws IOException {
-		bos.write(b);
-	}
+  @Override
+  public void flush() throws IOException {
+    bos.flush();
+  }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.io.OutputStream#flush()
-	 */
-	@Override
-	public void flush() throws IOException {
-		bos.flush();
-	}
+  public byte[] getBuffer() {
+    return bos.toByteArray();
+  }
 
-	/**
-	 * Gets the buffer.
-	 *
-	 * @return the buffer
-	 */
-	public byte[] getBuffer() {
-		return bos.toByteArray();
-	}
+  @Override
+  public boolean isReady() {
+    return false;
+  }
 
-	/**
-	 * Reset.
-	 */
-	public void reset() {
-		bos.reset();
-	}
+  public void reset() {
+    bos.reset();
+  }
 
-	@Override
-	public boolean isReady() {
-		return false;
-	}
+  @Override
+  public void setWriteListener(WriteListener writeListener) {
 
-	@Override
-	public void setWriteListener(WriteListener writeListener) {
-		// NB: purposely doing nothing here
-	}
+  }
+
+  @Override
+  public void write(int b) throws IOException {
+    bos.write(b);
+  }
 
 }

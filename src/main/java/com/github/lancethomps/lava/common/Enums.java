@@ -14,228 +14,150 @@ import org.apache.log4j.Logger;
 
 import com.github.lancethomps.lava.common.logging.Logs;
 
-/**
- * The Class EnumParser.
- */
 // TODO: Update all enums to use this
 public class Enums {
 
-	/** The Constant DEFAULT_VALUE_MAP. */
-	public static final Map<Class<?>, Enum<?>> DEFAULT_VALUE_MAP = new HashMap<>();
+  public static final Map<Class<?>, Enum<?>> DEFAULT_VALUE_MAP = new HashMap<>();
 
-	/** The Constant STRING_TO_TYPE_MAPS. */
-	public static final Map<Class<?>, Map<String, Enum<?>>> STRING_TO_TYPE_MAPS = new HashMap<>();
+  public static final Map<Class<?>, Map<String, Enum<?>>> STRING_TO_TYPE_MAPS = new HashMap<>();
 
-	/** The Constant THROWING_ENUMS. */
-	public static final Set<Class<?>> THROWING_ENUMS = new HashSet<>();
+  public static final Set<Class<?>> THROWING_ENUMS = new HashSet<>();
 
-	/** The Constant LOG. */
-	private static final Logger LOG = Logger.getLogger(Enums.class);
+  private static final Logger LOG = Logger.getLogger(Enums.class);
 
-	/**
-	 * Creates the string to type map.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @return the map
-	 */
-	public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(Class<T> type) {
-		return createStringToTypeMap(type, null);
-	}
+  public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(Class<T> type) {
+    return createStringToTypeMap(type, null);
+  }
 
-	/**
-	 * Creates the string to type map.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @param defaultValue the default value
-	 * @return the map
-	 */
-	public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(Class<T> type, T defaultValue) {
-		return createStringToTypeMap(type, defaultValue, (List<Function<T, Object>>) null);
-	}
+  public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(Class<T> type, T defaultValue) {
+    return createStringToTypeMap(type, defaultValue, (List<Function<T, Object>>) null);
+  }
 
-	/**
-	 * Creates the string to type map.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @param defaultValue the default value
-	 * @param throwException the throw exception
-	 * @param additionalSupplier the additional supplier
-	 * @return the map
-	 */
-	@SafeVarargs
-	public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(Class<T> type, T defaultValue, boolean throwException, Function<T, Object>... additionalSupplier) {
-		List<Function<T, Object>> additionalSuppliers = (additionalSupplier == null) || (additionalSupplier.length == 0) ? null : Arrays.asList(additionalSupplier);
-		return createStringToTypeMap(type, defaultValue, throwException, additionalSuppliers);
-	}
+  @SafeVarargs
+  public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(
+    Class<T> type,
+    T defaultValue,
+    boolean throwException,
+    Function<T, Object>... additionalSupplier
+  ) {
+    List<Function<T, Object>> additionalSuppliers =
+      (additionalSupplier == null) || (additionalSupplier.length == 0) ? null : Arrays.asList(additionalSupplier);
+    return createStringToTypeMap(type, defaultValue, throwException, additionalSuppliers);
+  }
 
-	/**
-	 * Creates the string to type map.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @param defaultValue the default value
-	 * @param throwException the throw exception
-	 * @param additionalSuppliers the additional suppliers
-	 * @return the map
-	 */
-	public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(Class<T> type, T defaultValue, boolean throwException, List<Function<T, Object>> additionalSuppliers) {
-		return createStringToTypeMap(type, defaultValue, throwException, additionalSuppliers, null);
-	}
+  public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(
+    Class<T> type,
+    T defaultValue,
+    boolean throwException,
+    List<Function<T, Object>> additionalSuppliers
+  ) {
+    return createStringToTypeMap(type, defaultValue, throwException, additionalSuppliers, null);
+  }
 
-	/**
-	 * Creates the string to type map.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @param defaultValue the default value
-	 * @param throwException the throw exception
-	 * @param additionalSuppliers the additional suppliers
-	 * @param additionalMultiSuppliers the additional multi suppliers
-	 * @return the map
-	 */
-	public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(
-		Class<T> type,
-		T defaultValue,
-		boolean throwException,
-		List<Function<T, Object>> additionalSuppliers,
-		List<Function<T, Collection<?>>> additionalMultiSuppliers
-	) {
-		synchronized (STRING_TO_TYPE_MAPS) {
-			Map<String, Enum<?>> map = STRING_TO_TYPE_MAPS.computeIfAbsent(type, k -> new HashMap<>());
-			try {
-				for (T val : type.getEnumConstants()) {
-					map.put(val.name(), val);
-					map.put(val.name().toLowerCase(), val);
-					if ((additionalSuppliers != null) && !additionalSuppliers.isEmpty()) {
-						additionalSuppliers
-							.stream()
-							.map(func -> func.apply(val))
-							.filter(Objects::nonNull)
-							.filter(key -> !map.containsKey(key.toString()))
-							.forEach(key -> map.put(key.toString(), val));
-					}
-					if ((additionalMultiSuppliers != null) && !additionalMultiSuppliers.isEmpty()) {
-						additionalMultiSuppliers
-							.stream()
-							.map(func -> func.apply(val))
-							.filter(Objects::nonNull)
-							.flatMap(Collection::stream)
-							.filter(Objects::nonNull)
-							.filter(key -> !map.containsKey(key.toString()))
-							.forEach(key -> map.put(key.toString(), val));
-					}
-				}
-				if (defaultValue != null) {
-					DEFAULT_VALUE_MAP.put(type, defaultValue);
-				}
-				if (throwException) {
-					THROWING_ENUMS.add(type);
-				}
-			} catch (Throwable e) {
-				Logs.logError(LOG, e, "Issue creating string to type map for [%s] with default value [%s] and throw exception set to [%s]", type, defaultValue, throwException);
-			}
-			return map;
-		}
-	}
+  public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(
+    Class<T> type,
+    T defaultValue,
+    boolean throwException,
+    List<Function<T, Object>> additionalSuppliers,
+    List<Function<T, Collection<?>>> additionalMultiSuppliers
+  ) {
+    synchronized (STRING_TO_TYPE_MAPS) {
+      Map<String, Enum<?>> map = STRING_TO_TYPE_MAPS.computeIfAbsent(type, k -> new HashMap<>());
+      try {
+        for (T val : type.getEnumConstants()) {
+          map.put(val.name(), val);
+          map.put(val.name().toLowerCase(), val);
+          if ((additionalSuppliers != null) && !additionalSuppliers.isEmpty()) {
+            additionalSuppliers
+              .stream()
+              .map(func -> func.apply(val))
+              .filter(Objects::nonNull)
+              .filter(key -> !map.containsKey(key.toString()))
+              .forEach(key -> map.put(key.toString(), val));
+          }
+          if ((additionalMultiSuppliers != null) && !additionalMultiSuppliers.isEmpty()) {
+            additionalMultiSuppliers
+              .stream()
+              .map(func -> func.apply(val))
+              .filter(Objects::nonNull)
+              .flatMap(Collection::stream)
+              .filter(Objects::nonNull)
+              .filter(key -> !map.containsKey(key.toString()))
+              .forEach(key -> map.put(key.toString(), val));
+          }
+        }
+        if (defaultValue != null) {
+          DEFAULT_VALUE_MAP.put(type, defaultValue);
+        }
+        if (throwException) {
+          THROWING_ENUMS.add(type);
+        }
+      } catch (Throwable e) {
+        Logs.logError(
+          LOG,
+          e,
+          "Issue creating string to type map for [%s] with default value [%s] and throw exception set to [%s]",
+          type,
+          defaultValue,
+          throwException
+        );
+      }
+      return map;
+    }
+  }
 
-	/**
-	 * Creates the string to type map.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @param defaultValue the default value
-	 * @param additionalSupplier the additional supplier
-	 * @return the map
-	 */
-	@SafeVarargs
-	public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(Class<T> type, T defaultValue, Function<T, Object>... additionalSupplier) {
-		return createStringToTypeMap(type, defaultValue, false, additionalSupplier);
-	}
+  @SafeVarargs
+  public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(
+    Class<T> type,
+    T defaultValue,
+    Function<T, Object>... additionalSupplier
+  ) {
+    return createStringToTypeMap(type, defaultValue, false, additionalSupplier);
+  }
 
-	/**
-	 * Creates the string to type map.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @param defaultValue the default value
-	 * @param additionalSuppliers the additional suppliers
-	 * @return the map
-	 */
-	public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(Class<T> type, T defaultValue, List<Function<T, Object>> additionalSuppliers) {
-		return createStringToTypeMap(type, defaultValue, false, additionalSuppliers);
-	}
+  public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(
+    Class<T> type,
+    T defaultValue,
+    List<Function<T, Object>> additionalSuppliers
+  ) {
+    return createStringToTypeMap(type, defaultValue, false, additionalSuppliers);
+  }
 
-	/**
-	 * From string.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @param val the val
-	 * @return the t
-	 */
-	public static <T extends Enum<?>> T fromString(Class<T> type, String val) {
-		return fromString(type, val, null);
-	}
+  public static <T extends Enum<?>> T fromString(Class<T> type, String val) {
+    return fromString(type, val, null);
+  }
 
-	/**
-	 * From string.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @param val the val
-	 * @param defaultValue the default value
-	 * @return the t
-	 */
-	public static <T extends Enum<?>> T fromString(Class<T> type, String val, T defaultValue) {
-		return fromString(type, val, defaultValue, true);
-	}
+  public static <T extends Enum<?>> T fromString(Class<T> type, String val, T defaultValue) {
+    return fromString(type, val, defaultValue, true);
+  }
 
-	/**
-	 * From string.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @param val the val
-	 * @param defaultValue the default value
-	 * @param allowGlobalDefault the allow global default
-	 * @return the t
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Enum<?>> T fromString(Class<T> type, String val, T defaultValue, boolean allowGlobalDefault) {
-		if ((type == null) || (val == null)) {
-			return defaultValue;
-		}
-		Map<String, Enum<?>> map = STRING_TO_TYPE_MAPS.get(type);
-		if (map == null) {
-			map = createStringToTypeMap(type);
-		}
-		if (map == null) {
-			T enumVal = (defaultValue == null) && allowGlobalDefault ? (T) DEFAULT_VALUE_MAP.get(type) : defaultValue;
-			if ((enumVal == null) && THROWING_ENUMS.contains(type)) {
-				throw new IllegalArgumentException(String.format("No enum of type [%s] matching string [%s]!", type, val));
-			}
-			return enumVal;
-		}
-		T enumVal = (T) map.get(val);
-		if (enumVal == null) {
-			enumVal = (T) map.getOrDefault(val.toLowerCase(), (defaultValue == null) && allowGlobalDefault ? (T) DEFAULT_VALUE_MAP.get(type) : defaultValue);
-		}
-		return enumVal;
-	}
+  @SuppressWarnings("unchecked")
+  public static <T extends Enum<?>> T fromString(Class<T> type, String val, T defaultValue, boolean allowGlobalDefault) {
+    if ((type == null) || (val == null)) {
+      return defaultValue;
+    }
+    Map<String, Enum<?>> map = STRING_TO_TYPE_MAPS.get(type);
+    if (map == null) {
+      map = createStringToTypeMap(type);
+    }
+    if (map == null) {
+      T enumVal = (defaultValue == null) && allowGlobalDefault ? (T) DEFAULT_VALUE_MAP.get(type) : defaultValue;
+      if ((enumVal == null) && THROWING_ENUMS.contains(type)) {
+        throw new IllegalArgumentException(String.format("No enum of type [%s] matching string [%s]!", type, val));
+      }
+      return enumVal;
+    }
+    T enumVal = (T) map.get(val);
+    if (enumVal == null) {
+      enumVal =
+        (T) map.getOrDefault(val.toLowerCase(), (defaultValue == null) && allowGlobalDefault ? (T) DEFAULT_VALUE_MAP.get(type) : defaultValue);
+    }
+    return enumVal;
+  }
 
-	/**
-	 * Gets the default value.
-	 *
-	 * @param <T> the generic type
-	 * @param type the type
-	 * @return the default value
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Enum<?>> T getDefaultValue(Class<T> type) {
-		return (T) DEFAULT_VALUE_MAP.get(type);
-	}
+  @SuppressWarnings("unchecked")
+  public static <T extends Enum<?>> T getDefaultValue(Class<T> type) {
+    return (T) DEFAULT_VALUE_MAP.get(type);
+  }
 
 }

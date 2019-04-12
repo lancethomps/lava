@@ -4,28 +4,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.github.lancethomps.lava.common.web.throttle.RequestThrottleContext;
 
-/**
- * The Interface RequestThrottleContextInitializer.
- *
- * @author lancethomps
- */
 public interface RequestThrottleContextInitializer {
 
-	/**
-	 * Gets the request context.
-	 *
-	 * @param request the request
-	 * @return the request context
-	 */
-	default RequestThrottleContext getRequestContext(HttpServletRequest request) {
-		return WebRequestContext.getRequestContext(request);
-	}
+  default RequestThrottleContext getRequestContext(HttpServletRequest request) {
+    return WebRequestContext.getRequestContext(request);
+  }
 
-	/**
-	 * Gets the user id.
-	 *
-	 * @param context the context
-	 * @return the user id
-	 */
-	String getUserId(RequestThrottleContext context);
+  String getUserId(RequestThrottleContext context);
+
 }

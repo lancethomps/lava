@@ -5,123 +5,69 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 
-/**
- * The Class BeanDefinitionWithOverride.
- *
- * @author lancethomps
- * @param <T> the generic type
- */
 public class BeanDefinitionWithOverride<T> implements FactoryBean<T>, BeanFactoryAware {
 
-	/** The bean factory. */
-	private BeanFactory beanFactory;
+  private BeanFactory beanFactory;
 
-	/** The default bean name. */
-	private String defaultBeanName;
+  private String defaultBeanName;
 
-	/** The default value. */
-	private T defaultValue;
+  private T defaultValue;
 
-	/** The override bean name. */
-	private String overrideBeanName;
+  private String overrideBeanName;
 
-	/**
-	 * @return the beanFactory
-	 */
-	public BeanFactory getBeanFactory() {
-		return beanFactory;
-	}
+  public BeanFactory getBeanFactory() {
+    return beanFactory;
+  }
 
-	/**
-	 * @return the defaultBeanName
-	 */
-	public String getDefaultBeanName() {
-		return defaultBeanName;
-	}
+  @Override
+  public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+    this.beanFactory = beanFactory;
+  }
 
-	/**
-	 * @return the defaultValue
-	 */
-	public T getDefaultValue() {
-		return defaultValue;
-	}
+  public String getDefaultBeanName() {
+    return defaultBeanName;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public T getObject() throws Exception {
-		if ((overrideBeanName != null) && beanFactory.containsBean(overrideBeanName)) {
-			return (T) beanFactory.getBean(overrideBeanName);
-		}
-		if ((defaultBeanName != null) && beanFactory.containsBean(defaultBeanName)) {
-			return (T) beanFactory.getBean(defaultBeanName);
-		}
-		return defaultValue;
-	}
+  public void setDefaultBeanName(String defaultBeanName) {
+    this.defaultBeanName = defaultBeanName;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
-	 */
-	@Override
-	public Class<?> getObjectType() {
-		return Object.class;
-	}
+  public T getDefaultValue() {
+    return defaultValue;
+  }
 
-	/**
-	 * @return the overrideBeanName
-	 */
-	public String getOverrideBeanName() {
-		return overrideBeanName;
-	}
+  public void setDefaultValue(T defaultValue) {
+    this.defaultValue = defaultValue;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
+  @Override
+  @SuppressWarnings("unchecked")
+  public T getObject() throws Exception {
+    if ((overrideBeanName != null) && beanFactory.containsBean(overrideBeanName)) {
+      return (T) beanFactory.getBean(overrideBeanName);
+    }
+    if ((defaultBeanName != null) && beanFactory.containsBean(defaultBeanName)) {
+      return (T) beanFactory.getBean(defaultBeanName);
+    }
+    return defaultValue;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
-	 */
-	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;
-	}
+  @Override
+  public Class<?> getObjectType() {
+    return Object.class;
+  }
 
-	/**
-	 * Sets the default bean name.
-	 *
-	 * @param defaultBeanName the new default bean name
-	 */
-	public void setDefaultBeanName(String defaultBeanName) {
-		this.defaultBeanName = defaultBeanName;
-	}
+  public String getOverrideBeanName() {
+    return overrideBeanName;
+  }
 
-	/**
-	 * @param defaultValue the defaultValue to set
-	 */
-	public void setDefaultValue(T defaultValue) {
-		this.defaultValue = defaultValue;
-	}
+  public void setOverrideBeanName(String overrideBeanName) {
+    this.overrideBeanName = overrideBeanName;
+  }
 
-	/**
-	 * Sets the override bean name.
-	 *
-	 * @param overrideBeanName the new override bean name
-	 */
-	public void setOverrideBeanName(String overrideBeanName) {
-		this.overrideBeanName = overrideBeanName;
-	}
+  @Override
+  public boolean isSingleton() {
+    return true;
+  }
+
 }

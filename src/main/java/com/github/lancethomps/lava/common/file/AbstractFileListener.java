@@ -14,117 +14,84 @@ import com.github.lancethomps.lava.common.Checks;
 import com.github.lancethomps.lava.common.lambda.ThrowingConsumer;
 import com.github.lancethomps.lava.common.logging.Logs;
 
-/**
- * The Class AbstractFileListener.
- */
 public abstract class AbstractFileListener implements Listener {
 
-	/** The Constant LOG. */
-	private static final Logger LOG = Logger.getLogger(AbstractFileListener.class);
+  private static final Logger LOG = Logger.getLogger(AbstractFileListener.class);
 
-	/** The root dir. */
-	private String baseDir;
+  private String baseDir;
 
-	/** The file load callbacks. */
-	private List<ThrowingConsumer<File>> fileLoadCallbacks = new ArrayList<>();
+  private List<ThrowingConsumer<File>> fileLoadCallbacks = new ArrayList<>();
 
-	/** The config. */
-	private ListenerConfiguration listenerConfiguration;
+  private ListenerConfiguration listenerConfiguration;
 
-	/**
-	 * Adds the file load callback.
-	 *
-	 * @param callback the callback
-	 */
-	public void addFileLoadCallback(final ThrowingConsumer<File> callback) {
-		synchronized (fileLoadCallbacks) {
-			fileLoadCallbacks.add(callback);
-		}
-	}
+  public void addFileLoadCallback(final ThrowingConsumer<File> callback) {
+    synchronized (fileLoadCallbacks) {
+      fileLoadCallbacks.add(callback);
+    }
+  }
 
-	/**
-	 * After properties set.
-	 *
-	 * @throws Exception the exception
-	 */
-	public void afterBaseDirSet() throws Exception {
-		// Override this for PostConstruct logic
-	}
+  public void afterBaseDirSet() throws Exception {
 
-	/**
-	 * @return the baseDir
-	 */
-	public String getBaseDir() {
-		return baseDir;
-	}
+  }
 
-	@Override
-	public List<ThrowingConsumer<File>> getFileLoadCallbacks() {
-		return fileLoadCallbacks;
-	}
+  public String getBaseDir() {
+    return baseDir;
+  }
 
-	/**
-	 * @return the config
-	 */
-	public ListenerConfiguration getListenerConfiguration() {
-		return listenerConfiguration;
-	}
+  public void setBaseDir(String baseDir) {
+    this.baseDir = baseDir;
+  }
 
-	@Override
-	public void handleFileDelete(File file) {
-	}
+  @Override
+  public List<ThrowingConsumer<File>> getFileLoadCallbacks() {
+    return fileLoadCallbacks;
+  }
 
-	@Override
-	public void handleFileLoad(File file) {
-		Logs.logError(LOG, new Exception(), "Listeners should overwrite the handleFileLoad method! The file [%s] was not loaded due to no available method.", file);
-	}
+  public ListenerConfiguration getListenerConfiguration() {
+    return listenerConfiguration;
+  }
 
-	/**
-	 * Load all files in dir.
-	 *
-	 * @param dir the dir
-	 */
-	public void loadAllFilesInDir(File dir) {
-		if ((dir != null) && dir.exists() && dir.isDirectory()) {
-			File[] files = dir.listFiles();
-			if ((files != null) && (files.length > 0)) {
-				Stream.of(files).filter(File::isFile).peek(file -> logWarn(LOG, "Loading file [%s] with listener [%s]", getRelativePathForFile(file), getClass().getSimpleName())).forEach(
-					this::handleFileLoad
-				);
-				if (listenerConfiguration.isIncludeSubDirs()) {
-					Stream.of(files).filter(File::isDirectory).forEach(this::loadAllFilesInDir);
-				}
-			}
-		}
-	}
+  public void setListenerConfiguration(ListenerConfiguration listenerConfiguration) {
+    this.listenerConfiguration = listenerConfiguration;
+  }
 
-	/**
-	 * @param baseDir the baseDir to set
-	 */
-	public void setBaseDir(String baseDir) {
-		this.baseDir = baseDir;
-	}
+  @Override
+  public void handleFileDelete(File file) {
+  }
 
-	/**
-	 * Sets the listener configuration.
-	 *
-	 * @param listenerConfiguration the new listener configuration
-	 */
-	public void setListenerConfiguration(ListenerConfiguration listenerConfiguration) {
-		this.listenerConfiguration = listenerConfiguration;
-	}
+  @Override
+  public void handleFileLoad(File file) {
+    Logs.logError(
+      LOG,
+      new Exception(),
+      "Listeners should overwrite the handleFileLoad method! The file [%s] was not loaded due to no available method.",
+      file
+    );
+  }
 
-	/**
-	 * Gets the relative path for file.
-	 *
-	 * @param file the file
-	 * @return the relative path for file
-	 */
-	private String getRelativePathForFile(File file) {
-		if (Checks.isNotBlank(baseDir)) {
-			return StringUtils.removeStart(FileUtil.fullPath(file), baseDir + File.separatorChar);
-		}
-		return file.getName();
-	}
+  public void loadAllFilesInDir(File dir) {
+    if ((dir != null) && dir.exists() && dir.isDirectory()) {
+      File[] files = dir.listFiles();
+      if ((files != null) && (files.length > 0)) {
+        Stream
+          .of(files)
+          .filter(File::isFile)
+          .peek(file -> logWarn(LOG, "Loading file [%s] with listener [%s]", getRelativePathForFile(file), getClass().getSimpleName()))
+          .forEach(
+            this::handleFileLoad
+          );
+        if (listenerConfiguration.isIncludeSubDirs()) {
+          Stream.of(files).filter(File::isDirectory).forEach(this::loadAllFilesInDir);
+        }
+      }
+    }
+  }
+
+  private String getRelativePathForFile(File file) {
+    if (Checks.isNotBlank(baseDir)) {
+      return StringUtils.removeStart(FileUtil.fullPath(file), baseDir + File.separatorChar);
+    }
+    return file.getName();
+  }
 
 }

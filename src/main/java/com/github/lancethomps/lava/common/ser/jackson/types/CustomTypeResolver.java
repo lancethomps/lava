@@ -19,97 +19,74 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.google.common.collect.Sets;
 
-/**
- * The Class CustomTypeResolver.
- */
 public class CustomTypeResolver extends DefaultTypeResolverBuilder {
 
-	/** The Constant IGNORE_PACKAGES. */
-	public static final Set<String> IGNORE_PACKAGES = Sets.newHashSet();
+  public static final Set<String> IGNORE_PACKAGES = Sets.newHashSet();
 
-	/** The Constant IGNORE_TYPES. */
-	public static final Set<Class<?>> IGNORE_TYPES = Sets.newHashSet(LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
+  public static final Set<Class<?>> IGNORE_TYPES = Sets.newHashSet(LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
 
-	/** The Constant INCLUDE_PACKAGES. */
-	public static final Set<String> INCLUDE_PACKAGES = Sets.newHashSet(
-		"com.github.lancethomps.lava",
-		"org.apache.commons.math3.linear"
-	);
+  public static final Set<String> INCLUDE_PACKAGES = Sets.newHashSet(
+    "com.github.lancethomps.lava",
+    "org.apache.commons.math3.linear"
+  );
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 7025088197372998890L;
+  private static final long serialVersionUID = 7025088197372998890L;
 
-	/** The shortened type override. */
-	private boolean shortenedTypeOverride;
+  private boolean shortenedTypeOverride;
 
-	/**
-	 * Instantiates a new custom type resolver.
-	 */
-	public CustomTypeResolver() {
-		this(false);
-	}
+  public CustomTypeResolver() {
+    this(false);
+  }
 
-	/**
-	 * Instantiates a new custom type resolver.
-	 *
-	 * @param shortenedTypeOverride the shortened type override
-	 */
-	public CustomTypeResolver(boolean shortenedTypeOverride) {
-		super(DefaultTyping.NON_FINAL);
-		this.shortenedTypeOverride = shortenedTypeOverride;
-	}
+  public CustomTypeResolver(boolean shortenedTypeOverride) {
+    super(DefaultTyping.NON_FINAL);
+    this.shortenedTypeOverride = shortenedTypeOverride;
+  }
 
-	/**
-	 * Builds the type des.
-	 *
-	 * @param config the config
-	 * @param baseType the base type
-	 * @param subtypes the subtypes
-	 * @return the type deserializer
-	 */
-	public TypeDeserializer buildTypeDes(DeserializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
-		TypeIdResolver idRes = idResolver(config, baseType, subtypes, false, true);
-		JavaType defaultImpl;
+  public TypeDeserializer buildTypeDes(DeserializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
+    TypeIdResolver idRes = idResolver(config, baseType, subtypes, false, true);
+    JavaType defaultImpl;
 
-		if (_defaultImpl == null) {
-			defaultImpl = null;
-		} else {
-			if ((_defaultImpl == Void.class) || (_defaultImpl == NoClass.class)) {
-				defaultImpl = config.getTypeFactory().constructType(_defaultImpl);
-			} else {
-				defaultImpl = config.getTypeFactory().constructSpecializedType(baseType, _defaultImpl);
-			}
-		}
-		return new CustomTypeDeserializer(baseType, idRes, _typeProperty, _typeIdVisible, defaultImpl, _includeAs);
-	}
+    if (_defaultImpl == null) {
+      defaultImpl = null;
+    } else {
+      if ((_defaultImpl == Void.class) || (_defaultImpl == NoClass.class)) {
+        defaultImpl = config.getTypeFactory().constructType(_defaultImpl);
+      } else {
+        defaultImpl = config.getTypeFactory().constructSpecializedType(baseType, _defaultImpl);
+      }
+    }
+    return new CustomTypeDeserializer(baseType, idRes, _typeProperty, _typeIdVisible, defaultImpl, _includeAs);
+  }
 
-	@Override
-	public TypeDeserializer buildTypeDeserializer(DeserializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
-		return useForType(baseType) ? buildTypeDes(config, baseType, subtypes) : null;
-	}
+  @Override
+  public TypeDeserializer buildTypeDeserializer(DeserializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
+    return useForType(baseType) ? buildTypeDes(config, baseType, subtypes) : null;
+  }
 
-	@Override
-	public boolean useForType(JavaType t) {
-		while (t.isArrayType()) {
-			t = t.getContentType();
-		}
-		String className = t.getRawClass().getName();
-		if (Temporal.class.isAssignableFrom(t.getRawClass()) || IGNORE_TYPES.contains(t.getRawClass())) {
-			return false;
-		}
-		if ((!t.isFinal() || (!t.isEnumType() && className.startsWith("com.github.lancethomps.lava"))) && !TreeNode.class.isAssignableFrom(t.getRawClass())) {
-			for (String pack : INCLUDE_PACKAGES) {
-				if (className.startsWith(pack) && !IGNORE_PACKAGES.stream().anyMatch(className::startsWith)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+  @Override
+  public boolean useForType(JavaType t) {
+    while (t.isArrayType()) {
+      t = t.getContentType();
+    }
+    String className = t.getRawClass().getName();
+    if (Temporal.class.isAssignableFrom(t.getRawClass()) || IGNORE_TYPES.contains(t.getRawClass())) {
+      return false;
+    }
+    if ((!t.isFinal() || (!t.isEnumType() && className.startsWith("com.github.lancethomps.lava"))) &&
+      !TreeNode.class.isAssignableFrom(t.getRawClass())) {
+      for (String pack : INCLUDE_PACKAGES) {
+        if (className.startsWith(pack) && !IGNORE_PACKAGES.stream().anyMatch(className::startsWith)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
-	@Override
-	protected TypeIdResolver idResolver(MapperConfig<?> config, JavaType baseType, Collection<NamedType> subtypes, boolean forSer, boolean forDeser) {
-		return new CustomTypeIdResolver(baseType, config.getTypeFactory(), shortenedTypeOverride);
-	}
+  @Override
+  protected TypeIdResolver idResolver(MapperConfig<?> config, JavaType baseType, Collection<NamedType> subtypes, boolean forSer, boolean forDeser) {
+    return new CustomTypeIdResolver(baseType, config.getTypeFactory(), shortenedTypeOverride);
+  }
 
 }

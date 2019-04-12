@@ -5,69 +5,44 @@ import java.util.regex.Pattern;
 import com.github.lancethomps.lava.common.Patterns;
 import com.github.lancethomps.lava.common.ser.ExternalizableBean;
 
-/**
- * The Class AbstractUserAgentRegex.
- *
- * @author lancethomps
- */
 public abstract class AbstractUserAgentParserRegex extends ExternalizableBean {
 
-	/** The parsed regex. */
-	private Pattern parsedRegex;
+  private Pattern parsedRegex;
 
-	/** The regex. */
-	private String regex;
+  private String regex;
 
-	/** The regex flag. */
-	private String regexFlag;
+  private String regexFlag;
 
-	@Override
-	public void afterDeserialization() {
-		super.afterDeserialization();
-		if (regex != null) {
-			parsedRegex = Pattern.compile(regex, Patterns.asOptions(regexFlag));
-		}
-	}
+  @Override
+  public void afterDeserialization() {
+    super.afterDeserialization();
+    if (regex != null) {
+      parsedRegex = Pattern.compile(regex, Patterns.asOptions(regexFlag));
+    }
+  }
 
-	/**
-	 * @return the regex
-	 */
-	public Pattern getParsedRegex() {
-		return parsedRegex;
-	}
+  public Pattern getParsedRegex() {
+    return parsedRegex;
+  }
 
-	/**
-	 * @return the regex
-	 */
-	public String getRegex() {
-		return regex;
-	}
+  public void setParsedRegex(Pattern parsedRegex) {
+    this.parsedRegex = parsedRegex;
+  }
 
-	/**
-	 * @return the regexFlag
-	 */
-	public String getRegexFlag() {
-		return regexFlag;
-	}
+  public String getRegex() {
+    return regex;
+  }
 
-	/**
-	 * @param parsedRegex the parsedRegex to set
-	 */
-	public void setParsedRegex(Pattern parsedRegex) {
-		this.parsedRegex = parsedRegex;
-	}
+  public void setRegex(String regex) {
+    this.regex = regex;
+  }
 
-	/**
-	 * @param regex the regex to set
-	 */
-	public void setRegex(String regex) {
-		this.regex = regex;
-	}
+  public String getRegexFlag() {
+    return regexFlag;
+  }
 
-	/**
-	 * @param regexFlag the regexFlag to set
-	 */
-	public void setRegexFlag(String regexFlag) {
-		this.regexFlag = regexFlag;
-	}
+  public void setRegexFlag(String regexFlag) {
+    this.regexFlag = regexFlag;
+  }
+
 }

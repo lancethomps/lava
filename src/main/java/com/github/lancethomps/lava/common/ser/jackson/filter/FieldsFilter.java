@@ -15,8 +15,6 @@ import javax.annotation.Nullable;
 
 import org.apache.log4j.Logger;
 
-import com.github.lancethomps.lava.common.Checks;
-import com.github.lancethomps.lava.common.web.requests.MissingRequestParameter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
@@ -25,331 +23,191 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.github.bohnman.squiggly.context.provider.SimpleSquigglyContextProvider;
 import com.github.bohnman.squiggly.filter.SquigglyPropertyFilter;
 import com.github.bohnman.squiggly.parser.SquigglyParser;
+import com.github.lancethomps.lava.common.Checks;
+import com.github.lancethomps.lava.common.web.requests.MissingRequestParameter;
 import com.google.common.collect.Sets;
 
-/**
- * The Class FieldsFilter.
- *
- * @author lancethomps
- */
 public class FieldsFilter extends SimpleBeanPropertyFilter implements Serializable {
 
-	/** The Constant FIELDS_FILTER_ID. */
-	public static final String FIELDS_FILTER_ID = "fieldsFilter";
+  public static final String FIELDS_FILTER_ID = "fieldsFilter";
 
-	/** The Constant EMPTY_FIELD_LIST. */
-	private static final Set<String> EMPTY_FIELD_LIST = Collections.unmodifiableSet(new HashSet<String>());
+  private static final Set<String> EMPTY_FIELD_LIST = Collections.unmodifiableSet(new HashSet<String>());
 
-	/** The Constant LOG. */
-	private static final Logger LOG = Logger.getLogger(FieldsFilter.class);
+  private static final Logger LOG = Logger.getLogger(FieldsFilter.class);
+  private static final long serialVersionUID = 1L;
+  private static Set<String> mandatoryFields = Sets.newHashSet(
+    "allDataReturned",
+    "debugMessage",
+    "errorCodes",
+    "failureReason",
+    "identifiersWithoutFullData",
+    "messages",
+    "missingParameters",
+    "success",
+    "uniqueId"
+  );
+  private static Set<Class<?>> mandatoryFieldsViaDeclaringTypes = Sets.newHashSet(MissingRequestParameter.class);
+  private Predicate<PropertyWriter> includePredicate;
 
-	/** The mandatory fields. */
-	private static Set<String> mandatoryFields = Sets.newHashSet(
-		"allDataReturned",
-		"debugMessage",
-		"errorCodes",
-		"failureReason",
-		"identifiersWithoutFullData",
-		"messages",
-		"missingParameters",
-		"success",
-		"uniqueId"
-	);
+  private SimpleBeanPropertyFilter serializeAsFieldFilter;
 
-	/** The mandatory fields via declaring types. */
-	private static Set<Class<?>> mandatoryFieldsViaDeclaringTypes = Sets.newHashSet(MissingRequestParameter.class);
+  public FieldsFilter() {
+    super();
+  }
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 1L;
+  public FieldsFilter(@Nullable final Collection<Pattern> whiteList, @Nullable final Collection<Pattern> blackList) {
+    super();
+    addFilter(whiteList, blackList);
+  }
 
-	/** The include predicate. */
-	private Predicate<PropertyWriter> includePredicate;
+  public FieldsFilter(final Map<Class<?>, Set<String>> propertiesToExcludeByType) {
+    super();
+    addFilter(propertiesToExcludeByType);
+  }
 
-	/** The serialize as field filter. */
-	private SimpleBeanPropertyFilter serializeAsFieldFilter;
+  public FieldsFilter(final Predicate<PropertyWriter> includePredicate, SimpleBeanPropertyFilter serializeAsFieldFilter) {
+    super();
+    this.includePredicate = includePredicate;
+    this.serializeAsFieldFilter = serializeAsFieldFilter;
+  }
 
-	/**
-	 * Instantiates a new jackson exclude fields filter.
-	 */
-	public FieldsFilter() {
-		super();
-	}
+  public FieldsFilter(final Set<String> properties) {
+    super();
+    addFilter(properties);
+  }
 
-	/**
-	 * Instantiates a new fields filter.
-	 *
-	 * @param whiteList the white list
-	 * @param blackList the black list
-	 */
-	public FieldsFilter(@Nullable final Collection<Pattern> whiteList, @Nullable final Collection<Pattern> blackList) {
-		super();
-		addFilter(whiteList, blackList);
-	}
+  public FieldsFilter(final String graphFilter) {
+    super();
+    addGraphFilter(graphFilter);
+  }
 
-	/**
-	 * Instantiates a new jackson exclude fields filter.
-	 *
-	 * @param propertiesToExcludeByType the properties to exclude by type
-	 */
-	public FieldsFilter(final Map<Class<?>, Set<String>> propertiesToExcludeByType) {
-		super();
-		addFilter(propertiesToExcludeByType);
-	}
+  public static boolean checkForMandatoryFieldInclusion(@Nonnull PropertyWriter writer) {
+    Class<?> declaringType;
+    if ((mandatoryFields != null) && mandatoryFields.contains(writer.getName())) {
+      return true;
+    } else {
+      return (mandatoryFieldsViaDeclaringTypes != null) && (writer.getMember() != null) &&
+        ((declaringType = writer.getMember().getDeclaringClass()) != null)
+        && mandatoryFieldsViaDeclaringTypes.stream().anyMatch(check -> check.isAssignableFrom(declaringType));
+    }
+  }
 
-	/**
-	 * Instantiates a new jackson exclude fields filter.
-	 *
-	 * @param includePredicate the include predicate
-	 * @param serializeAsFieldFilter the serialize as field filter
-	 */
-	public FieldsFilter(final Predicate<PropertyWriter> includePredicate, SimpleBeanPropertyFilter serializeAsFieldFilter) {
-		super();
-		this.includePredicate = includePredicate;
-		this.serializeAsFieldFilter = serializeAsFieldFilter;
-	}
+  public static FieldsFilter fromOnlyFields(final Set<String> properties) {
+    return new FieldsFilter().addOnlyFilter(properties);
+  }
 
-	/**
-	 * Instantiates a new jackson exclude fields filter.
-	 *
-	 * @param properties the properties
-	 */
-	public FieldsFilter(final Set<String> properties) {
-		super();
-		addFilter(properties);
-	}
+  public static FieldsFilter fromSkipFields(final Map<Class<?>, Set<String>> propertiesToExcludeByType) {
+    return new FieldsFilter().addFilter(propertiesToExcludeByType);
+  }
 
-	/**
-	 * Instantiates a new fields filter.
-	 *
-	 * @param graphFilter the graph filter
-	 */
-	public FieldsFilter(final String graphFilter) {
-		super();
-		addGraphFilter(graphFilter);
-	}
+  public static FieldsFilter fromSkipFields(final Set<String> properties) {
+    return new FieldsFilter().addFilter(properties);
+  }
 
-	/**
-	 * Check for mandatory field inclusion.
-	 *
-	 * @param writer the writer
-	 * @return true, if successful
-	 */
-	public static boolean checkForMandatoryFieldInclusion(@Nonnull PropertyWriter writer) {
-		Class<?> declaringType;
-		if ((mandatoryFields != null) && mandatoryFields.contains(writer.getName())) {
-			return true;
-		} else if ((mandatoryFieldsViaDeclaringTypes != null) && (writer.getMember() != null) && ((declaringType = writer.getMember().getDeclaringClass()) != null)
-			&& mandatoryFieldsViaDeclaringTypes.stream().anyMatch(check -> check.isAssignableFrom(declaringType))) {
-			return true;
-		}
-		return false;
-	}
+  public static Set<String> getMandatoryFields() {
+    return mandatoryFields;
+  }
 
-	/**
-	 * From only fields.
-	 *
-	 * @param properties the properties
-	 * @return the jackson exclude fields filter
-	 */
-	public static FieldsFilter fromOnlyFields(final Set<String> properties) {
-		return new FieldsFilter().addOnlyFilter(properties);
-	}
+  public static void setMandatoryFields(Set<String> mandatoryFields) {
+    FieldsFilter.mandatoryFields = mandatoryFields;
+  }
 
-	/**
-	 * From skip fields.
-	 *
-	 * @param propertiesToExcludeByType the properties to exclude by type
-	 * @return the jackson exclude fields filter
-	 */
-	public static FieldsFilter fromSkipFields(final Map<Class<?>, Set<String>> propertiesToExcludeByType) {
-		return new FieldsFilter().addFilter(propertiesToExcludeByType);
-	}
+  public static Set<Class<?>> getMandatoryFieldsViaDeclaringTypes() {
+    return mandatoryFieldsViaDeclaringTypes;
+  }
 
-	/**
-	 * From skip fields.
-	 *
-	 * @param properties the properties
-	 * @return the jackson exclude fields filter
-	 */
-	public static FieldsFilter fromSkipFields(final Set<String> properties) {
-		return new FieldsFilter().addFilter(properties);
-	}
+  public static void setMandatoryFieldsViaDeclaringTypes(Set<Class<?>> mandatoryFieldsViaDeclaringTypes) {
+    FieldsFilter.mandatoryFieldsViaDeclaringTypes = mandatoryFieldsViaDeclaringTypes;
+  }
 
-	/**
-	 * @return the mandatoryFields
-	 */
-	public static Set<String> getMandatoryFields() {
-		return mandatoryFields;
-	}
+  public FieldsFilter addFieldInclusionPredicateFilter(final Map<Class<?>, BiPredicate<Object, Object>> predicateByType) {
+    serializeAsFieldFilter = new FieldInclusionPredicateFilter(predicateByType);
+    return this;
+  }
 
-	/**
-	 * @return the mandatoryFieldsViaDeclaringTypes
-	 */
-	public static Set<Class<?>> getMandatoryFieldsViaDeclaringTypes() {
-		return mandatoryFieldsViaDeclaringTypes;
-	}
+  public FieldsFilter addFilter(@Nullable final Collection<Pattern> whiteList, @Nullable final Collection<Pattern> blackList) {
+    addOrSetPredicate(writer -> Checks.passesWhiteAndBlackListCheck(writer.getName(), whiteList, blackList).getLeft());
+    return this;
+  }
 
-	/**
-	 * @param mandatoryFields the mandatoryFields to set
-	 */
-	public static void setMandatoryFields(Set<String> mandatoryFields) {
-		FieldsFilter.mandatoryFields = mandatoryFields;
-	}
+  public FieldsFilter addFilter(final Map<Class<?>, Set<String>> propertiesToExcludeByType) {
+    addOrSetPredicate(writer -> {
+      Class<?> type = writer instanceof BeanPropertyWriter ? writer.getMember().getMember().getDeclaringClass() :
+        writer.getType().getRawClass();
+      return !propertiesToExcludeByType.getOrDefault(type, EMPTY_FIELD_LIST).contains(writer.getName());
+    });
+    return this;
+  }
 
-	/**
-	 * @param mandatoryFieldsViaDeclaringTypes the mandatoryFieldsViaDeclaringTypes to set
-	 */
-	public static void setMandatoryFieldsViaDeclaringTypes(Set<Class<?>> mandatoryFieldsViaDeclaringTypes) {
-		FieldsFilter.mandatoryFieldsViaDeclaringTypes = mandatoryFieldsViaDeclaringTypes;
-	}
+  public FieldsFilter addFilter(final Set<String> properties) {
+    addOrSetPredicate(writer -> !properties.contains(writer.getName()));
+    return this;
+  }
 
-	/**
-	 * Adds the function by type filter.
-	 *
-	 * @param predicateByType the predicate by type
-	 * @return the fields filter
-	 */
-	public FieldsFilter addFieldInclusionPredicateFilter(final Map<Class<?>, BiPredicate<Object, Object>> predicateByType) {
-		serializeAsFieldFilter = new FieldInclusionPredicateFilter(predicateByType);
-		return this;
-	}
+  public FieldsFilter addGraphFilter(final String graphFilter) {
+    serializeAsFieldFilter = new SquigglyPropertyFilter(new SimpleSquigglyContextProvider(new SquigglyParser(), graphFilter));
+    return this;
+  }
 
-	/**
-	 * Adds the filter.
-	 *
-	 * @param whiteList the white list
-	 * @param blackList the black list
-	 * @return the fields filter
-	 */
-	public FieldsFilter addFilter(@Nullable final Collection<Pattern> whiteList, @Nullable final Collection<Pattern> blackList) {
-		addOrSetPredicate(writer -> Checks.passesWhiteAndBlackListCheck(writer.getName(), whiteList, blackList).getLeft());
-		return this;
-	}
+  public FieldsFilter addOnlyFilter(final Set<String> properties) {
+    addOrSetPredicate(writer -> properties.contains(writer.getName()));
+    return this;
+  }
 
-	/**
-	 * Adds the filter.
-	 *
-	 * @param propertiesToExcludeByType the properties to exclude by type
-	 * @return the jackson exclude fields filter
-	 */
-	public FieldsFilter addFilter(final Map<Class<?>, Set<String>> propertiesToExcludeByType) {
-		addOrSetPredicate(writer -> {
-			Class<?> type = writer instanceof BeanPropertyWriter ? ((BeanPropertyWriter) writer).getMember().getMember().getDeclaringClass() : writer.getType().getRawClass();
-			return !propertiesToExcludeByType.getOrDefault(type, EMPTY_FIELD_LIST).contains(writer.getName());
-		});
-		return this;
-	}
+  public FieldsFilter addOrSetPredicate(Predicate<PropertyWriter> includePredicate) {
+    if (includePredicate != null) {
+      if (this.includePredicate == null) {
+        this.includePredicate = includePredicate;
+      } else {
+        final Predicate<PropertyWriter> current = this.includePredicate;
+        this.includePredicate = writer -> current.test(writer) && includePredicate.test(writer);
+      }
+    }
+    return this;
+  }
 
-	/**
-	 * Adds the filter.
-	 *
-	 * @param properties the properties
-	 * @return the jackson exclude fields filter
-	 */
-	public FieldsFilter addFilter(final Set<String> properties) {
-		addOrSetPredicate(writer -> !properties.contains(writer.getName()));
-		return this;
-	}
+  public FieldsFilter copy() {
+    return new FieldsFilter(includePredicate, serializeAsFieldFilter);
+  }
 
-	/**
-	 * Adds the graph filter.
-	 *
-	 * @param graphFilter the graph filter
-	 * @return the fields filter
-	 */
-	public FieldsFilter addGraphFilter(final String graphFilter) {
-		serializeAsFieldFilter = new SquigglyPropertyFilter(new SimpleSquigglyContextProvider(new SquigglyParser(), graphFilter));
-		return this;
-	}
+  public Predicate<PropertyWriter> getIncludePredicate() {
+    return includePredicate;
+  }
 
-	/**
-	 * Adds the only filter.
-	 *
-	 * @param properties the properties
-	 * @return the jackson exclude fields filter
-	 */
-	public FieldsFilter addOnlyFilter(final Set<String> properties) {
-		addOrSetPredicate(writer -> properties.contains(writer.getName()));
-		return this;
-	}
+  public SimpleBeanPropertyFilter getSerializeAsFieldFilter() {
+    return serializeAsFieldFilter;
+  }
 
-	/**
-	 * Adds the or set predicate.
-	 *
-	 * @param includePredicate the include predicate
-	 * @return the jackson exclude fields filter
-	 */
-	public FieldsFilter addOrSetPredicate(Predicate<PropertyWriter> includePredicate) {
-		if (includePredicate != null) {
-			if (this.includePredicate == null) {
-				this.includePredicate = includePredicate;
-			} else {
-				final Predicate<PropertyWriter> current = this.includePredicate;
-				this.includePredicate = writer -> current.test(writer) && includePredicate.test(writer);
-			}
-		}
-		return this;
-	}
+  public FieldsFilter setSerializeAsFieldFilter(SimpleBeanPropertyFilter serializeAsFieldFilter) {
+    this.serializeAsFieldFilter = serializeAsFieldFilter;
+    return this;
+  }
 
-	/**
-	 * Copy.
-	 *
-	 * @return the jackson exclude fields filter
-	 */
-	public FieldsFilter copy() {
-		return new FieldsFilter(includePredicate, serializeAsFieldFilter);
-	}
+  @Override
+  public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
+    if (serializeAsFieldFilter != null) {
+      if (checkForMandatoryFieldInclusion(writer)) {
+        super.serializeAsField(pojo, jgen, provider, writer);
+      } else if ((includePredicate == null) || includePredicate.test(writer)) {
+        serializeAsFieldFilter.serializeAsField(pojo, jgen, provider, writer);
+      } else if (!jgen.canOmitFields()) {
+        writer.serializeAsOmittedField(pojo, jgen, provider);
+      }
+    } else {
+      super.serializeAsField(pojo, jgen, provider, writer);
+    }
+  }
 
-	/**
-	 * @return the includePredicate
-	 */
-	public Predicate<PropertyWriter> getIncludePredicate() {
-		return includePredicate;
-	}
+  @Override
+  protected boolean include(BeanPropertyWriter writer) {
+    // TODO: decide whether to check for mandatory field inclusion here
+    return (includePredicate == null) || includePredicate.test(writer);
+  }
 
-	/**
-	 * @return the serializeAsFieldFilter
-	 */
-	public SimpleBeanPropertyFilter getSerializeAsFieldFilter() {
-		return serializeAsFieldFilter;
-	}
-
-	@Override
-	public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
-		if (serializeAsFieldFilter != null) {
-			if (checkForMandatoryFieldInclusion(writer)) {
-				super.serializeAsField(pojo, jgen, provider, writer);
-			} else if ((includePredicate == null) || includePredicate.test(writer)) {
-				serializeAsFieldFilter.serializeAsField(pojo, jgen, provider, writer);
-			} else if (!jgen.canOmitFields()) {
-				writer.serializeAsOmittedField(pojo, jgen, provider);
-			}
-		} else {
-			super.serializeAsField(pojo, jgen, provider, writer);
-		}
-	}
-
-	/**
-	 * Sets the serialize as field filter.
-	 *
-	 * @param serializeAsFieldFilter the serializeAsFieldFilter to set
-	 * @return the fields filter
-	 */
-	public FieldsFilter setSerializeAsFieldFilter(SimpleBeanPropertyFilter serializeAsFieldFilter) {
-		this.serializeAsFieldFilter = serializeAsFieldFilter;
-		return this;
-	}
-
-	@Override
-	protected boolean include(BeanPropertyWriter writer) {
-		// TODO: decide whether to check for mandatory field inclusion here
-		return (includePredicate == null) || includePredicate.test(writer);
-	}
-
-	@Override
-	protected boolean include(PropertyWriter writer) {
-		// TODO: decide whether to check for mandatory field inclusion here
-		return (includePredicate == null) || includePredicate.test(writer);
-	}
+  @Override
+  protected boolean include(PropertyWriter writer) {
+    // TODO: decide whether to check for mandatory field inclusion here
+    return (includePredicate == null) || includePredicate.test(writer);
+  }
 
 }

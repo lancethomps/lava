@@ -6,171 +6,83 @@ import com.github.lancethomps.lava.common.merge.MergeConfig;
 import com.github.lancethomps.lava.common.ser.ExternalizableBean;
 import com.github.lancethomps.lava.common.ser.OutputExpression;
 
-/**
- * The Class SavedPortfoliosExpressionMapping.
- *
- * @author amparikh
- * @param <T> the generic type
- */
 public class ExpressionsDataMapping<T> extends ExternalizableBean {
 
-	/** The break after match. */
-	private Boolean breakAfterMatch;
+  private String id;
+  private Boolean breakAfterMatch;
+  private List<OutputExpression> expressions;
+  private T mapping;
 
-	/** The expressions. */
-	private List<OutputExpression> expressions;
+  private MergeConfig mergeConfig;
 
-	/** The id. */
-	private String id;
+  private List<OutputExpression> outputExpressions;
 
-	/** The tags. */
-	private T mapping;
+  @Override
+  public void afterDeserialization() {
+    if (expressions != null) {
+      ExprFactory.compileCreateExpressions(expressions, false, false);
+    }
+    if (outputExpressions != null) {
+      ExprFactory.compileCreateExpressions(outputExpressions, false, false);
+    }
+  }
 
-	/** The merge config. */
-	private MergeConfig mergeConfig;
+  public Boolean getBreakAfterMatch() {
+    return breakAfterMatch;
+  }
 
-	/** The output expressions. */
-	private List<OutputExpression> outputExpressions;
+  public ExpressionsDataMapping<T> setBreakAfterMatch(Boolean breakAfterMatch) {
+    this.breakAfterMatch = breakAfterMatch;
+    return this;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.github.lancethomps.lava.common.ser.PostConstructor#afterDeserialization()
-	 */
-	@Override
-	public void afterDeserialization() {
-		if (expressions != null) {
-			ExprFactory.compileCreateExpressions(expressions, false, false);
-		}
-		if (outputExpressions != null) {
-			ExprFactory.compileCreateExpressions(outputExpressions, false, false);
-		}
-	}
+  public List<OutputExpression> getExpressions() {
+    return expressions;
+  }
 
-	/**
-	 * Gets the break after match.
-	 *
-	 * @return the breakAfterMatch
-	 */
-	public Boolean getBreakAfterMatch() {
-		return breakAfterMatch;
-	}
+  public ExpressionsDataMapping<T> setExpressions(List<OutputExpression> expressions) {
+    this.expressions = expressions;
+    return this;
+  }
 
-	/**
-	 * Gets the expressions.
-	 *
-	 * @return the expressions
-	 */
-	public List<OutputExpression> getExpressions() {
-		return expressions;
-	}
+  public String getId() {
+    return id;
+  }
 
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
+  public ExpressionsDataMapping<T> setId(String id) {
+    this.id = id;
+    return this;
+  }
 
-	/**
-	 * Gets the mapping.
-	 *
-	 * @return the mapping
-	 */
-	public T getMapping() {
-		return mapping;
-	}
+  public T getMapping() {
+    return mapping;
+  }
 
-	/**
-	 * Gets the merge config.
-	 *
-	 * @return the mergeConfig
-	 */
-	public MergeConfig getMergeConfig() {
-		return mergeConfig;
-	}
+  public ExpressionsDataMapping<T> setMapping(T mapping) {
+    this.mapping = mapping;
+    return this;
+  }
 
-	/**
-	 * Gets the output expressions.
-	 *
-	 * @return the outputExpressions
-	 */
-	public List<OutputExpression> getOutputExpressions() {
-		return outputExpressions;
-	}
+  public MergeConfig getMergeConfig() {
+    return mergeConfig;
+  }
 
-	/**
-	 * Sets the break after match.
-	 *
-	 * @param breakAfterMatch the breakAfterMatch to set
-	 * @return ExpressionsDataMapping the expressions data mapping
-	 */
-	public ExpressionsDataMapping<T> setBreakAfterMatch(Boolean breakAfterMatch) {
-		this.breakAfterMatch = breakAfterMatch;
-		return this;
-	}
+  public ExpressionsDataMapping<T> setMergeConfig(MergeConfig mergeConfig) {
+    this.mergeConfig = mergeConfig;
+    return this;
+  }
 
-	/**
-	 * Sets the expressions.
-	 *
-	 * @param expressions the expressions to set
-	 * @return ExpressionsDataMapping the expressions data mapping
-	 */
-	public ExpressionsDataMapping<T> setExpressions(List<OutputExpression> expressions) {
-		this.expressions = expressions;
-		return this;
-	}
+  public List<OutputExpression> getOutputExpressions() {
+    return outputExpressions;
+  }
 
-	/**
-	 * Sets the id.
-	 *
-	 * @param id the id to set
-	 * @return the expressions data mapping
-	 */
-	public ExpressionsDataMapping<T> setId(String id) {
-		this.id = id;
-		return this;
-	}
+  public ExpressionsDataMapping<T> setOutputExpressions(List<OutputExpression> outputExpressions) {
+    this.outputExpressions = outputExpressions;
+    return this;
+  }
 
-	/**
-	 * Sets the mapping.
-	 *
-	 * @param mapping the mapping to set
-	 * @return ExpressionsDataMapping the expressions data mapping
-	 */
-	public ExpressionsDataMapping<T> setMapping(T mapping) {
-		this.mapping = mapping;
-		return this;
-	}
-
-	/**
-	 * Sets the merge config.
-	 *
-	 * @param mergeConfig the mergeConfig to set
-	 * @return ExpressionsDataMapping the expressions data mapping
-	 */
-	public ExpressionsDataMapping<T> setMergeConfig(MergeConfig mergeConfig) {
-		this.mergeConfig = mergeConfig;
-		return this;
-	}
-
-	/**
-	 * Sets the output expressions.
-	 *
-	 * @param outputExpressions the outputExpressions to set
-	 * @return ExpressionsDataMapping the expressions data mapping
-	 */
-	public ExpressionsDataMapping<T> setOutputExpressions(List<OutputExpression> outputExpressions) {
-		this.outputExpressions = outputExpressions;
-		return this;
-	}
-
-	/**
-	 * Test break after match.
-	 *
-	 * @return true, if successful
-	 */
-	public boolean testBreakAfterMatch() {
-		return (breakAfterMatch != null) && breakAfterMatch.booleanValue();
-	}
+  public boolean testBreakAfterMatch() {
+    return (breakAfterMatch != null) && breakAfterMatch.booleanValue();
+  }
 
 }

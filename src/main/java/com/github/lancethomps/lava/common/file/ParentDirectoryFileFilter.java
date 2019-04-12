@@ -5,28 +5,19 @@ import java.io.Serializable;
 
 import org.apache.commons.io.filefilter.AbstractFileFilter;
 
-/**
- * The Class ParentDirectoryFileFilter.
- */
 public class ParentDirectoryFileFilter extends AbstractFileFilter implements Serializable {
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -2169482506424144174L;
+  private static final long serialVersionUID = -2169482506424144174L;
 
-	/** The parent dir. */
-	private File parentDir;
+  private File parentDir;
 
-	/**
-	 * Instantiates a new parent directory file filter.
-	 *
-	 * @param parentDir the parent dir
-	 */
-	public ParentDirectoryFileFilter(File parentDir) {
-		this.parentDir = parentDir;
-	}
+  public ParentDirectoryFileFilter(File parentDir) {
+    this.parentDir = parentDir;
+  }
 
-	@Override
-	public boolean accept(File file) {
-		return FileUtil.fullPath(parentDir).equalsIgnoreCase(FileUtil.fullPath(file.getParentFile()));
-	}
+  @Override
+  public boolean accept(File file) {
+    return FileUtil.fullPath(parentDir).equalsIgnoreCase(FileUtil.fullPath(file.getParentFile()));
+  }
+
 }

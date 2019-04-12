@@ -3,129 +3,66 @@ package com.github.lancethomps.lava.common.web.requests.parsers;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * The Class MockRequestWithAllowedJsonParam.
- */
 public class MockRequestWithAllowedJsonParam {
 
-	/** The from date. */
-	@RequestField
-	private LocalDateTime fromDate;
+  @RequestField
+  private LocalDateTime fromDate;
 
-	/** The group by field. */
-	@RequestField
-	private List<String> groupByFields;
+  @RequestField
+  private List<String> groupByFields;
 
-	/** The request key. */
-	@RequestField
-	private String requestKey;
+  @RequestField
+  private String requestKey;
 
-	/** The response fields. */
-	@RequestField
-	private List<String> responseFields;
+  @RequestField
+  private List<String> responseFields;
 
-	/** The to date. */
-	@RequestField
-	private LocalDateTime toDate;
+  @RequestField
+  private LocalDateTime toDate;
 
-	/**
-	 * Gets the from date.
-	 *
-	 * @return the fromDate
-	 */
-	public LocalDateTime getFromDate() {
-		return fromDate;
-	}
+  public LocalDateTime getFromDate() {
+    return fromDate;
+  }
 
-	/**
-	 * Gets the group by fields.
-	 *
-	 * @return the groupByFields
-	 */
-	public List<String> getGroupByFields() {
-		return groupByFields;
-	}
+  public MockRequestWithAllowedJsonParam setFromDate(LocalDateTime fromDate) {
+    this.fromDate = fromDate;
+    return this;
+  }
 
-	/**
-	 * Gets the request key.
-	 *
-	 * @return the requestKey
-	 */
-	public String getRequestKey() {
-		return requestKey;
-	}
+  public List<String> getGroupByFields() {
+    return groupByFields;
+  }
 
-	/**
-	 * Gets the response fields.
-	 *
-	 * @return the responseFields
-	 */
-	public List<String> getResponseFields() {
-		return responseFields;
-	}
+  public MockRequestWithAllowedJsonParam setGroupByFields(List<String> groupByFields) {
+    this.groupByFields = groupByFields;
+    return this;
+  }
 
-	/**
-	 * Gets the to date.
-	 *
-	 * @return the toDate
-	 */
-	public LocalDateTime getToDate() {
-		return toDate;
-	}
+  public String getRequestKey() {
+    return requestKey;
+  }
 
-	/**
-	 * Sets the from date.
-	 *
-	 * @param fromDate the fromDate to set
-	 * @return the mock request with allowed json param
-	 */
-	public MockRequestWithAllowedJsonParam setFromDate(LocalDateTime fromDate) {
-		this.fromDate = fromDate;
-		return this;
-	}
+  public MockRequestWithAllowedJsonParam setRequestKey(String requestKey) {
+    this.requestKey = requestKey;
+    return this;
+  }
 
-	/**
-	 * Sets the group by fields.
-	 *
-	 * @param groupByFields the groupByFields to set
-	 * @return the mock request with allowed json param
-	 */
-	public MockRequestWithAllowedJsonParam setGroupByFields(List<String> groupByFields) {
-		this.groupByFields = groupByFields;
-		return this;
-	}
+  public List<String> getResponseFields() {
+    return responseFields;
+  }
 
-	/**
-	 * Sets the request key.
-	 *
-	 * @param requestKey the requestKey to set
-	 * @return the mock request with allowed json param
-	 */
-	public MockRequestWithAllowedJsonParam setRequestKey(String requestKey) {
-		this.requestKey = requestKey;
-		return this;
-	}
+  public MockRequestWithAllowedJsonParam setResponseFields(List<String> responseFields) {
+    this.responseFields = responseFields;
+    return this;
+  }
 
-	/**
-	 * Sets the response fields.
-	 *
-	 * @param responseFields the responseFields to set
-	 * @return the mock request with allowed json param
-	 */
-	public MockRequestWithAllowedJsonParam setResponseFields(List<String> responseFields) {
-		this.responseFields = responseFields;
-		return this;
-	}
+  public LocalDateTime getToDate() {
+    return toDate;
+  }
 
-	/**
-	 * Sets the to date.
-	 *
-	 * @param toDate the toDate to set
-	 * @return the mock request with allowed json param
-	 */
-	public MockRequestWithAllowedJsonParam setToDate(LocalDateTime toDate) {
-		this.toDate = toDate;
-		return this;
-	}
+  public MockRequestWithAllowedJsonParam setToDate(LocalDateTime toDate) {
+    this.toDate = toDate;
+    return this;
+  }
 
 }

@@ -4,30 +4,14 @@ import java.util.Map;
 
 import javax.script.CompiledScript;
 
-/**
- * The Class JsEngineExpression.
- *
- * @author lancethomps
- */
 public class JsEngineExpression extends ScriptEngineExpression {
 
-	/**
-	 * Instantiates a new js engine expression.
-	 */
-	public JsEngineExpression() {
-		super();
-	}
+  public JsEngineExpression() {
+    super();
+  }
 
-	/**
-	 * Instantiates a new js engine expression.
-	 *
-	 * @param expression the expression
-	 * @param sandbox the sandbox
-	 * @param compiled the compiled
-	 * @param globalVariables the global variables
-	 */
-	public JsEngineExpression(String expression, boolean sandbox, CompiledScript compiled, Map<String, Object> globalVariables) {
-		super(expression, sandbox, compiled, globalVariables);
-	}
+  public JsEngineExpression(String expression, boolean sandbox, CompiledScript compiled, Map<String, Object> globalVariables) {
+    super(expression, sandbox, compiled, globalVariables);
+  }
 
 }

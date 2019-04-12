@@ -8,412 +8,216 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nonnull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.lancethomps.lava.common.Checks;
 import com.github.lancethomps.lava.common.time.Stopwatch;
 import com.github.lancethomps.lava.common.time.TimerEnabledBean;
 import com.github.lancethomps.lava.common.time.TimerHandlingBean;
 import com.github.lancethomps.lava.common.time.Timing;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.util.concurrent.AtomicDouble;
 
-/**
- * The Class LogIntervalData.
- */
 public class LogIntervalData implements TimerEnabledBean, TimerHandlingBean {
 
-	/** The cancel requested. */
-	private boolean cancelRequested;
+  private String id;
+  private boolean cancelRequested;
+  private AtomicLong count = new AtomicLong();
+  private Map<String, AtomicLong> counts;
+  private Map<String, Object> debugData;
+  private double logInterval = LOG_INTERVAL;
 
-	/** The count. */
-	private AtomicLong count = new AtomicLong();
+  private String msg;
 
-	/** The counts. */
-	private Map<String, AtomicLong> counts;
+  private AtomicDouble nextLogPct;
 
-	/** The debug data. */
-	private Map<String, Object> debugData;
+  private Map<String, Long> timerLogs;
 
-	/** The id. */
-	private String id;
+  private long total;
 
-	/** The log interval. */
-	private double logInterval = LOG_INTERVAL;
+  private Stopwatch watch;
 
-	/** The msg. */
-	private String msg;
+  @JsonIgnore
+  private Map<String, Stopwatch> watches;
 
-	/** The next log pct. */
-	private AtomicDouble nextLogPct;
+  public LogIntervalData() {
+    super();
+  }
 
-	/** The timer logs. */
-	private Map<String, Long> timerLogs;
+  public LogIntervalData(long total, String msg) {
+    this(total, msg, LOG_INTERVAL);
+  }
 
-	/** The total. */
-	private long total;
+  public LogIntervalData(long total, String msg, double logInterval) {
+    super();
+    this.total = total;
+    this.msg = msg;
+    this.logInterval = logInterval;
+    nextLogPct = new AtomicDouble(logInterval);
+    watch = Timing.getStopwatch();
+  }
 
-	/** The watch. */
-	private Stopwatch watch;
+  public LogIntervalData addDebugData(Map<String, Object> debugData) {
+    if (debugData != null) {
+      if (this.debugData == null) {
+        this.debugData = new LinkedHashMap<>();
+      }
+      this.debugData.putAll(debugData);
+    }
+    return this;
+  }
 
-	/** The watches. */
-	@JsonIgnore
-	private Map<String, Stopwatch> watches;
+  public LogIntervalData addDebugData(String key, Object val) {
+    if ((key != null) && (val != null)) {
+      if (debugData == null) {
+        debugData = new LinkedHashMap<>();
+      }
+      debugData.put(key, val);
+    }
+    return this;
+  }
 
-	/**
-	 * Instantiates a new log interval data.
-	 */
-	public LogIntervalData() {
-		super();
-	}
+  public LogIntervalData addToCount(@Nonnull String key) {
+    return addToCount(key, 1);
+  }
 
-	/**
-	 * Instantiates a new log interval data.
-	 *
-	 * @param total the total
-	 * @param msg the msg
-	 */
-	public LogIntervalData(long total, String msg) {
-		this(total, msg, LOG_INTERVAL);
-	}
+  public LogIntervalData addToCount(@Nonnull String key, long delta) {
+    if (counts == null) {
+      counts = new LinkedHashMap<>();
+    }
+    counts.computeIfAbsent(key, k -> new AtomicLong(0)).addAndGet(delta);
+    return this;
+  }
 
-	/**
-	 * Instantiates a new log interval data.
-	 *
-	 * @param total the total
-	 * @param msg the msg
-	 * @param logInterval the log interval
-	 */
-	public LogIntervalData(long total, String msg, double logInterval) {
-		super();
-		this.total = total;
-		this.msg = msg;
-		this.logInterval = logInterval;
-		nextLogPct = new AtomicDouble(logInterval);
-		watch = Timing.getStopwatch();
-	}
+  public <T extends Number> LogIntervalData addToCounts(@Nonnull Map<String, T> otherCounts) {
+    if (Checks.isNotEmpty(otherCounts)) {
+      if (counts == null) {
+        counts = new LinkedHashMap<>();
+      }
+      otherCounts.forEach((key, val) -> counts.merge(
+        key,
+        val instanceof AtomicLong ? (AtomicLong) val : new AtomicLong(val.longValue()),
+        (curr, add) -> {
+          curr.addAndGet(add.get());
+          return curr;
+        }
+      ));
+    }
+    return this;
+  }
 
-	/**
-	 * Adds the debug data.
-	 *
-	 * @param debugData the debug data
-	 * @return the t
-	 */
-	public LogIntervalData addDebugData(Map<String, Object> debugData) {
-		if (debugData != null) {
-			if (this.debugData == null) {
-				this.debugData = new LinkedHashMap<>();
-			}
-			this.debugData.putAll(debugData);
-		}
-		return this;
-	}
+  public AtomicLong getCount() {
+    return count;
+  }
 
-	/**
-	 * Adds the debug data.
-	 *
-	 * @param key the key
-	 * @param val the val
-	 * @return the t
-	 */
-	public LogIntervalData addDebugData(String key, Object val) {
-		if ((key != null) && (val != null)) {
-			if (debugData == null) {
-				debugData = new LinkedHashMap<>();
-			}
-			debugData.put(key, val);
-		}
-		return this;
-	}
+  public LogIntervalData setCount(AtomicLong count) {
+    this.count = count;
+    return this;
+  }
 
-	/**
-	 * Adds the to count.
-	 *
-	 * @param key the key
-	 * @return the log interval data
-	 */
-	public LogIntervalData addToCount(@Nonnull String key) {
-		return addToCount(key, 1);
-	}
+  public Map<String, AtomicLong> getCounts() {
+    return counts;
+  }
 
-	/**
-	 * Adds the to count.
-	 *
-	 * @param key the key
-	 * @param delta the delta
-	 * @return the log interval data
-	 */
-	public LogIntervalData addToCount(@Nonnull String key, long delta) {
-		if (counts == null) {
-			counts = new LinkedHashMap<>();
-		}
-		counts.computeIfAbsent(key, k -> new AtomicLong(0)).addAndGet(delta);
-		return this;
-	}
+  public LogIntervalData setCounts(Map<String, AtomicLong> counts) {
+    this.counts = counts;
+    return this;
+  }
 
-	/**
-	 * Adds the to counts.
-	 *
-	 * @param <T> the generic type
-	 * @param otherCounts the other counts
-	 * @return the log interval data
-	 */
-	public <T extends Number> LogIntervalData addToCounts(@Nonnull Map<String, T> otherCounts) {
-		if (Checks.isNotEmpty(otherCounts)) {
-			if (counts == null) {
-				counts = new LinkedHashMap<>();
-			}
-			otherCounts.forEach((key, val) -> counts.merge(key, val instanceof AtomicLong ? (AtomicLong) val : new AtomicLong(val.longValue()), (curr, add) -> {
-				curr.addAndGet(add.get());
-				return curr;
-			}));
-		}
-		return this;
-	}
+  public Map<String, Object> getDebugData() {
+    return debugData;
+  }
 
-	/**
-	 * Gets the count.
-	 *
-	 * @return the count
-	 */
-	public AtomicLong getCount() {
-		return count;
-	}
+  public LogIntervalData setDebugData(Map<String, Object> debugData) {
+    this.debugData = debugData;
+    return this;
+  }
 
-	/**
-	 * @return the counts
-	 */
-	public Map<String, AtomicLong> getCounts() {
-		return counts;
-	}
+  public <T> T getDebugDataPoint(String key) {
+    return debugData == null ? null : (T) debugData.get(key);
+  }
 
-	/**
-	 * Gets the debug data.
-	 *
-	 * @return the debugData
-	 */
-	public Map<String, Object> getDebugData() {
-		return debugData;
-	}
+  public String getId() {
+    return id;
+  }
 
-	/**
-	 * Gets the debug data point.
-	 *
-	 * @param <T> the generic type
-	 * @param key the key
-	 * @return the debug data point
-	 */
-	public <T> T getDebugDataPoint(String key) {
-		return debugData == null ? null : (T) debugData.get(key);
-	}
+  public LogIntervalData setId(String id) {
+    this.id = id;
+    return this;
+  }
 
-	/**
-	 * Gets the id.
-	 *
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
+  public double getLogInterval() {
+    return logInterval;
+  }
 
-	/**
-	 * Gets the log interval.
-	 *
-	 * @return the logInterval
-	 */
-	public double getLogInterval() {
-		return logInterval;
-	}
+  public LogIntervalData setLogInterval(double logInterval) {
+    this.logInterval = logInterval;
+    return this;
+  }
 
-	/**
-	 * Gets the msg.
-	 *
-	 * @return the msg
-	 */
-	public String getMsg() {
-		return msg;
-	}
+  public String getMsg() {
+    return msg;
+  }
 
-	/**
-	 * Gets the next log pct.
-	 *
-	 * @return the nextLogPct
-	 */
-	public AtomicDouble getNextLogPct() {
-		return nextLogPct;
-	}
+  public LogIntervalData setMsg(String msg) {
+    this.msg = msg;
+    return this;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.github.lancethomps.lava.common.time.TimerHandlingBean#getTimerLogs()
-	 */
-	@Override
-	public Map<String, Long> getTimerLogs() {
-		return timerLogs;
-	}
+  public AtomicDouble getNextLogPct() {
+    return nextLogPct;
+  }
 
-	/**
-	 * Gets the total.
-	 *
-	 * @return the total
-	 */
-	public long getTotal() {
-		return total;
-	}
+  public LogIntervalData setNextLogPct(AtomicDouble nextLogPct) {
+    this.nextLogPct = nextLogPct;
+    return this;
+  }
 
-	/**
-	 * Gets the watch.
-	 *
-	 * @return the watch
-	 */
-	public Stopwatch getWatch() {
-		return watch;
-	}
+  @Override
+  public Map<String, Long> getTimerLogs() {
+    return timerLogs;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.github.lancethomps.lava.common.time.TimerEnabledBean#getWatches()
-	 */
-	@Override
-	public Map<String, Stopwatch> getWatches() {
-		return watches;
-	}
+  public long getTotal() {
+    return total;
+  }
 
-	/**
-	 * Checks if is cancel requested.
-	 *
-	 * @return the cancelRequested
-	 */
-	public boolean isCancelRequested() {
-		return cancelRequested;
-	}
+  public LogIntervalData setTotal(long total) {
+    this.total = total;
+    return this;
+  }
 
-	/**
-	 * Sets the cancel requested.
-	 *
-	 * @param cancelRequested the cancelRequested to set
-	 * @return the log interval data
-	 */
-	public LogIntervalData setCancelRequested(boolean cancelRequested) {
-		this.cancelRequested = cancelRequested;
-		return this;
-	}
+  public Stopwatch getWatch() {
+    return watch;
+  }
 
-	/**
-	 * Sets the count.
-	 *
-	 * @param count the count to set
-	 * @return the log interval data
-	 */
-	public LogIntervalData setCount(AtomicLong count) {
-		this.count = count;
-		return this;
-	}
+  public LogIntervalData setWatch(Stopwatch watch) {
+    this.watch = watch;
+    return this;
+  }
 
-	/**
-	 * Sets the counts.
-	 *
-	 * @param counts the counts to set
-	 * @return the log interval data
-	 */
-	public LogIntervalData setCounts(Map<String, AtomicLong> counts) {
-		this.counts = counts;
-		return this;
-	}
+  @Override
+  public Map<String, Stopwatch> getWatches() {
+    return watches;
+  }
 
-	/**
-	 * Sets the debug data.
-	 *
-	 * @param debugData the debugData to set
-	 * @return the log interval data
-	 */
-	public LogIntervalData setDebugData(Map<String, Object> debugData) {
-		this.debugData = debugData;
-		return this;
-	}
+  public boolean isCancelRequested() {
+    return cancelRequested;
+  }
 
-	/**
-	 * Sets the id.
-	 *
-	 * @param id the id to set
-	 * @return the log interval data
-	 */
-	public LogIntervalData setId(String id) {
-		this.id = id;
-		return this;
-	}
+  public LogIntervalData setCancelRequested(boolean cancelRequested) {
+    this.cancelRequested = cancelRequested;
+    return this;
+  }
 
-	/**
-	 * Sets the log interval.
-	 *
-	 * @param logInterval the logInterval to set
-	 * @return the log interval data
-	 */
-	public LogIntervalData setLogInterval(double logInterval) {
-		this.logInterval = logInterval;
-		return this;
-	}
+  @Override
+  public <T extends TimerHandlingBean> T setTimerLogs(Map<String, Long> timerLogs) {
+    this.timerLogs = timerLogs;
+    return (T) this;
+  }
 
-	/**
-	 * Sets the msg.
-	 *
-	 * @param msg the msg to set
-	 * @return the log interval data
-	 */
-	public LogIntervalData setMsg(String msg) {
-		this.msg = msg;
-		return this;
-	}
-
-	/**
-	 * Sets the next log pct.
-	 *
-	 * @param nextLogPct the nextLogPct to set
-	 * @return the log interval data
-	 */
-	public LogIntervalData setNextLogPct(AtomicDouble nextLogPct) {
-		this.nextLogPct = nextLogPct;
-		return this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.github.lancethomps.lava.common.time.TimerHandlingBean#setTimerLogs(java.util.Map)
-	 */
-	@Override
-	public <T extends TimerHandlingBean> T setTimerLogs(Map<String, Long> timerLogs) {
-		this.timerLogs = timerLogs;
-		return (T) this;
-	}
-
-	/**
-	 * Sets the total.
-	 *
-	 * @param total the total to set
-	 * @return the log interval data
-	 */
-	public LogIntervalData setTotal(long total) {
-		this.total = total;
-		return this;
-	}
-
-	/**
-	 * Sets the watch.
-	 *
-	 * @param watch the watch to set
-	 * @return the log interval data
-	 */
-	public LogIntervalData setWatch(Stopwatch watch) {
-		this.watch = watch;
-		return this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.github.lancethomps.lava.common.time.TimerEnabledBean#setWatches(java.util.Map)
-	 */
-	@Override
-	public <T extends TimerEnabledBean> T setWatches(Map<String, Stopwatch> watches) {
-		this.watches = watches;
-		return (T) this;
-	}
+  @Override
+  public <T extends TimerEnabledBean> T setWatches(Map<String, Stopwatch> watches) {
+    this.watches = watches;
+    return (T) this;
+  }
 
 }

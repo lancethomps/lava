@@ -24,175 +24,118 @@ import com.github.lancethomps.lava.common.logging.Logs;
 import com.github.lancethomps.lava.common.web.BaseSpringTest;
 import com.google.common.collect.Lists;
 
-/**
- * The Class RequestThrottleTest.
- *
- * @author lancethomps
- */
 public class RequestThrottleTest extends BaseSpringTest {
 
-	/** The Constant BLACK_LISTED_URI. */
-	private static final String BLACK_LISTED_URI = "/throttle-black-listed";
+  private static final String BLACK_LISTED_URI = "/throttle-black-listed";
 
-	/** The Constant DEFAULT_URI. */
-	private static final String DEFAULT_URI = "/throttle-test";
+  private static final String DEFAULT_URI = "/throttle-test";
 
-	/** The Constant LOG. */
-	private static final Logger LOG = Logger.getLogger(RequestThrottleTest.class);
+  private static final Logger LOG = Logger.getLogger(RequestThrottleTest.class);
 
-	/** The Constant WHITE_LISTED_URI. */
-	private static final String WHITE_LISTED_URI = "/throttle-white-listed";
+  private static final String WHITE_LISTED_URI = "/throttle-white-listed";
 
-	/** The handler adapter. */
-	@Autowired
-	private RequestMappingHandlerAdapter handlerAdapter;
+  @Autowired
+  private RequestMappingHandlerAdapter handlerAdapter;
 
-	/** The handler mapping. */
-	@Autowired
-	private RequestMappingHandlerMapping handlerMapping;
+  @Autowired
+  private RequestMappingHandlerMapping handlerMapping;
 
-	/** The request count for limit. */
-	private Long requestCountForLimit;
+  private Long requestCountForLimit;
 
-	/** The throttle. */
-	@Autowired
-	private RequestThrottle throttle;
+  @Autowired
+  private RequestThrottle throttle;
 
-	/**
-	 * Setup.
-	 *
-	 * @throws Exception the exception
-	 */
-	@Before
-	public void setup() throws Exception {
-		Logs.logInfo(LOG, "throttle %s", throttle);
-		setupWhiteList();
-		requestCountForLimit = (long) throttle.getConfig().getDefaultMaxRequests() + 2;
-	}
+  @Before
+  public void setup() throws Exception {
+    Logs.logInfo(LOG, "throttle %s", throttle);
+    setupWhiteList();
+    requestCountForLimit = (long) throttle.getConfig().getDefaultMaxRequests() + 2;
+  }
 
-	/**
-	 * Test request throttle black list.
-	 *
-	 * @throws Exception the exception
-	 */
-	@Test
-	public void testRequestThrottleBlackList() throws Exception {
-		setupBlackList();
-		RequestThrottleException err = null;
-		try {
-			testMultipleRequests(requestCountForLimit, BLACK_LISTED_URI);
-		} catch (RequestThrottleException e) {
-			err = e;
-		} finally {
-			removeBlackList();
-		}
+  @Test
+  public void testRequestThrottleBlackList() throws Exception {
+    setupBlackList();
+    RequestThrottleException err = null;
+    try {
+      testMultipleRequests(requestCountForLimit, BLACK_LISTED_URI);
+    } catch (RequestThrottleException e) {
+      err = e;
+    } finally {
+      removeBlackList();
+    }
 
-		Assert.assertNotNull(err);
-	}
+    Assert.assertNotNull(err);
+  }
 
-	/**
-	 * Test request throttle limit is hit.
-	 *
-	 * @throws Exception the exception
-	 */
-	@Test
-	public void testRequestThrottleLimitIsHit() throws Exception {
-		RequestThrottleException err = null;
-		try {
-			testMultipleRequests(requestCountForLimit, DEFAULT_URI);
-		} catch (RequestThrottleException e) {
-			err = e;
-		}
+  @Test
+  public void testRequestThrottleLimitIsHit() throws Exception {
+    RequestThrottleException err = null;
+    try {
+      testMultipleRequests(requestCountForLimit, DEFAULT_URI);
+    } catch (RequestThrottleException e) {
+      err = e;
+    }
 
-		Assert.assertNotNull(err);
-	}
+    Assert.assertNotNull(err);
+  }
 
-	/**
-	 * Test request throttle not in black list.
-	 *
-	 * @throws Exception the exception
-	 */
-	@Test
-	public void testRequestThrottleNotInBlackList() throws Exception {
-		removeWhiteList();
-		setupBlackList();
-		testMultipleRequests(requestCountForLimit, DEFAULT_URI);
-		removeBlackList();
-		setupWhiteList();
-	}
+  @Test
+  public void testRequestThrottleNotInBlackList() throws Exception {
+    removeWhiteList();
+    setupBlackList();
+    testMultipleRequests(requestCountForLimit, DEFAULT_URI);
+    removeBlackList();
+    setupWhiteList();
+  }
 
-	/**
-	 * Test request throttle white list.
-	 *
-	 * @throws Exception the exception
-	 */
-	@Test
-	public void testRequestThrottleWhiteList() throws Exception {
-		testMultipleRequests(requestCountForLimit, WHITE_LISTED_URI);
-	}
+  @Test
+  public void testRequestThrottleWhiteList() throws Exception {
+    testMultipleRequests(requestCountForLimit, WHITE_LISTED_URI);
+  }
 
-	/**
-	 * Removes the black list.
-	 */
-	private void removeBlackList() {
-		throttle.getConfig().setBlackList(null);
-	}
+  private void removeBlackList() {
+    throttle.getConfig().setBlackList(null);
+  }
 
-	/**
-	 * Removes the white list.
-	 */
-	private void removeWhiteList() {
-		throttle.getConfig().setWhiteList(null);
-	}
+  private void removeWhiteList() {
+    throttle.getConfig().setWhiteList(null);
+  }
 
-	/**
-	 * Setup black list.
-	 */
-	private void setupBlackList() {
-		throttle.getConfig().setBlackList(Lists.newArrayList(Pattern.compile('^' + BLACK_LISTED_URI + '$')));
-	}
+  private void setupBlackList() {
+    throttle.getConfig().setBlackList(Lists.newArrayList(Pattern.compile('^' + BLACK_LISTED_URI + '$')));
+  }
 
-	/**
-	 * Setup white list.
-	 */
-	private void setupWhiteList() {
-		throttle.getConfig().setWhiteList(Lists.newArrayList(Pattern.compile('^' + WHITE_LISTED_URI + '$')));
-	}
+  private void setupWhiteList() {
+    throttle.getConfig().setWhiteList(Lists.newArrayList(Pattern.compile('^' + WHITE_LISTED_URI + '$')));
+  }
 
-	/**
-	 * Test multiple requests.
-	 *
-	 * @param count the count
-	 * @param uri the uri
-	 * @throws Exception the exception
-	 */
-	private void testMultipleRequests(long count, String uri) throws Exception {
-		List<Pair<MockHttpServletRequest, MockHttpServletResponse>> mockReqs = Stream
-			.iterate(0, pos -> pos + 1)
-			.limit(count)
-			.map(pos -> Pair.of(new MockHttpServletRequest(HttpMethod.GET.name(), uri), new MockHttpServletResponse()))
-			.collect(Collectors.toList());
-		for (Pair<MockHttpServletRequest, MockHttpServletResponse> mockReq : mockReqs) {
-			MockHttpServletRequest request = mockReq.getLeft();
-			MockHttpServletResponse response = mockReq.getRight();
+  private void testMultipleRequests(long count, String uri) throws Exception {
+    List<Pair<MockHttpServletRequest, MockHttpServletResponse>> mockReqs = Stream
+      .iterate(0, pos -> pos + 1)
+      .limit(count)
+      .map(pos -> Pair.of(new MockHttpServletRequest(HttpMethod.GET.name(), uri), new MockHttpServletResponse()))
+      .collect(Collectors.toList());
+    for (Pair<MockHttpServletRequest, MockHttpServletResponse> mockReq : mockReqs) {
+      MockHttpServletRequest request = mockReq.getLeft();
+      MockHttpServletResponse response = mockReq.getRight();
 
-			HandlerExecutionChain handlerExecutionChain = handlerMapping.getHandler(request);
-			HandlerInterceptor[] interceptors = handlerExecutionChain.getInterceptors();
-			for (HandlerInterceptor interceptor : interceptors) {
-				interceptor.preHandle(request, response, handlerExecutionChain.getHandler());
-			}
-		}
-		for (Pair<MockHttpServletRequest, MockHttpServletResponse> mockReq : mockReqs) {
-			MockHttpServletRequest request = mockReq.getLeft();
-			MockHttpServletResponse response = mockReq.getRight();
+      HandlerExecutionChain handlerExecutionChain = handlerMapping.getHandler(request);
+      HandlerInterceptor[] interceptors = handlerExecutionChain.getInterceptors();
+      for (HandlerInterceptor interceptor : interceptors) {
+        interceptor.preHandle(request, response, handlerExecutionChain.getHandler());
+      }
+    }
+    for (Pair<MockHttpServletRequest, MockHttpServletResponse> mockReq : mockReqs) {
+      MockHttpServletRequest request = mockReq.getLeft();
+      MockHttpServletResponse response = mockReq.getRight();
 
-			HandlerExecutionChain handlerExecutionChain = handlerMapping.getHandler(request);
-			ModelAndView mav = handlerAdapter.handle(request, response, handlerExecutionChain.getHandler());
-			HandlerInterceptor[] interceptors = handlerExecutionChain.getInterceptors();
-			for (HandlerInterceptor interceptor : interceptors) {
-				interceptor.postHandle(request, response, handlerExecutionChain.getHandler(), mav);
-			}
-		}
-	}
+      HandlerExecutionChain handlerExecutionChain = handlerMapping.getHandler(request);
+      ModelAndView mav = handlerAdapter.handle(request, response, handlerExecutionChain.getHandler());
+      HandlerInterceptor[] interceptors = handlerExecutionChain.getInterceptors();
+      for (HandlerInterceptor interceptor : interceptors) {
+        interceptor.postHandle(request, response, handlerExecutionChain.getHandler(), mav);
+      }
+    }
+  }
 
 }

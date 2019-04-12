@@ -2,97 +2,67 @@ package com.github.lancethomps.lava.common.web.config;
 
 import java.util.regex.Pattern;
 
-import com.github.lancethomps.lava.common.SimpleDomainObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.lancethomps.lava.common.SimpleDomainObject;
 
-/**
- * The Class RequestProcessingLocation.
- */
 @SuppressWarnings("serial")
 public class RequestProcessingLocation extends SimpleDomainObject {
 
-	/** The config. */
-	private RequestProcessingConfig config;
+  private RequestProcessingConfig config;
 
-	/** The location. */
-	private String location;
+  private String location;
 
-	/** The regex. */
-	@JsonIgnore
-	private Pattern regex;
+  @JsonIgnore
+  private Pattern regex;
 
-	/** The type. */
-	private RequestProcessingLocationType type = RequestProcessingLocationType.PREFIX_MATCH;
+  private RequestProcessingLocationType type = RequestProcessingLocationType.PREFIX_MATCH;
 
-	@Override
-	public void afterDeserialization() {
-		if (type.isRegex()) {
-			switch (type) {
-			case CASE_INSENSITIVE_REGEX:
-				regex = Pattern.compile(location, Pattern.CASE_INSENSITIVE);
-				break;
-			case CASE_SENSITIVE_REGEX:
-				regex = Pattern.compile(location);
-				break;
-			default:
-				break;
-			}
-		}
-	}
+  @Override
+  public void afterDeserialization() {
+    if (type.isRegex()) {
+      switch (type) {
+        case CASE_INSENSITIVE_REGEX:
+          regex = Pattern.compile(location, Pattern.CASE_INSENSITIVE);
+          break;
+        case CASE_SENSITIVE_REGEX:
+          regex = Pattern.compile(location);
+          break;
+        default:
+          break;
+      }
+    }
+  }
 
-	/**
-	 * @return the config
-	 */
-	public RequestProcessingConfig getConfig() {
-		return config;
-	}
+  public RequestProcessingConfig getConfig() {
+    return config;
+  }
 
-	/**
-	 * @return the location
-	 */
-	public String getLocation() {
-		return location;
-	}
+  public void setConfig(RequestProcessingConfig config) {
+    this.config = config;
+  }
 
-	/**
-	 * @return the regex
-	 */
-	public Pattern getRegex() {
-		return regex;
-	}
+  public String getLocation() {
+    return location;
+  }
 
-	/**
-	 * @return the type
-	 */
-	public RequestProcessingLocationType getType() {
-		return type;
-	}
+  public void setLocation(String location) {
+    this.location = location;
+  }
 
-	/**
-	 * @param config the config to set
-	 */
-	public void setConfig(RequestProcessingConfig config) {
-		this.config = config;
-	}
+  public Pattern getRegex() {
+    return regex;
+  }
 
-	/**
-	 * @param location the location to set
-	 */
-	public void setLocation(String location) {
-		this.location = location;
-	}
+  public void setRegex(Pattern regex) {
+    this.regex = regex;
+  }
 
-	/**
-	 * @param regex the regex to set
-	 */
-	public void setRegex(Pattern regex) {
-		this.regex = regex;
-	}
+  public RequestProcessingLocationType getType() {
+    return type;
+  }
 
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(RequestProcessingLocationType type) {
-		this.type = type;
-	}
+  public void setType(RequestProcessingLocationType type) {
+    this.type = type;
+  }
+
 }

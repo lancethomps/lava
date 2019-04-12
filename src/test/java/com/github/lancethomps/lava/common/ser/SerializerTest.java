@@ -17,71 +17,49 @@ import com.github.lancethomps.lava.common.BaseTest;
 import com.github.lancethomps.lava.common.FailedTestDataLogger;
 import com.github.lancethomps.lava.common.TestingCommon;
 
-/**
- * The Class SerializerTest.
- *
- * @author lancethomps
- */
 public class SerializerTest extends BaseTest {
 
-	/** The data logger. */
-	@Rule
-	public final FailedTestDataLogger dataLogger = new FailedTestDataLogger();
+  @Rule
+  public final FailedTestDataLogger dataLogger = new FailedTestDataLogger();
 
-	/**
-	 * Test deserialize csv.
-	 *
-	 * @throws Exception the exception
-	 */
-	@Test
-	public void testDeserializeCsv() throws Exception {
-		final List<Map<String, Object>> csvData = getCsvTestData();
+  @Test
+  public void testDeserializeCsv() throws Exception {
+    final List<Map<String, Object>> csvData = getCsvTestData();
 
-		final List<Map<String, Object>> deserialized = Serializer.fromCsv(getClass().getResourceAsStream("/serializer/deserialize-csv-data.csv"));
-		dataLogger.addData("deserialized", deserialized);
-		TestingCommon.assertEqualsViaJsonDiff("Serializer.fromCsv", csvData, deserialized);
-	}
+    final List<Map<String, Object>> deserialized = Serializer.fromCsv(getClass().getResourceAsStream("/serializer/deserialize-csv-data.csv"));
+    dataLogger.addData("deserialized", deserialized);
+    TestingCommon.assertEqualsViaJsonDiff("Serializer.fromCsv", csvData, deserialized);
+  }
 
-	/**
-	 * Test serialize csv.
-	 *
-	 * @throws Exception the exception
-	 */
-	@Test
-	public void testSerializeCsv() throws Exception {
-		final String serialized = Serializer.toCsv(getCsvTestData());
+  @Test
+  public void testSerializeCsv() throws Exception {
+    final String serialized = Serializer.toCsv(getCsvTestData());
 
-		final String csv = StringUtils.replace(IOUtils.toString(getClass().getResourceAsStream("/serializer/serialize-csv-data.csv"), StandardCharsets.UTF_8), "\n", System.lineSeparator());
-		Assert.assertEquals("Serializer.toCsv", csv, serialized);
-	}
+    final String csv =
+      StringUtils.replace(
+        IOUtils.toString(getClass().getResourceAsStream("/serializer/serialize-csv-data.csv"), StandardCharsets.UTF_8),
+        "\n",
+        System.lineSeparator()
+      );
+    Assert.assertEquals("Serializer.toCsv", csv, serialized);
+  }
 
-	/**
-	 * Test xls deserialization.
-	 *
-	 * @throws Exception the exception
-	 */
-	// @Test
-	public void testXlsDeserialization() throws Exception {
-		// TODO: add test
-	}
+  public void testXlsDeserialization() throws Exception {
+    // TODO: add test
+  }
 
-	/**
-	 * Gets the csv test data.
-	 *
-	 * @return the csv test data
-	 */
-	private List<Map<String, Object>> getCsvTestData() {
-		final List<Map<String, Object>> csvData = new ArrayList<>();
-		final Map<String, Object> data = new HashMap<>();
-		csvData.add(data);
-		data.put("field", "value");
-		final Map<String, Object> innerData = new HashMap<>();
-		innerData.put("field", "innerValue");
-		data.put("innerData", innerData);
-		final List<String> list = Arrays.asList("listVal1", "listVal2");
-		data.put("list", list);
-		dataLogger.addData("csvData", csvData);
-		return csvData;
-	}
+  private List<Map<String, Object>> getCsvTestData() {
+    final List<Map<String, Object>> csvData = new ArrayList<>();
+    final Map<String, Object> data = new HashMap<>();
+    csvData.add(data);
+    data.put("field", "value");
+    final Map<String, Object> innerData = new HashMap<>();
+    innerData.put("field", "innerValue");
+    data.put("innerData", innerData);
+    final List<String> list = Arrays.asList("listVal1", "listVal2");
+    data.put("list", list);
+    dataLogger.addData("csvData", csvData);
+    return csvData;
+  }
 
 }

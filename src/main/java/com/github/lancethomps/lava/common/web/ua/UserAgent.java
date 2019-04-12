@@ -10,476 +10,251 @@ import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.Version;
 import ua_parser.Client;
 
-/**
- * The Class UserAgent.
- *
- * @author lancethomps
- */
 public class UserAgent extends ExternalizableBean {
 
-	/** The browser. */
-	private String browser;
+  private String browser;
 
-	/** The browser manufacturer. */
-	private String browserManufacturer;
+  private String browserManufacturer;
 
-	/** The browser rendering engine. */
-	private String browserRenderingEngine;
+  private String browserRenderingEngine;
 
-	/** The browser type. */
-	private String browserType;
+  private String browserType;
 
-	/** The browser version. */
-	private String browserVersion;
+  private String browserVersion;
 
-	/** The browser version major. */
-	private String browserVersionMajor;
+  private String browserVersionMajor;
 
-	/** The browser version minor. */
-	private String browserVersionMinor;
+  private String browserVersionMinor;
 
-	/** The browser version patch. */
-	private String browserVersionPatch;
+  private String browserVersionPatch;
 
-	/** The device brand. */
-	private String deviceBrand;
+  private String deviceBrand;
 
-	/** The device family. */
-	private String deviceFamily;
+  private String deviceFamily;
 
-	/** The device model. */
-	private String deviceModel;
+  private String deviceModel;
 
-	/** The os. */
-	private String os;
+  private String os;
 
-	/** The os device type. */
-	private String osDeviceType;
+  private String osDeviceType;
 
-	/** The os manufacturer. */
-	private String osManufacturer;
+  private String osManufacturer;
 
-	/** The os version major. */
-	private String osVersionMajor;
+  private String osVersionMajor;
 
-	/** The os version minor. */
-	private String osVersionMinor;
+  private String osVersionMinor;
 
-	/** The os version patch. */
-	private String osVersionPatch;
+  private String osVersionPatch;
 
-	/** The os version patch minor. */
-	private String osVersionPatchMinor;
+  private String osVersionPatchMinor;
 
-	/** The user agent string. */
-	private String userAgent;
+  private String userAgent;
 
-	/**
-	 * Instantiates a new user agent.
-	 */
-	public UserAgent() {
-		super();
-	}
+  public UserAgent() {
+    super();
+  }
 
-	/**
-	 * From ua parser.
-	 *
-	 * @param client the client
-	 * @return the user agent
-	 */
-	public static UserAgent fromUaParser(Client client) {
-		return fromUaParser(client, null);
-	}
+  public static UserAgent fromUaParser(Client client) {
+    return fromUaParser(client, null);
+  }
 
-	/**
-	 * From ua parser.
-	 *
-	 * @param client the client
-	 * @param userAgent the user agent
-	 * @return the user agent
-	 */
-	public static UserAgent fromUaParser(Client client, String userAgent) {
-		UserAgent ua = new UserAgent();
-		ua.setUserAgent(userAgent);
-		return ua;
-	}
+  public static UserAgent fromUaParser(Client client, String userAgent) {
+    UserAgent ua = new UserAgent();
+    ua.setUserAgent(userAgent);
+    return ua;
+  }
 
-	/**
-	 * From user agent utils.
-	 *
-	 * @param other the other
-	 * @return the user agent
-	 */
-	public static UserAgent fromUserAgentUtils(eu.bitwalker.useragentutils.UserAgent other) {
-		return fromUserAgentUtils(other, null);
-	}
+  public static UserAgent fromUserAgentUtils(eu.bitwalker.useragentutils.UserAgent other) {
+    return fromUserAgentUtils(other, null);
+  }
 
-	/**
-	 * From user agent utils.
-	 *
-	 * @param other the other
-	 * @param userAgent the user agent
-	 * @return the user agent
-	 */
-	public static UserAgent fromUserAgentUtils(eu.bitwalker.useragentutils.UserAgent other, String userAgent) {
-		UserAgent ua = new UserAgent();
-		ua.setUserAgent(userAgent != null ? userAgent : WebRequests.getUserAgentString(other));
-		Browser browser = other.getBrowser();
-		if (browser != null) {
-			ua.setBrowser(browser.name())
-				.setBrowserManufacturer(ofNullable(browser.getManufacturer()).map(Enum::name).orElse(null))
-				.setBrowserRenderingEngine(ofNullable(browser.getRenderingEngine()).map(Enum::name).orElse(null))
-				.setBrowserType(ofNullable(browser.getBrowserType()).map(Enum::name).orElse(null));
-		}
-		Version vers = other.getBrowserVersion();
-		if (vers != null) {
-			ua.setBrowserVersion(vers.toString())
-				.setBrowserVersionMajor(vers.getMajorVersion())
-				.setBrowserVersionMinor(vers.getMinorVersion());
-		}
-		OperatingSystem os = other.getOperatingSystem();
-		if (os != null) {
-			ua.setOs(os.name())
-				.setOsDeviceType(ofNullable(os.getDeviceType()).map(Enum::name).orElse(null))
-				.setOsManufacturer(ofNullable(os.getManufacturer()).map(Enum::name).orElse(null));
-		}
-		return ua;
-	}
+  public static UserAgent fromUserAgentUtils(eu.bitwalker.useragentutils.UserAgent other, String userAgent) {
+    UserAgent ua = new UserAgent();
+    ua.setUserAgent(userAgent != null ? userAgent : WebRequests.getUserAgentString(other));
+    Browser browser = other.getBrowser();
+    if (browser != null) {
+      ua.setBrowser(browser.name())
+        .setBrowserManufacturer(ofNullable(browser.getManufacturer()).map(Enum::name).orElse(null))
+        .setBrowserRenderingEngine(ofNullable(browser.getRenderingEngine()).map(Enum::name).orElse(null))
+        .setBrowserType(ofNullable(browser.getBrowserType()).map(Enum::name).orElse(null));
+    }
+    Version vers = other.getBrowserVersion();
+    if (vers != null) {
+      ua.setBrowserVersion(vers.toString())
+        .setBrowserVersionMajor(vers.getMajorVersion())
+        .setBrowserVersionMinor(vers.getMinorVersion());
+    }
+    OperatingSystem os = other.getOperatingSystem();
+    if (os != null) {
+      ua.setOs(os.name())
+        .setOsDeviceType(ofNullable(os.getDeviceType()).map(Enum::name).orElse(null))
+        .setOsManufacturer(ofNullable(os.getManufacturer()).map(Enum::name).orElse(null));
+    }
+    return ua;
+  }
 
-	/**
-	 * Gets the browser.
-	 *
-	 * @return the browser
-	 */
-	public String getBrowser() {
-		return browser;
-	}
+  public String getBrowser() {
+    return browser;
+  }
 
-	/**
-	 * Gets the browser manufacturer.
-	 *
-	 * @return the browserManufacturer
-	 */
-	public String getBrowserManufacturer() {
-		return browserManufacturer;
-	}
+  public UserAgent setBrowser(String browser) {
+    this.browser = browser;
+    return this;
+  }
 
-	/**
-	 * Gets the browser rendering engine.
-	 *
-	 * @return the browserRenderingEngine
-	 */
-	public String getBrowserRenderingEngine() {
-		return browserRenderingEngine;
-	}
+  public String getBrowserManufacturer() {
+    return browserManufacturer;
+  }
 
-	/**
-	 * Gets the browser type.
-	 *
-	 * @return the browserType
-	 */
-	public String getBrowserType() {
-		return browserType;
-	}
+  public UserAgent setBrowserManufacturer(String browserManufacturer) {
+    this.browserManufacturer = browserManufacturer;
+    return this;
+  }
 
-	/**
-	 * Gets the browser version.
-	 *
-	 * @return the browserVersion
-	 */
-	public String getBrowserVersion() {
-		return browserVersion;
-	}
+  public String getBrowserRenderingEngine() {
+    return browserRenderingEngine;
+  }
 
-	/**
-	 * Gets the browser version major.
-	 *
-	 * @return the browserVersionMajor
-	 */
-	public String getBrowserVersionMajor() {
-		return browserVersionMajor;
-	}
+  public UserAgent setBrowserRenderingEngine(String browserRenderingEngine) {
+    this.browserRenderingEngine = browserRenderingEngine;
+    return this;
+  }
 
-	/**
-	 * Gets the browser version minor.
-	 *
-	 * @return the browserVersionMinor
-	 */
-	public String getBrowserVersionMinor() {
-		return browserVersionMinor;
-	}
+  public String getBrowserType() {
+    return browserType;
+  }
 
-	/**
-	 * @return the browserVersionPatch
-	 */
-	public String getBrowserVersionPatch() {
-		return browserVersionPatch;
-	}
+  public UserAgent setBrowserType(String browserType) {
+    this.browserType = browserType;
+    return this;
+  }
 
-	/**
-	 * @return the deviceBrand
-	 */
-	public String getDeviceBrand() {
-		return deviceBrand;
-	}
+  public String getBrowserVersion() {
+    return browserVersion;
+  }
 
-	/**
-	 * @return the deviceFamily
-	 */
-	public String getDeviceFamily() {
-		return deviceFamily;
-	}
+  public UserAgent setBrowserVersion(String browserVersion) {
+    this.browserVersion = browserVersion;
+    return this;
+  }
 
-	/**
-	 * @return the deviceModel
-	 */
-	public String getDeviceModel() {
-		return deviceModel;
-	}
+  public String getBrowserVersionMajor() {
+    return browserVersionMajor;
+  }
 
-	/**
-	 * Gets the os.
-	 *
-	 * @return the os
-	 */
-	public String getOs() {
-		return os;
-	}
+  public UserAgent setBrowserVersionMajor(String browserVersionMajor) {
+    this.browserVersionMajor = browserVersionMajor;
+    return this;
+  }
 
-	/**
-	 * Gets the os device type.
-	 *
-	 * @return the osDeviceType
-	 */
-	public String getOsDeviceType() {
-		return osDeviceType;
-	}
+  public String getBrowserVersionMinor() {
+    return browserVersionMinor;
+  }
 
-	/**
-	 * Gets the os manufacturer.
-	 *
-	 * @return the osManufacturer
-	 */
-	public String getOsManufacturer() {
-		return osManufacturer;
-	}
+  public UserAgent setBrowserVersionMinor(String browserVersionMinor) {
+    this.browserVersionMinor = browserVersionMinor;
+    return this;
+  }
 
-	/**
-	 * @return the osVersionMajor
-	 */
-	public String getOsVersionMajor() {
-		return osVersionMajor;
-	}
+  public String getBrowserVersionPatch() {
+    return browserVersionPatch;
+  }
 
-	/**
-	 * @return the osVersionMinor
-	 */
-	public String getOsVersionMinor() {
-		return osVersionMinor;
-	}
+  public UserAgent setBrowserVersionPatch(String browserVersionPatch) {
+    this.browserVersionPatch = browserVersionPatch;
+    return this;
+  }
 
-	/**
-	 * @return the osVersionPatch
-	 */
-	public String getOsVersionPatch() {
-		return osVersionPatch;
-	}
+  public String getDeviceBrand() {
+    return deviceBrand;
+  }
 
-	/**
-	 * @return the osVersionPatchMinor
-	 */
-	public String getOsVersionPatchMinor() {
-		return osVersionPatchMinor;
-	}
+  public void setDeviceBrand(String deviceBrand) {
+    this.deviceBrand = deviceBrand;
+  }
 
-	/**
-	 * Gets the user agent string.
-	 *
-	 * @return the userAgentString
-	 */
-	public String getUserAgent() {
-		return userAgent;
-	}
+  public String getDeviceFamily() {
+    return deviceFamily;
+  }
 
-	/**
-	 * Sets the browser.
-	 *
-	 * @param browser the browser to set
-	 * @return the user agent
-	 */
-	public UserAgent setBrowser(String browser) {
-		this.browser = browser;
-		return this;
-	}
+  public void setDeviceFamily(String deviceFamily) {
+    this.deviceFamily = deviceFamily;
+  }
 
-	/**
-	 * Sets the browser manufacturer.
-	 *
-	 * @param browserManufacturer the browserManufacturer to set
-	 * @return the user agent
-	 */
-	public UserAgent setBrowserManufacturer(String browserManufacturer) {
-		this.browserManufacturer = browserManufacturer;
-		return this;
-	}
+  public String getDeviceModel() {
+    return deviceModel;
+  }
 
-	/**
-	 * Sets the browser rendering engine.
-	 *
-	 * @param browserRenderingEngine the browserRenderingEngine to set
-	 * @return the user agent
-	 */
-	public UserAgent setBrowserRenderingEngine(String browserRenderingEngine) {
-		this.browserRenderingEngine = browserRenderingEngine;
-		return this;
-	}
+  public void setDeviceModel(String deviceModel) {
+    this.deviceModel = deviceModel;
+  }
 
-	/**
-	 * Sets the browser type.
-	 *
-	 * @param browserType the browserType to set
-	 * @return the user agent
-	 */
-	public UserAgent setBrowserType(String browserType) {
-		this.browserType = browserType;
-		return this;
-	}
+  public String getOs() {
+    return os;
+  }
 
-	/**
-	 * Sets the browser version.
-	 *
-	 * @param browserVersion the browserVersion to set
-	 * @return the user agent
-	 */
-	public UserAgent setBrowserVersion(String browserVersion) {
-		this.browserVersion = browserVersion;
-		return this;
-	}
+  public UserAgent setOs(String os) {
+    this.os = os;
+    return this;
+  }
 
-	/**
-	 * Sets the browser version major.
-	 *
-	 * @param browserVersionMajor the browserVersionMajor to set
-	 * @return the user agent
-	 */
-	public UserAgent setBrowserVersionMajor(String browserVersionMajor) {
-		this.browserVersionMajor = browserVersionMajor;
-		return this;
-	}
+  public String getOsDeviceType() {
+    return osDeviceType;
+  }
 
-	/**
-	 * Sets the browser version minor.
-	 *
-	 * @param browserVersionMinor the browserVersionMinor to set
-	 * @return the user agent
-	 */
-	public UserAgent setBrowserVersionMinor(String browserVersionMinor) {
-		this.browserVersionMinor = browserVersionMinor;
-		return this;
-	}
+  public UserAgent setOsDeviceType(String osDeviceType) {
+    this.osDeviceType = osDeviceType;
+    return this;
+  }
 
-	/**
-	 * Sets the browser version patch.
-	 *
-	 * @param browserVersionPatch the browserVersionPatch to set
-	 * @return the user agent
-	 */
-	public UserAgent setBrowserVersionPatch(String browserVersionPatch) {
-		this.browserVersionPatch = browserVersionPatch;
-		return this;
-	}
+  public String getOsManufacturer() {
+    return osManufacturer;
+  }
 
-	/**
-	 * @param deviceBrand the deviceBrand to set
-	 */
-	public void setDeviceBrand(String deviceBrand) {
-		this.deviceBrand = deviceBrand;
-	}
+  public UserAgent setOsManufacturer(String osManufacturer) {
+    this.osManufacturer = osManufacturer;
+    return this;
+  }
 
-	/**
-	 * @param deviceFamily the deviceFamily to set
-	 */
-	public void setDeviceFamily(String deviceFamily) {
-		this.deviceFamily = deviceFamily;
-	}
+  public String getOsVersionMajor() {
+    return osVersionMajor;
+  }
 
-	/**
-	 * @param deviceModel the deviceModel to set
-	 */
-	public void setDeviceModel(String deviceModel) {
-		this.deviceModel = deviceModel;
-	}
+  public void setOsVersionMajor(String osVersionMajor) {
+    this.osVersionMajor = osVersionMajor;
+  }
 
-	/**
-	 * Sets the os.
-	 *
-	 * @param os the os to set
-	 * @return the user agent
-	 */
-	public UserAgent setOs(String os) {
-		this.os = os;
-		return this;
-	}
+  public String getOsVersionMinor() {
+    return osVersionMinor;
+  }
 
-	/**
-	 * Sets the os device type.
-	 *
-	 * @param osDeviceType the osDeviceType to set
-	 * @return the user agent
-	 */
-	public UserAgent setOsDeviceType(String osDeviceType) {
-		this.osDeviceType = osDeviceType;
-		return this;
-	}
+  public void setOsVersionMinor(String osVersionMinor) {
+    this.osVersionMinor = osVersionMinor;
+  }
 
-	/**
-	 * Sets the os manufacturer.
-	 *
-	 * @param osManufacturer the osManufacturer to set
-	 * @return the user agent
-	 */
-	public UserAgent setOsManufacturer(String osManufacturer) {
-		this.osManufacturer = osManufacturer;
-		return this;
-	}
+  public String getOsVersionPatch() {
+    return osVersionPatch;
+  }
 
-	/**
-	 * @param osVersionMajor the osVersionMajor to set
-	 */
-	public void setOsVersionMajor(String osVersionMajor) {
-		this.osVersionMajor = osVersionMajor;
-	}
+  public void setOsVersionPatch(String osVersionPatch) {
+    this.osVersionPatch = osVersionPatch;
+  }
 
-	/**
-	 * @param osVersionMinor the osVersionMinor to set
-	 */
-	public void setOsVersionMinor(String osVersionMinor) {
-		this.osVersionMinor = osVersionMinor;
-	}
+  public String getOsVersionPatchMinor() {
+    return osVersionPatchMinor;
+  }
 
-	/**
-	 * @param osVersionPatch the osVersionPatch to set
-	 */
-	public void setOsVersionPatch(String osVersionPatch) {
-		this.osVersionPatch = osVersionPatch;
-	}
+  public void setOsVersionPatchMinor(String osVersionPatchMinor) {
+    this.osVersionPatchMinor = osVersionPatchMinor;
+  }
 
-	/**
-	 * @param osVersionPatchMinor the osVersionPatchMinor to set
-	 */
-	public void setOsVersionPatchMinor(String osVersionPatchMinor) {
-		this.osVersionPatchMinor = osVersionPatchMinor;
-	}
+  public String getUserAgent() {
+    return userAgent;
+  }
 
-	/**
-	 * Sets the user agent string.
-	 *
-	 * @param userAgent the user agent
-	 * @return the user agent
-	 */
-	public UserAgent setUserAgent(String userAgent) {
-		this.userAgent = userAgent;
-		return this;
-	}
+  public UserAgent setUserAgent(String userAgent) {
+    this.userAgent = userAgent;
+    return this;
+  }
 
 }

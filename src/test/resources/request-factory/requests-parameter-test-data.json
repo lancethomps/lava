@@ -1,13 +1,13 @@
 [{
-	"requestKey": "1",
-	"responseFields": "hierarchy1",
-	"groupByFields": "hierarchy1",
-	"fromDate": "t-2b-1m+1d/d",
-	"toDate": "t-2b/d"
+  "requestKey": "1",
+  "responseFields": "hierarchy1",
+  "groupByFields": "hierarchy1",
+  "fromDate": "t-2b-1m+1d/d",
+  "toDate": "t-2b/d"
 }, {
-	"requestKey": "2",
-	"responseFields": "hierarchy2",
-	"groupByFields": "hierarchy2",
-	"fromDate": "t-2b-1m+1d/d",
-	"toDate": "t-2b/d"
+  "requestKey": "2",
+  "responseFields": "hierarchy2",
+  "groupByFields": "hierarchy2",
+  "fromDate": "t-2b-1m+1d/d",
+  "toDate": "t-2b/d"
 }]

@@ -2,52 +2,31 @@ package com.github.lancethomps.lava.common.expr;
 
 import com.github.lancethomps.lava.common.Enums;
 
-/**
- * The Enum ExprParser.
- */
 public enum ExprParser {
 
-	/** The js. */
-	JS("nashorn"),
+  JS("nashorn"),
 
-	/** The ognl. */
-	OGNL,
+  OGNL,
 
-	/** The py. */
-	PY("python"),
+  PY("python"),
 
-	/** The spring. */
-	SPEL;
+  SPEL;
 
-	/** The engine name. */
-	private final String engineName;
+  static {
+    Enums.createStringToTypeMap(ExprParser.class, null, ExprParser::getEngineName);
+  }
 
-	/**
-	 * Instantiates a new expr parser.
-	 */
-	ExprParser() {
-		this(null);
-	}
+  private final String engineName;
 
-	/**
-	 * Instantiates a new expr parser.
-	 *
-	 * @param engineName the engine name
-	 */
-	ExprParser(String engineName) {
-		this.engineName = engineName;
-	}
+  ExprParser() {
+    this(null);
+  }
 
-	static {
-		Enums.createStringToTypeMap(ExprParser.class, null, ExprParser::getEngineName);
-	}
+  ExprParser(String engineName) {
+    this.engineName = engineName;
+  }
 
-	/**
-	 * Gets the engine name.
-	 *
-	 * @return the engineName
-	 */
-	public String getEngineName() {
-		return engineName;
-	}
+  public String getEngineName() {
+    return engineName;
+  }
 }

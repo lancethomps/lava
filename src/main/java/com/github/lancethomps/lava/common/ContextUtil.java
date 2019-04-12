@@ -42,516 +42,330 @@ import com.github.lancethomps.lava.common.file.FileUtil;
 import com.github.lancethomps.lava.common.logging.Logs;
 import com.google.common.collect.Sets;
 
-/**
- * The Class ContextUtil.
- */
 public final class ContextUtil {
 
-	/** The Constant CLASSPATH_PREFIX. */
-	public static final String CLASSPATH_PREFIX = "classpath:";
+  public static final String CLASSPATH_PREFIX = "classpath:";
+  public static final DateTimeFormatter INTRADAY_FORMAT = Dates.formatterFromPattern("yyyyMMdd-HH-mm-ss-SSS");
+  public static final String SERVER_TYPE = "tomcat";
+  public static final String UNKNOWN_USER = "Unknown";
+  public static final String UNKNOWN_USER_THREAD_SUFFIX = String.format("_%s", UNKNOWN_USER);
+  public static final boolean WILDFLY = SERVER_TYPE.equalsIgnoreCase("wildfly");
+  private static final Logger LOG = Logger.getLogger(ContextUtil.class);
+  private static Set<String> adminUserIds;
+  private static String rootPath;
+  private static Properties serverProperties;
+  private static ServletContext servletContext;
 
-	/** The Constant DEFAULT_INTRADAY_FORMAT. */
-	public static final DateTimeFormatter INTRADAY_FORMAT = Dates.formatterFromPattern("yyyyMMdd-HH-mm-ss-SSS");
+  static {
+    loadServerProperties();
+  }
 
-	/** The Constant SERVER_TYPE. */
-	public static final String SERVER_TYPE = "tomcat";
+  public static void addAdminUsers(Collection<String> userIds) {
+    Set<String> adminUserIds = Sets.newHashSet();
+    if (isNotEmpty(userIds)) {
+      adminUserIds.addAll(userIds);
+    }
+    if ((serverProperties != null) && serverProperties.containsKey("adminUserIds")) {
+      Set<String> defaultUserIds = newHashSet(splitCsv(serverProperties.getProperty("adminUserIds")));
+      if (isNotEmpty(defaultUserIds)) {
+        adminUserIds.addAll(defaultUserIds);
+      }
+    }
+    ContextUtil.adminUserIds = adminUserIds;
+  }
 
-	/** The Constant UNKNOWN_USER. */
-	public static final String UNKNOWN_USER = "Unknown";
+  public static Set<String> getAdminUserIds() {
+    return adminUserIds;
+  }
 
-	/** The Constant UNKNOWN_USER_THREAD_SUFFIX. */
-	public static final String UNKNOWN_USER_THREAD_SUFFIX = String.format("_%s", UNKNOWN_USER);
+  public static String getAndResetThreadName(Thread thread, String prefix) {
+    if (thread == null) {
+      thread = Thread.currentThread();
+    }
+    String name = prefix + '-' + thread.getId();
+    thread.setName(name);
+    return name;
+  }
 
-	/** The Constant IS_WILDFLY. */
-	public static final boolean WILDFLY = SERVER_TYPE.equalsIgnoreCase("wildfly");
+  public static String getAndSetCustomThreadName(Thread thread, String prefix, String suffix, String userId) {
+    if (thread == null) {
+      thread = Thread.currentThread();
+    }
+    String name = String.format(
+      "%s-%s_%s_%s_%s",
+      prefix,
+      thread.getId(),
+      INTRADAY_FORMAT.format(LocalDateTime.now(ZONE_PST)),
+      suffix,
+      defaultIfBlank(userId, UNKNOWN_USER)
+    );
+    thread.setName(name);
+    return name;
+  }
 
-	/** The admin user ids. */
-	private static Set<String> adminUserIds;
+  public static InputStream getClassResource(String path) {
+    return ContextUtil.class.getResourceAsStream(path);
+  }
 
-	/** The Constant LOG. */
-	private static final Logger LOG = Logger.getLogger(ContextUtil.class);
+  public static File getConfigFile(String relativePath) {
+    return getConfigFile(relativePath, null, null);
+  }
 
-	/** The root path. */
-	private static String rootPath;
+  public static File getConfigFile(String relativePath, String fileSystemDir, String classpathBaseDir, File... otherFiles) {
+    String resolvedRelativePath = FileUtil.useCorrectFileSeps(relativePath);
+    String resolvedClasspathBaseDir = classpathBaseDir;
+    if (resolvedClasspathBaseDir != null) {
+      resolvedClasspathBaseDir = FileUtil.useCorrectFileSeps(resolvedClasspathBaseDir);
+      if (!(resolvedClasspathBaseDir.endsWith(separator))) {
+        resolvedClasspathBaseDir += separator;
+      }
+    }
+    String resolvedFileSystemDir = fileSystemDir;
+    if (resolvedFileSystemDir != null) {
+      resolvedFileSystemDir = FileUtil.useCorrectFileSeps(resolvedFileSystemDir);
+      if (!(resolvedFileSystemDir.endsWith(separator))) {
+        resolvedFileSystemDir += separator;
+      }
+      resolvedFileSystemDir =
+        StringUtils.removeEnd(resolvedFileSystemDir, StringUtils.substringBeforeLast(resolvedRelativePath, separator) + separator);
+      if (!(resolvedFileSystemDir.endsWith(separator))) {
+        resolvedFileSystemDir += separator;
+      }
+    }
+    File classpathFile = ContextUtil.getFile(CLASSPATH_PREFIX + StringUtils.defaultString(resolvedClasspathBaseDir) + resolvedRelativePath);
+    File fileSystemFile = new File(resolvedFileSystemDir + resolvedRelativePath);
+    File latestFile;
+    if (resolvedFileSystemDir == null) {
+      latestFile = classpathFile;
+    } else {
+      latestFile = FileUtil.getLatestFile(classpathFile, fileSystemFile);
+    }
+    if (LOG.isTraceEnabled()) {
+      Logs.logTrace(
+        LOG,
+        "Config file parameters resolved to - relativePath: [%s] => [%s] fileSystemDir: [%s] => [%s] classpathBaseDir: [%s] => [%s] classpathFile: " +
+          "[%s] fileSystemFile: [%s] latestFile: [%s]",
+        relativePath,
+        resolvedRelativePath,
+        fileSystemDir,
+        resolvedFileSystemDir,
+        classpathBaseDir,
+        resolvedClasspathBaseDir,
+        FileUtil.fullPath(classpathFile),
+        FileUtil.fullPath(fileSystemFile),
+        FileUtil.fullPath(latestFile)
+      );
+    }
+    return latestFile;
+  }
 
-	/** The server properties. */
-	private static Properties serverProperties;
+  public static File getCpFile(String path) {
+    return getFile(CLASSPATH_PREFIX + path);
+  }
 
-	/** The servlet context. */
-	private static ServletContext servletContext;
+  public static File getFile(String path) {
+    return getFile(path, false);
+  }
 
-	static {
-		loadServerProperties();
-	}
+  public static File getFile(String path, boolean addRoot) {
+    if (isBlank(path)) {
+      return null;
+    }
+    String filePath = path;
+    try {
+      if (filePath.startsWith(CLASSPATH_PREFIX)) {
+        if (WILDFLY && isNotBlank(getRootPath())) {
+          filePath = path.replace(CLASSPATH_PREFIX, getRootPath() + "WEB-INF/classes/");
+          return ResourceUtils.getFile(filePath);
+        }
+        return ResourceUtils.getFile(filePath);
+      }
+      if (addRoot) {
+        if (filePath.startsWith("/") || filePath.startsWith("\\")) {
+          filePath = filePath.substring(1);
+        }
+        filePath = getRootPath() + filePath;
+      }
+      return ResourceUtils.getFile(filePath);
+    } catch (FileNotFoundException e) {
+      return null;
+    }
+  }
 
-	/**
-	 * Adds the admin users.
-	 *
-	 * @param userIds the user ids
-	 */
-	public static void addAdminUsers(Collection<String> userIds) {
-		Set<String> adminUserIds = Sets.newHashSet();
-		if (isNotEmpty(userIds)) {
-			adminUserIds.addAll(userIds);
-		}
-		if ((serverProperties != null) && serverProperties.containsKey("adminUserIds")) {
-			Set<String> defaultUserIds = newHashSet(splitCsv(serverProperties.getProperty("adminUserIds")));
-			if (isNotEmpty(defaultUserIds)) {
-				adminUserIds.addAll(defaultUserIds);
-			}
-		}
-		ContextUtil.adminUserIds = adminUserIds;
-	}
+  public static String getFirstResolvedProperty(String... keys) {
+    if (keys != null) {
+      for (String key : keys) {
+        String prop = getProperty(key);
+        if (isNotBlank(prop)) {
+          return prop;
+        }
+      }
+    }
+    return null;
+  }
 
-	/**
-	 * @return the adminUserIds
-	 */
-	public static Set<String> getAdminUserIds() {
-		return adminUserIds;
-	}
+  public static String getRootPath() {
+    if (isBlank(rootPath) && (servletContext != null)) {
+      String root = FileUtil.fullPath(servletContext.getRealPath("/"));
+      if (!endsWith(root, "/") && !endsWith(root, "\\")) {
+        root = root + File.separatorChar;
+      }
+      rootPath = root;
+      System.setProperty("myserver.rootPath", FileUtil.fullPath(new File(rootPath)));
+      Logs.logTrace(LOG, "Servlet root path set to [%s].", rootPath);
+    }
+    return rootPath;
+  }
 
-	/**
-	 * Gets the and reset thread name.
-	 *
-	 * @param thread the thread
-	 * @param prefix the prefix
-	 * @return the and reset thread name
-	 */
-	public static String getAndResetThreadName(Thread thread, String prefix) {
-		if (thread == null) {
-			thread = Thread.currentThread();
-		}
-		String name = prefix + '-' + thread.getId();
-		thread.setName(name);
-		return name;
-	}
+  public static void setRootPath(String rootPath) {
+    if (isBlank(ContextUtil.rootPath)) {
+      ContextUtil.rootPath = rootPath;
+    }
+  }
 
-	/**
-	 * Gets the and set custom thread name.
-	 *
-	 * @param thread the thread
-	 * @param prefix the prefix
-	 * @param suffix the suffix
-	 * @param userId the user id
-	 * @return the and set custom thread name
-	 */
-	public static String getAndSetCustomThreadName(Thread thread, String prefix, String suffix, String userId) {
-		if (thread == null) {
-			thread = Thread.currentThread();
-		}
-		String name = String.format("%s-%s_%s_%s_%s", prefix, thread.getId(), INTRADAY_FORMAT.format(LocalDateTime.now(ZONE_PST)), suffix, defaultIfBlank(userId, UNKNOWN_USER));
-		thread.setName(name);
-		return name;
-	}
+  public static Properties getServerProperties() {
+    return serverProperties;
+  }
 
-	/**
-	 * Gets the class resource.
-	 *
-	 * @param path the path
-	 * @return the class resource
-	 */
-	public static InputStream getClassResource(String path) {
-		return ContextUtil.class.getResourceAsStream(path);
-	}
+  public static void setServerProperties(Properties serverProperties) {
+    ContextUtil.serverProperties = serverProperties;
+    if ((serverProperties != null) && serverProperties.containsKey("adminUserIds")) {
+      adminUserIds = newHashSet(splitCsv(serverProperties.getProperty("adminUserIds")));
+      Logs.logWarn(LOG, "Admin users ==> %s", adminUserIds);
+    }
+  }
 
-	/**
-	 * Gets the config file.
-	 *
-	 * @param relativePath the relative path
-	 * @return the config file
-	 */
-	public static File getConfigFile(String relativePath) {
-		return getConfigFile(relativePath, null, null);
-	}
+  public static boolean getSystemBoolean(String key, boolean defaultValue) {
+    String prop = getProperty(key);
+    return isNotBlank(prop) ? BooleanUtils.toBoolean(prop) : defaultValue;
+  }
 
-	/**
-	 * Gets the config file.
-	 *
-	 * @param relativePath the relative path
-	 * @param fileSystemDir the file system dir
-	 * @param classpathBaseDir the classpath base dir
-	 * @param otherFiles the other files
-	 * @return the config file
-	 */
-	public static File getConfigFile(String relativePath, String fileSystemDir, String classpathBaseDir, File... otherFiles) {
-		String resolvedRelativePath = FileUtil.useCorrectFileSeps(relativePath);
-		String resolvedClasspathBaseDir = classpathBaseDir;
-		if (resolvedClasspathBaseDir != null) {
-			resolvedClasspathBaseDir = FileUtil.useCorrectFileSeps(resolvedClasspathBaseDir);
-			if (!(resolvedClasspathBaseDir.endsWith(separator))) {
-				resolvedClasspathBaseDir += separator;
-			}
-		}
-		String resolvedFileSystemDir = fileSystemDir;
-		if (resolvedFileSystemDir != null) {
-			resolvedFileSystemDir = FileUtil.useCorrectFileSeps(resolvedFileSystemDir);
-			if (!(resolvedFileSystemDir.endsWith(separator))) {
-				resolvedFileSystemDir += separator;
-			}
-			resolvedFileSystemDir = StringUtils.removeEnd(resolvedFileSystemDir, StringUtils.substringBeforeLast(resolvedRelativePath, separator) + separator);
-			if (!(resolvedFileSystemDir.endsWith(separator))) {
-				resolvedFileSystemDir += separator;
-			}
-		}
-		File classpathFile = ContextUtil.getFile(CLASSPATH_PREFIX + StringUtils.defaultString(resolvedClasspathBaseDir) + resolvedRelativePath);
-		File fileSystemFile = new File(resolvedFileSystemDir + resolvedRelativePath);
-		File latestFile;
-		if (resolvedFileSystemDir == null) {
-			latestFile = classpathFile;
-		} else {
-			latestFile = FileUtil.getLatestFile(classpathFile, fileSystemFile);
-		}
-		if (LOG.isTraceEnabled()) {
-			Logs.logTrace(
-				LOG,
-				"Config file parameters resolved to - relativePath: [%s] => [%s] fileSystemDir: [%s] => [%s] classpathBaseDir: [%s] => [%s] classpathFile: [%s] fileSystemFile: [%s] latestFile: [%s]",
-				relativePath,
-				resolvedRelativePath,
-				fileSystemDir,
-				resolvedFileSystemDir,
-				classpathBaseDir,
-				resolvedClasspathBaseDir,
-				FileUtil.fullPath(classpathFile),
-				FileUtil.fullPath(fileSystemFile),
-				FileUtil.fullPath(latestFile)
-			);
-		}
-		return latestFile;
-	}
+  public static boolean getSystemBoolean(String key, String defaultValue) {
+    return parseBoolean(getProperty(key, defaultValue));
+  }
 
-	/**
-	 * Gets the cp file.
-	 *
-	 * @param path the path
-	 * @return the cp file
-	 */
-	public static File getCpFile(String path) {
-		return getFile(CLASSPATH_PREFIX + path);
-	}
+  public static String getThreadNameAndAddPrefix(@Nonnull String prefix) {
+    return getThreadNameAndAddPrefix(prefix, Thread.currentThread());
+  }
 
-	/**
-	 * Gets the file.
-	 *
-	 * @param path the path
-	 * @return the file
-	 */
-	public static File getFile(String path) {
-		return getFile(path, false);
-	}
+  public static String getThreadNameAndAddPrefix(@Nonnull String prefix, @Nonnull Thread thread) {
+    String currentName = thread.getName();
+    thread.setName(prefix + currentName);
+    return currentName;
+  }
 
-	/**
-	 * Gets the file.
-	 *
-	 * @param path the path
-	 * @param addRoot the add root
-	 * @return the file
-	 */
-	public static File getFile(String path, boolean addRoot) {
-		if (isBlank(path)) {
-			return null;
-		}
-		String filePath = path;
-		try {
-			if (filePath.startsWith(CLASSPATH_PREFIX)) {
-				if (WILDFLY && isNotBlank(getRootPath())) {
-					filePath = path.replace(CLASSPATH_PREFIX, getRootPath() + "WEB-INF/classes/");
-					return ResourceUtils.getFile(filePath);
-				}
-				return ResourceUtils.getFile(filePath);
-			}
-			if (addRoot) {
-				if (filePath.startsWith("/") || filePath.startsWith("\\")) {
-					filePath = filePath.substring(1, filePath.length());
-				}
-				filePath = getRootPath() + filePath;
-			}
-			return ResourceUtils.getFile(filePath);
-		} catch (FileNotFoundException e) {
-			return null;
-		}
-	}
+  public static String getThreadNameAndAppendSuffix(@Nonnull String suffix) {
+    return getThreadNameAndAppendSuffix(suffix, Thread.currentThread());
+  }
 
-	/**
-	 * Gets the first resolved property.
-	 *
-	 * @param keys the keys
-	 * @return the first resolved property
-	 */
-	public static String getFirstResolvedProperty(String... keys) {
-		if (keys != null) {
-			for (String key : keys) {
-				String prop = getProperty(key);
-				if (isNotBlank(prop)) {
-					return prop;
-				}
-			}
-		}
-		return null;
-	}
+  public static String getThreadNameAndAppendSuffix(@Nonnull String suffix, @Nonnull Thread thread) {
+    String currentName = thread.getName();
+    thread.setName(currentName + suffix);
+    return currentName;
+  }
 
-	/**
-	 * Gets the root path.
-	 *
-	 * @return the root path
-	 */
-	public static String getRootPath() {
-		if (isBlank(rootPath) && (servletContext != null)) {
-			String root = FileUtil.fullPath(servletContext.getRealPath("/"));
-			if (!endsWith(root, "/") && !endsWith(root, "\\")) {
-				root = root + File.separatorChar;
-			}
-			rootPath = root;
-			System.setProperty("myserver.rootPath", FileUtil.fullPath(new File(rootPath)));
-			Logs.logTrace(LOG, "Servlet root path set to [%s].", rootPath);
-		}
-		return rootPath;
-	}
+  public static boolean isAdminUser(String userId) {
+    return Checks.isNotEmpty(adminUserIds) && ((userId != null) && adminUserIds.contains(userId));
+  }
 
-	/**
-	 * @return the serverProperties
-	 */
-	public static Properties getServerProperties() {
-		return serverProperties;
-	}
+  public static void loadServerProperties() {
+    try {
+      File propsFile = getFile(CLASSPATH_PREFIX + "properties/server.properties", false);
+      if ((propsFile != null) && propsFile.exists()) {
+        setServerProperties(FileUtil.loadProperties(propsFile));
+      }
+    } catch (Throwable e) {
+      Logs.logError(LOG, e, "Issue while trying to get server.properties file!");
+    }
+  }
 
-	/**
-	 * Gets the system boolean.
-	 *
-	 * @param key the key
-	 * @param defaultValue the default value
-	 * @return the system boolean
-	 */
-	public static boolean getSystemBoolean(String key, boolean defaultValue) {
-		String prop = getProperty(key);
-		return isNotBlank(prop) ? BooleanUtils.toBoolean(prop) : defaultValue;
-	}
+  public static boolean parseBoolean(String bool) {
+    return BooleanUtils.toBoolean(bool);
+  }
 
-	/**
-	 * Gets the system boolean.
-	 *
-	 * @param key the key
-	 * @param defaultValue the default value
-	 * @return the system boolean
-	 */
-	public static boolean getSystemBoolean(String key, String defaultValue) {
-		return parseBoolean(getProperty(key, defaultValue));
-	}
+  public static boolean parseBoolean(String bool, boolean defaultValue) {
+    return bool != null ? BooleanUtils.toBoolean(bool) : defaultValue;
+  }
 
-	/**
-	 * Gets the thread name and add prefix.
-	 *
-	 * @param prefix the prefix
-	 * @return the thread name and add prefix
-	 */
-	public static String getThreadNameAndAddPrefix(@Nonnull String prefix) {
-		return getThreadNameAndAddPrefix(prefix, Thread.currentThread());
-	}
+  public static String resolvePossibleRootRelativePath(String path) {
+    return FileUtil.isAbsolutePath(path) ? path : getRootPath() + path;
+  }
 
-	/**
-	 * Gets the thread name and add prefix.
-	 *
-	 * @param prefix the prefix
-	 * @param thread the thread
-	 * @return the thread name and add prefix
-	 */
-	public static String getThreadNameAndAddPrefix(@Nonnull String prefix, @Nonnull Thread thread) {
-		String currentName = thread.getName();
-		thread.setName(prefix + currentName);
-		return currentName;
-	}
+  public static void setServletContext(ServletContext servletContext) {
+    Logs.logTrace(LOG, "Setting servlet context...");
+    ContextUtil.servletContext = servletContext;
+    getRootPath();
+    loadServerProperties();
+  }
 
-	/**
-	 * Gets the thread name and append suffix.
-	 *
-	 * @param suffix the suffix
-	 * @return the thread name and append suffix
-	 */
-	public static String getThreadNameAndAppendSuffix(@Nonnull String suffix) {
-		return getThreadNameAndAppendSuffix(suffix, Thread.currentThread());
-	}
+  public static void shutdownGracefully() {
+    Runtime.getRuntime().halt(0);
+  }
 
-	/**
-	 * Gets the thread name and append suffix.
-	 *
-	 * @param suffix the suffix
-	 * @param thread the thread
-	 * @return the thread name and append suffix
-	 */
-	public static String getThreadNameAndAppendSuffix(@Nonnull String suffix, @Nonnull Thread thread) {
-		String currentName = thread.getName();
-		thread.setName(currentName + suffix);
-		return currentName;
-	}
+  public static void shutdownGracefully(ContextLoader contextLoader, WebApplicationContext wac) {
+    Logs.logWarn(LOG, "Shutting down server...");
+    ServletContext sc = wac == null ? null : wac.getServletContext();
+    if (sc != null) {
+      try {
+        Enumeration<String> attrNames = sc.getAttributeNames();
+        while (attrNames.hasMoreElements()) {
+          String attrName = attrNames.nextElement();
+          if (attrName.startsWith("org.springframework.")) {
+            Object attrValue = sc.getAttribute(attrName);
+            if (attrValue instanceof DisposableBean) {
+              try {
+                ((DisposableBean) attrValue).destroy();
+              } catch (Throwable e) {
+                Logs.printerr(e, "Couldn't invoke destroy method of attribute with name '%s'", attrName);
+              }
+            }
+          }
+        }
+      } catch (Throwable e) {
+        Logs.printerr(e, "Exception while shutting down context.");
+      }
+    }
+    try {
+      if (contextLoader != null) {
+        contextLoader.closeWebApplicationContext(sc);
+      }
+    } catch (Throwable e) {
+      Logs.printerr(e, "Exception while shutting down context.");
+    }
+    try {
+      Enumeration<Driver> drivers = DriverManager.getDrivers();
+      if ((drivers != null) && (contextLoader != null)) {
+        while (drivers.hasMoreElements()) {
+          Driver driver = drivers.nextElement();
+          ClassLoader driverclassLoader = driver.getClass().getClassLoader();
+          ClassLoader thisClassLoader = contextLoader.getClass().getClassLoader();
+          if ((driverclassLoader != null) && (thisClassLoader != null) && driverclassLoader.equals(thisClassLoader)) {
+            try {
+              Logs.println("Deregistering [%s]", driver);
+              DriverManager.deregisterDriver(driver);
+            } catch (SQLException e) {
+              Logs.printerr(e, "Exception while deregistering driver [%s]", driver);
+            }
+          }
+        }
+      }
+    } catch (Throwable e) {
+      Logs.printerr(e, "Exception while shutting down context.");
+    }
 
-	/**
-	 * Checks if is admin user.
-	 *
-	 * @param userId the user id
-	 * @return true, if is admin user
-	 */
-	public static boolean isAdminUser(String userId) {
-		return Checks.isNotEmpty(adminUserIds) && ((userId != null) && adminUserIds.contains(userId));
-	}
+    System.exit(0);
+  }
 
-	/**
-	 * Load server properties.
-	 */
-	public static void loadServerProperties() {
-		try {
-			File propsFile = getFile(CLASSPATH_PREFIX + "properties/server.properties", false);
-			if ((propsFile != null) && propsFile.exists()) {
-				setServerProperties(FileUtil.loadProperties(propsFile));
-			}
-		} catch (Throwable e) {
-			Logs.logError(LOG, e, "Issue while trying to get server.properties file!");
-		}
-	}
-
-	/**
-	 * Parses the boolean.
-	 *
-	 * @param bool the bool
-	 * @return true, if successful
-	 */
-	public static boolean parseBoolean(String bool) {
-		return BooleanUtils.toBoolean(bool);
-	}
-
-	/**
-	 * Parses the boolean.
-	 *
-	 * @param bool the bool
-	 * @param defaultValue the default value
-	 * @return true, if successful
-	 */
-	public static boolean parseBoolean(String bool, boolean defaultValue) {
-		return bool != null ? BooleanUtils.toBoolean(bool) : defaultValue;
-	}
-
-	/**
-	 * Resolve possible root relative path.
-	 *
-	 * @param path the path
-	 * @return the string
-	 */
-	public static String resolvePossibleRootRelativePath(String path) {
-		return FileUtil.isAbsolutePath(path) ? path : getRootPath() + path;
-	}
-
-	/**
-	 * @param rootPath the rootPath to set
-	 */
-	public static void setRootPath(String rootPath) {
-		if (isBlank(ContextUtil.rootPath)) {
-			ContextUtil.rootPath = rootPath;
-		}
-	}
-
-	/**
-	 * @param serverProperties the serverProperties to set
-	 */
-	public static void setServerProperties(Properties serverProperties) {
-		ContextUtil.serverProperties = serverProperties;
-		if ((serverProperties != null) && serverProperties.containsKey("adminUserIds")) {
-			adminUserIds = newHashSet(splitCsv(serverProperties.getProperty("adminUserIds")));
-			Logs.logWarn(LOG, "Admin users ==> %s", adminUserIds);
-		}
-	}
-
-	/**
-	 * Sets the servlet context.
-	 *
-	 * @param servletContext the new servlet context
-	 */
-	public static void setServletContext(ServletContext servletContext) {
-		Logs.logTrace(LOG, "Setting servlet context...");
-		ContextUtil.servletContext = servletContext;
-		getRootPath();
-		loadServerProperties();
-	}
-
-	/**
-	 * Shutdown gracefully.
-	 */
-	public static void shutdownGracefully() {
-		Runtime.getRuntime().halt(0);
-	}
-
-	/**
-	 * Shutdown gracefully.
-	 *
-	 * @param contextLoader the context loader
-	 * @param wac the wac
-	 */
-	public static void shutdownGracefully(ContextLoader contextLoader, WebApplicationContext wac) {
-		Logs.logWarn(LOG, "Shutting down server...");
-		ServletContext sc = wac == null ? null : wac.getServletContext();
-		if (sc != null) {
-			try {
-				Enumeration<String> attrNames = sc.getAttributeNames();
-				while (attrNames.hasMoreElements()) {
-					String attrName = attrNames.nextElement();
-					if (attrName.startsWith("org.springframework.")) {
-						Object attrValue = sc.getAttribute(attrName);
-						if (attrValue instanceof DisposableBean) {
-							try {
-								((DisposableBean) attrValue).destroy();
-							} catch (Throwable e) {
-								Logs.printerr(e, "Couldn't invoke destroy method of attribute with name '%s'", attrName);
-							}
-						}
-					}
-				}
-			} catch (Throwable e) {
-				Logs.printerr(e, "Exception while shutting down context.");
-			}
-		}
-		try {
-			if (contextLoader != null) {
-				contextLoader.closeWebApplicationContext(sc);
-			}
-		} catch (Throwable e) {
-			Logs.printerr(e, "Exception while shutting down context.");
-		}
-		try {
-			Enumeration<Driver> drivers = DriverManager.getDrivers();
-			if ((drivers != null) && (contextLoader != null)) {
-				while (drivers.hasMoreElements()) {
-					Driver driver = drivers.nextElement();
-					ClassLoader driverclassLoader = driver.getClass().getClassLoader();
-					ClassLoader thisClassLoader = contextLoader.getClass().getClassLoader();
-					if ((driverclassLoader != null) && (thisClassLoader != null) && driverclassLoader.equals(thisClassLoader)) {
-						try {
-							Logs.println("Deregistering [%s]", driver);
-							DriverManager.deregisterDriver(driver);
-						} catch (SQLException e) {
-							Logs.printerr(e, "Exception while deregistering driver [%s]", driver);
-						}
-					}
-				}
-			}
-		} catch (Throwable e) {
-			Logs.printerr(e, "Exception while shutting down context.");
-		}
-		// Runtime.getRuntime().halt(0);
-		System.exit(0);
-	}
-
-	/**
-	 * Write debug json.
-	 *
-	 * @param bean the bean
-	 */
-	public static void writeDebugJson(Object bean) {
-		File debugDir = new File(getRootPath() + "debug");
-		debugDir.mkdirs();
-		File debugFile = new File(getRootPath() + "debug/" + System.currentTimeMillis() + ".json");
-		try {
-			FileUtil.writeFile(debugFile, toPrettyJson(bean));
-			Logs.logWarn(LOG, "Wrote debug JSON to file [%s]!", debugFile);
-		} catch (Throwable e) {
-			logError(LOG, e, "Could not write debug JSON to file [%s]. JSON is below...\n%s", FileUtil.fullPath(debugFile), toPrettyJson(bean));
-		}
-	}
+  public static void writeDebugJson(Object bean) {
+    File debugDir = new File(getRootPath() + "debug");
+    debugDir.mkdirs();
+    File debugFile = new File(getRootPath() + "debug/" + System.currentTimeMillis() + ".json");
+    try {
+      FileUtil.writeFile(debugFile, toPrettyJson(bean));
+      Logs.logWarn(LOG, "Wrote debug JSON to file [%s]!", debugFile);
+    } catch (Throwable e) {
+      logError(LOG, e, "Could not write debug JSON to file [%s]. JSON is below...\n%s", FileUtil.fullPath(debugFile), toPrettyJson(bean));
+    }
+  }
 
 }

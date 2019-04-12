@@ -1,11 +1,11 @@
 [
-	"diff_array_larger[2]",
-	"diff_array_larger[3]",
-	"diff_array_smaller[2]",
-	"diff_array_smaller[3]",
-	"diff_array_objs[0].diff_string",
-	"diff_number_decrease",
-	"diff_string_array[1]",
-	"diff_obj.diff_string",
-	"diff_string"
+  "diff_array_larger[2]",
+  "diff_array_larger[3]",
+  "diff_array_smaller[2]",
+  "diff_array_smaller[3]",
+  "diff_array_objs[0].diff_string",
+  "diff_number_decrease",
+  "diff_string_array[1]",
+  "diff_obj.diff_string",
+  "diff_string"
 ]

@@ -4,55 +4,47 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInput;
 
-/**
- * The Class ExternalizableInput.
- */
 public class ExternalizableInput extends InputStream {
 
-	/** The in. */
-	private final ObjectInput in;
+  private final ObjectInput in;
 
-	/**
-	 * Instantiates a new externalizable input.
-	 *
-	 * @param in the in
-	 */
-	public ExternalizableInput(ObjectInput in) {
-		this.in = in;
-	}
+  public ExternalizableInput(ObjectInput in) {
+    this.in = in;
+  }
 
-	@Override
-	public int available() throws IOException {
-		return in.available();
-	}
+  @Override
+  public int available() throws IOException {
+    return in.available();
+  }
 
-	@Override
-	public void close() throws IOException {
-		in.close();
-	}
+  @Override
+  public void close() throws IOException {
+    in.close();
+  }
 
-	@Override
-	public boolean markSupported() {
-		return false;
-	}
+  @Override
+  public boolean markSupported() {
+    return false;
+  }
 
-	@Override
-	public int read() throws IOException {
-		return in.read();
-	}
+  @Override
+  public int read() throws IOException {
+    return in.read();
+  }
 
-	@Override
-	public int read(byte[] buffer) throws IOException {
-		return in.read(buffer);
-	}
+  @Override
+  public int read(byte[] buffer) throws IOException {
+    return in.read(buffer);
+  }
 
-	@Override
-	public int read(byte[] buffer, int offset, int len) throws IOException {
-		return in.read(buffer, offset, len);
-	}
+  @Override
+  public int read(byte[] buffer, int offset, int len) throws IOException {
+    return in.read(buffer, offset, len);
+  }
 
-	@Override
-	public long skip(long n) throws IOException {
-		return in.skip(n);
-	}
+  @Override
+  public long skip(long n) throws IOException {
+    return in.skip(n);
+  }
+
 }

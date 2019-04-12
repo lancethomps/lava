@@ -1,34 +1,34 @@
 {
-	"diff_array_larger" : [
-		null,
-		null
-	],
-	"diff_array_objs" : [
-		{
-			"diff_number_array" : [
-				-3,
-				-3,
-				-3
-			],
-			"diff_string" : "aab"
-		}
-	],
-	"diff_array_smaller" : [
-		"c",
-		"d"
-	],
-	"diff_number" : 1.31,
-	"diff_number_array" : [
-		-3,
-		-6,
-		-9
-	],
-	"diff_number_decrease": -1.13,
-	"diff_obj" : {
-		"diff_string" : "b"
-	},
-	"diff_string" : "xyz",
-	"diff_string_array" : [
-		"rst"
-	]
+  "diff_array_larger" : [
+    null,
+    null
+  ],
+  "diff_array_objs" : [
+    {
+      "diff_number_array" : [
+        -3,
+        -3,
+        -3
+      ],
+      "diff_string" : "aab"
+    }
+  ],
+  "diff_array_smaller" : [
+    "c",
+    "d"
+  ],
+  "diff_number" : 1.31,
+  "diff_number_array" : [
+    -3,
+    -6,
+    -9
+  ],
+  "diff_number_decrease": -1.13,
+  "diff_obj" : {
+    "diff_string" : "b"
+  },
+  "diff_string" : "xyz",
+  "diff_string_array" : [
+    "rst"
+  ]
 }

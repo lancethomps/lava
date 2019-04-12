@@ -7,114 +7,58 @@ import com.github.lancethomps.lava.common.SimpleDomainObject;
 import com.github.lancethomps.lava.common.expr.ExprFactory;
 import com.github.lancethomps.lava.common.ser.OutputExpression;
 
-/**
- * The Class RequestProcessingRule.
- */
 @SuppressWarnings("serial")
 public class RequestProcessingRule extends SimpleDomainObject {
 
-	/** The black list. */
-	private List<Pattern> blackList;
+  private List<Pattern> blackList;
 
-	/** The config. */
-	private RequestProcessingConfig config;
+  private RequestProcessingConfig config;
 
-	/** The match expression. */
-	private OutputExpression matchExpression;
+  private OutputExpression matchExpression;
 
-	/** The white list. */
-	private List<Pattern> whiteList;
+  private List<Pattern> whiteList;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see com.github.lancethomps.lava.common.ser.PostConstructor#afterDeserialization()
-	 */
-	@Override
-	public void afterDeserialization() {
-		if (matchExpression != null) {
-			ExprFactory.compileCreateExpressions(false, false, true, matchExpression);
-		}
-	}
+  @Override
+  public void afterDeserialization() {
+    if (matchExpression != null) {
+      ExprFactory.compileCreateExpressions(false, false, true, matchExpression);
+    }
+  }
 
-	/**
-	 * Gets the black list.
-	 *
-	 * @return the blackList
-	 */
-	public List<Pattern> getBlackList() {
-		return blackList;
-	}
+  public List<Pattern> getBlackList() {
+    return blackList;
+  }
 
-	/**
-	 * Gets the config.
-	 *
-	 * @return the config
-	 */
-	public RequestProcessingConfig getConfig() {
-		return config;
-	}
+  public RequestProcessingRule setBlackList(List<Pattern> blackList) {
+    this.blackList = blackList;
+    return this;
+  }
 
-	/**
-	 * Gets the match expression.
-	 *
-	 * @return the expression
-	 */
-	public OutputExpression getMatchExpression() {
-		return matchExpression;
-	}
+  public RequestProcessingConfig getConfig() {
+    return config;
+  }
 
-	/**
-	 * Gets the white list.
-	 *
-	 * @return the whiteList
-	 */
-	public List<Pattern> getWhiteList() {
-		return whiteList;
-	}
+  public RequestProcessingRule setConfig(RequestProcessingConfig config) {
+    this.config = config;
+    return this;
+  }
 
-	/**
-	 * Sets the black list.
-	 *
-	 * @param blackList the blackList to set
-	 * @return the request processing rule
-	 */
-	public RequestProcessingRule setBlackList(List<Pattern> blackList) {
-		this.blackList = blackList;
-		return this;
-	}
+  public OutputExpression getMatchExpression() {
+    return matchExpression;
+  }
 
-	/**
-	 * Sets the config.
-	 *
-	 * @param config the config to set
-	 * @return the request processing rule
-	 */
-	public RequestProcessingRule setConfig(RequestProcessingConfig config) {
-		this.config = config;
-		return this;
-	}
+  public RequestProcessingRule setMatchExpression(OutputExpression matchExpression) {
+    this.matchExpression = matchExpression;
+    return this;
+  }
 
-	/**
-	 * Sets the expression.
-	 *
-	 * @param matchExpression the match expression
-	 * @return the request processing rule
-	 */
-	public RequestProcessingRule setMatchExpression(OutputExpression matchExpression) {
-		this.matchExpression = matchExpression;
-		return this;
-	}
+  public List<Pattern> getWhiteList() {
+    return whiteList;
+  }
 
-	/**
-	 * Sets the white list.
-	 *
-	 * @param whiteList the whiteList to set
-	 * @return the request processing rule
-	 */
-	public RequestProcessingRule setWhiteList(List<Pattern> whiteList) {
-		this.whiteList = whiteList;
-		return this;
-	}
+  public RequestProcessingRule setWhiteList(List<Pattern> whiteList) {
+    this.whiteList = whiteList;
+    return this;
+  }
 
 }

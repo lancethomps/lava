@@ -9,22 +9,22 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.std.MapSerializer;
 import com.fasterxml.jackson.databind.type.MapType;
 
-/**
- * The Class CustomBeanSerializerModifier.
- */
 public class CustomBeanSerializerModifier extends BeanSerializerModifier {
 
-	/**
-	 * Instantiates a new custom bean serializer modifier.
-	 */
-	public CustomBeanSerializerModifier() {
-		super();
-	}
+  public CustomBeanSerializerModifier() {
+    super();
+  }
 
-	@Override
-	public JsonSerializer<?> modifyMapSerializer(SerializationConfig config, MapType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-		return new CustomOrderedKeysMapSerializer((MapSerializer) serializer, config.getAnnotationIntrospector().findFilterId(beanDesc.getClassInfo()),
-			config.isEnabled(ORDER_MAP_ENTRIES_BY_KEYS));
-	}
+  @Override
+  public JsonSerializer<?> modifyMapSerializer(
+    SerializationConfig config,
+    MapType valueType,
+    BeanDescription beanDesc,
+    JsonSerializer<?> serializer
+  ) {
+    return new CustomOrderedKeysMapSerializer((MapSerializer) serializer, config.getAnnotationIntrospector().findFilterId(beanDesc.getClassInfo()),
+      config.isEnabled(ORDER_MAP_ENTRIES_BY_KEYS)
+    );
+  }
 
 }

@@ -1,77 +1,45 @@
 package com.github.lancethomps.lava.common.web.ua;
 
-/**
- * The Class UserAgentRegex.
- *
- * @author lancethomps
- */
 public class UserAgentParserRegex extends AbstractUserAgentParserRegex {
 
-	/** The family replacement. */
-	private String familyReplacement;
+  private String familyReplacement;
 
-	/** The v 1 replacement. */
-	private String v1Replacement;
+  private String v1Replacement;
 
-	/** The v 2 replacement. */
-	private String v2Replacement;
+  private String v2Replacement;
 
-	/** The v 3 replacement. */
-	private String v3Replacement;
+  private String v3Replacement;
 
-	/**
-	 * @return the familyReplacement
-	 */
-	public String getFamilyReplacement() {
-		return familyReplacement;
-	}
+  public String getFamilyReplacement() {
+    return familyReplacement;
+  }
 
-	/**
-	 * @return the v1Replacement
-	 */
-	public String getV1Replacement() {
-		return v1Replacement;
-	}
+  public void setFamilyReplacement(String familyReplacement) {
+    this.familyReplacement = familyReplacement;
+  }
 
-	/**
-	 * @return the v2Replacement
-	 */
-	public String getV2Replacement() {
-		return v2Replacement;
-	}
+  public String getV1Replacement() {
+    return v1Replacement;
+  }
 
-	/**
-	 * @return the v3Replacement
-	 */
-	public String getV3Replacement() {
-		return v3Replacement;
-	}
+  public void setV1Replacement(String v1Replacement) {
+    this.v1Replacement = v1Replacement;
+  }
 
-	/**
-	 * @param familyReplacement the familyReplacement to set
-	 */
-	public void setFamilyReplacement(String familyReplacement) {
-		this.familyReplacement = familyReplacement;
-	}
+  public String getV2Replacement() {
+    return v2Replacement;
+  }
 
-	/**
-	 * @param v1Replacement the v1Replacement to set
-	 */
-	public void setV1Replacement(String v1Replacement) {
-		this.v1Replacement = v1Replacement;
-	}
+  public void setV2Replacement(String v2Replacement) {
+    this.v2Replacement = v2Replacement;
+  }
 
-	/**
-	 * @param v2Replacement the v2Replacement to set
-	 */
-	public void setV2Replacement(String v2Replacement) {
-		this.v2Replacement = v2Replacement;
-	}
+  public String getV3Replacement() {
+    return v3Replacement;
+  }
 
-	/**
-	 * @param v3Replacement the v3Replacement to set
-	 */
-	public void setV3Replacement(String v3Replacement) {
-		this.v3Replacement = v3Replacement;
-	}
+  public void setV3Replacement(String v3Replacement) {
+    this.v3Replacement = v3Replacement;
+  }
+
 }

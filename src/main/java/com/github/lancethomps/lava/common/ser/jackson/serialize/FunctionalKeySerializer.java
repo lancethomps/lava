@@ -5,65 +5,46 @@ import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.github.lancethomps.lava.common.lambda.ThrowingTriFunction;
-import com.github.lancethomps.lava.common.logging.Logs;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
+import com.github.lancethomps.lava.common.lambda.ThrowingTriFunction;
+import com.github.lancethomps.lava.common.logging.Logs;
 
-/**
- * The Class FunctionalKeySerializer.
- *
- * @param <T> the generic type
- */
 public class FunctionalKeySerializer<T extends Object> extends StdScalarSerializer<T> {
 
-	/** The Constant LOG. */
-	private static final Logger LOG = Logger.getLogger(FunctionalKeySerializer.class);
+  private static final Logger LOG = Logger.getLogger(FunctionalKeySerializer.class);
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = 305655599047712413L;
+  private static final long serialVersionUID = 305655599047712413L;
 
-	/** The function. */
-	private final ThrowingTriFunction<T, JsonGenerator, SerializerProvider, String> function;
+  private final ThrowingTriFunction<T, JsonGenerator, SerializerProvider, String> function;
 
-	/**
-	 * Instantiates a new functional key serializer.
-	 *
-	 * @param type the type
-	 * @param function the function
-	 * @param addToGeneric the add to generic
-	 */
-	public FunctionalKeySerializer(Class<T> type, ThrowingTriFunction<T, JsonGenerator, SerializerProvider, String> function, boolean addToGeneric) {
-		super(type);
-		this.function = function;
-		if (addToGeneric) {
-			GenericKeySerializer.addKeySerializerFunction(type, function);
-		}
-	}
+  public FunctionalKeySerializer(Class<T> type, ThrowingTriFunction<T, JsonGenerator, SerializerProvider, String> function, boolean addToGeneric) {
+    super(type);
+    this.function = function;
+    if (addToGeneric) {
+      GenericKeySerializer.addKeySerializerFunction(type, function);
+    }
+  }
 
-	/**
-	 * Creates the and add.
-	 *
-	 * @param <T> the generic type
-	 * @param module the module
-	 * @param type the type
-	 * @param function the function
-	 * @return the simple module
-	 */
-	public static <T> SimpleModule createAndAdd(SimpleModule module, Class<T> type, ThrowingTriFunction<T, JsonGenerator, SerializerProvider, String> function) {
-		return module.addKeySerializer(type, new FunctionalKeySerializer<>(type, function, true));
-	}
+  public static <T> SimpleModule createAndAdd(
+    SimpleModule module,
+    Class<T> type,
+    ThrowingTriFunction<T, JsonGenerator, SerializerProvider, String> function
+  ) {
+    return module.addKeySerializer(type, new FunctionalKeySerializer<>(type, function, true));
+  }
 
-	@Override
-	public void serialize(T value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-		String key = null;
-		try {
-			key = function.apply(value, gen, provider);
-		} catch (Throwable e) {
-			Logs.logError(LOG, e, "Error serializing value [%s] of type [%s] to key!", value, _handledType);
-		}
-		gen.writeFieldName(StringUtils.defaultIfBlank(key, "null"));
-	}
+  @Override
+  public void serialize(T value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    String key = null;
+    try {
+      key = function.apply(value, gen, provider);
+    } catch (Throwable e) {
+      Logs.logError(LOG, e, "Error serializing value [%s] of type [%s] to key!", value, _handledType);
+    }
+    gen.writeFieldName(StringUtils.defaultIfBlank(key, "null"));
+  }
+
 }

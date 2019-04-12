@@ -1,31 +1,20 @@
 package com.github.lancethomps.lava.common.properties;
 
-/**
- * The Enum StandardPropertyType.
- */
 public enum StandardPropertyType {
 
-	/** The bundle. */
-	bundle,
+  bundle,
 
-	/** The date. */
-	date,
+  date,
 
-	/** The env. */
-	env,
+  env,
 
-	/** The expressions file. */
-	expressions_file,
+  expressions_file,
 
-	/** The markdown. */
-	markdown,
+  markdown,
 
-	/** The param. */
-	param,
+  param,
 
-	/** The request param. */
-	request_param,
+  request_param,
 
-	/** The system. */
-	system;
+  system
 }

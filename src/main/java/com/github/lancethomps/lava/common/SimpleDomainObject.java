@@ -8,27 +8,22 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.github.lancethomps.lava.common.ser.PostConstructor;
 import com.github.lancethomps.lava.common.ser.Serializer;
 
-/**
- * The Class SimpleDomainObject.
- *
- * @author lancethomps
- */
 @SuppressWarnings("serial")
 public class SimpleDomainObject extends PostConstructor implements Serializable {
 
-	@Override
-	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
-	}
+  @Override
+  public String toString() {
+    return Serializer.toLogString(this);
+  }
 
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
-	}
+  @Override
+  public boolean equals(Object obj) {
+    return EqualsBuilder.reflectionEquals(this, obj);
+  }
 
-	@Override
-	public String toString() {
-		return Serializer.toLogString(this);
-	}
+  @Override
+  public int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this);
+  }
 
 }

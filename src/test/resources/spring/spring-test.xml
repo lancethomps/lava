@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util" xmlns:cache="http://www.springframework.org/schema/cache"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-		org/springframework/beans/factory/xml/spring-beans-4.0.xsd
-		http://www.springframework.org/schema/context
-		org/springframework/context/config/spring-context-4.0.xsd
-		http://www.springframework.org/schema/util
-		org/springframework/beans/factory/xml/spring-util-4.0.xsd
-		http://www.springframework.org/schema/aop
-		org/springframework/aop/config/spring-aop-4.0.xsd
-		http://www.springframework.org/schema/cache
-		org/springframework/cache/config/spring-cache-4.0.xsd
-		http://www.springframework.org/schema/mvc
-		org/springframework/web/servlet/config/spring-mvc-4.0.xsd">
+  xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util" xmlns:cache="http://www.springframework.org/schema/cache"
+  xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+    org/springframework/beans/factory/xml/spring-beans-4.0.xsd
+    http://www.springframework.org/schema/context
+    org/springframework/context/config/spring-context-4.0.xsd
+    http://www.springframework.org/schema/util
+    org/springframework/beans/factory/xml/spring-util-4.0.xsd
+    http://www.springframework.org/schema/aop
+    org/springframework/aop/config/spring-aop-4.0.xsd
+    http://www.springframework.org/schema/cache
+    org/springframework/cache/config/spring-cache-4.0.xsd
+    http://www.springframework.org/schema/mvc
+    org/springframework/web/servlet/config/spring-mvc-4.0.xsd">
 
-	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter" />
+  <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter" />
 
-	<!-- Spring will fail if an Autowired field is not satisfied -->
-	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
-	<context:component-scan base-package="com.github.lancethomps.lava.common"/>
+  <!-- Spring will fail if an Autowired field is not satisfied -->
+  <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+  <context:component-scan base-package="com.github.lancethomps.lava.common"/>
 
-	<bean id="requestThrottle" class="com.github.lancethomps.lava.common.web.throttle.RequestThrottle"/>
+  <bean id="requestThrottle" class="com.github.lancethomps.lava.common.web.throttle.RequestThrottle"/>
 
-	<mvc:annotation-driven/>
-	<mvc:interceptors>
-		<ref bean="requestThrottle"/>
-	</mvc:interceptors>
+  <mvc:annotation-driven/>
+  <mvc:interceptors>
+    <ref bean="requestThrottle"/>
+  </mvc:interceptors>
 
 </beans>

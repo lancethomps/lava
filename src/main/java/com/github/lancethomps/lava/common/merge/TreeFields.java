@@ -6,62 +6,36 @@ import java.util.Map;
 
 import com.github.lancethomps.lava.common.ser.ExternalizableBean;
 
-/**
- * The Class TreeFields.
- *
- * @author lancethomps
- */
 public class TreeFields extends ExternalizableBean {
 
-	/** The agg vals. */
-	private Map<String, BigDecimal> aggVals = new HashMap<>();
+  private Map<String, BigDecimal> aggVals = new HashMap<>();
 
-	/** The max vals. */
-	private Map<String, Comparable<?>> maxVals = new HashMap<>();
+  private Map<String, Comparable<?>> maxVals = new HashMap<>();
 
-	/** The min vals. */
-	private Map<String, Comparable<?>> minVals = new HashMap<>();
+  private Map<String, Comparable<?>> minVals = new HashMap<>();
 
-	/**
-	 * @return the aggVals
-	 */
-	public Map<String, BigDecimal> getAggVals() {
-		return aggVals;
-	}
+  public Map<String, BigDecimal> getAggVals() {
+    return aggVals;
+  }
 
-	/**
-	 * @return the maxVals
-	 */
-	public Map<String, Comparable<?>> getMaxVals() {
-		return maxVals;
-	}
+  public void setAggVals(Map<String, BigDecimal> aggVals) {
+    this.aggVals = aggVals;
+  }
 
-	/**
-	 * @return the minVals
-	 */
-	public Map<String, Comparable<?>> getMinVals() {
-		return minVals;
-	}
+  public Map<String, Comparable<?>> getMaxVals() {
+    return maxVals;
+  }
 
-	/**
-	 * @param aggVals the aggVals to set
-	 */
-	public void setAggVals(Map<String, BigDecimal> aggVals) {
-		this.aggVals = aggVals;
-	}
+  public void setMaxVals(Map<String, Comparable<?>> maxVals) {
+    this.maxVals = maxVals;
+  }
 
-	/**
-	 * @param maxVals the maxVals to set
-	 */
-	public void setMaxVals(Map<String, Comparable<?>> maxVals) {
-		this.maxVals = maxVals;
-	}
+  public Map<String, Comparable<?>> getMinVals() {
+    return minVals;
+  }
 
-	/**
-	 * @param minVals the minVals to set
-	 */
-	public void setMinVals(Map<String, Comparable<?>> minVals) {
-		this.minVals = minVals;
-	}
+  public void setMinVals(Map<String, Comparable<?>> minVals) {
+    this.minVals = minVals;
+  }
 
 }

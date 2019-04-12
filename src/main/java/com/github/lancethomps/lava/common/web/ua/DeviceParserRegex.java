@@ -1,60 +1,35 @@
 package com.github.lancethomps.lava.common.web.ua;
 
-/**
- * The Class DeviceRegex.
- *
- * @author lancethomps
- */
 public class DeviceParserRegex extends AbstractUserAgentParserRegex {
 
-	/** The brand replacement. */
-	private String brandReplacement;
+  private String brandReplacement;
 
-	/** The device replacement. */
-	private String deviceReplacement;
+  private String deviceReplacement;
 
-	/** The model replacement. */
-	private String modelReplacement;
+  private String modelReplacement;
 
-	/**
-	 * @return the brandReplacement
-	 */
-	public String getBrandReplacement() {
-		return brandReplacement;
-	}
+  public String getBrandReplacement() {
+    return brandReplacement;
+  }
 
-	/**
-	 * @return the deviceReplacement
-	 */
-	public String getDeviceReplacement() {
-		return deviceReplacement;
-	}
+  public void setBrandReplacement(String brandReplacement) {
+    this.brandReplacement = brandReplacement;
+  }
 
-	/**
-	 * @return the modelReplacement
-	 */
-	public String getModelReplacement() {
-		return modelReplacement;
-	}
+  public String getDeviceReplacement() {
+    return deviceReplacement;
+  }
 
-	/**
-	 * @param brandReplacement the brandReplacement to set
-	 */
-	public void setBrandReplacement(String brandReplacement) {
-		this.brandReplacement = brandReplacement;
-	}
+  public void setDeviceReplacement(String deviceReplacement) {
+    this.deviceReplacement = deviceReplacement;
+  }
 
-	/**
-	 * @param deviceReplacement the deviceReplacement to set
-	 */
-	public void setDeviceReplacement(String deviceReplacement) {
-		this.deviceReplacement = deviceReplacement;
-	}
+  public String getModelReplacement() {
+    return modelReplacement;
+  }
 
-	/**
-	 * @param modelReplacement the modelReplacement to set
-	 */
-	public void setModelReplacement(String modelReplacement) {
-		this.modelReplacement = modelReplacement;
-	}
+  public void setModelReplacement(String modelReplacement) {
+    this.modelReplacement = modelReplacement;
+  }
+
 }

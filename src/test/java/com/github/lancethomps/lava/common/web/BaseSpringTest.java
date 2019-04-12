@@ -12,33 +12,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.github.lancethomps.lava.common.ThreadNameTestWatcher;
 
-/**
- * The Class BaseSpringWebTest.
- *
- * @author lancethomps
- */
 @ActiveProfiles("unit_test")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-	locations = {
-		"classpath:spring/spring-test.xml"
-	}
+  locations = {
+    "classpath:spring/spring-test.xml"
+  }
 )
 @Ignore
 public abstract class BaseSpringTest {
 
-	/** The thread name watcher. */
-	@Rule
-	public final ThreadNameTestWatcher threadNameWatcher = new ThreadNameTestWatcher();
+  @Rule
+  public final ThreadNameTestWatcher threadNameWatcher = new ThreadNameTestWatcher();
 
-	/**
-	 * Inits the system properties.
-	 *
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
-	@BeforeClass
-	public static void initSystemProperties() throws IOException {
+  @BeforeClass
+  public static void initSystemProperties() throws IOException {
 
-		// CONFIG REQUIRED EVERYWHERE FOR TESTING
-	}
+  }
+
 }
