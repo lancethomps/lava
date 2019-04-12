@@ -31,10 +31,11 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.github.lancethomps.lava.common.date.Dates;
 import com.github.lancethomps.lava.common.ser.Serializer;
 import com.github.lancethomps.lava.common.string.StringUtil;
-import com.fasterxml.jackson.databind.JavaType;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * The Class Randoms.
@@ -45,20 +46,23 @@ public class Randoms {
 	public static final SecureRandom RANDOM_GEN = new SecureRandom();
 
 	/** The Constant RANDOM_VALUE_SUPPLIERS. */
-	private static final Map<JavaType, Supplier<?>> RANDOM_VALUE_SUPPLIERS = new ConcurrentHashMap<>();
-
-	static {
-		RANDOM_VALUE_SUPPLIERS.put(MERGE_MAPPER.constructType(Boolean.class), () -> Randoms.RANDOM_GEN.nextBoolean());
-		RANDOM_VALUE_SUPPLIERS.put(MERGE_MAPPER.constructType(Boolean.TYPE), () -> Randoms.RANDOM_GEN.nextBoolean());
-		RANDOM_VALUE_SUPPLIERS.put(MERGE_MAPPER.constructType(String.class), () -> StringUtil.generateUniqueId(20));
-		RANDOM_VALUE_SUPPLIERS.put(MERGE_MAPPER.constructType(Date.class), () -> Dates.toOldDate(createRandomDateTime()));
-		RANDOM_VALUE_SUPPLIERS.put(MERGE_MAPPER.constructType(Byte.class), () -> {
+	private static final Map<JavaType, Supplier<?>> RANDOM_VALUE_SUPPLIERS = new ConcurrentHashMap<>(ImmutableMap.<JavaType, Supplier<?>>builder()
+		.put(MERGE_MAPPER.constructType(Boolean.class), () -> Randoms.RANDOM_GEN.nextBoolean())
+		.put(MERGE_MAPPER.constructType(Boolean.TYPE), () -> Randoms.RANDOM_GEN.nextBoolean())
+		.put(MERGE_MAPPER.constructType(String.class), () -> StringUtil.generateUniqueId(20))
+		.put(MERGE_MAPPER.constructType(Date.class), () -> Dates.toOldDate(createRandomDateTime()))
+		.put(MERGE_MAPPER.constructType(Byte.class), () -> {
 			byte[] bytes = new byte[1];
 			Randoms.RANDOM_GEN.nextBytes(bytes);
 			return bytes[0];
-		});
-		RANDOM_VALUE_SUPPLIERS.put(MERGE_MAPPER.constructType(Byte.TYPE), RANDOM_VALUE_SUPPLIERS.get(MERGE_MAPPER.constructType(Byte.class)));
-	}
+		})
+		.put(MERGE_MAPPER.constructType(Byte.TYPE), () -> {
+			byte[] bytes = new byte[1];
+			Randoms.RANDOM_GEN.nextBytes(bytes);
+			return bytes[0];
+		})
+		.build()
+	);
 
 	/**
 	 * Adds the random value supplier.
