@@ -41,14 +41,26 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+import org.reflections.scanners.FieldAnnotationsScanner;
+import org.reflections.scanners.MemberUsageScanner;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.MethodParameterNamesScanner;
+import org.reflections.scanners.MethodParameterScanner;
+import org.reflections.scanners.ResourcesScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.scanners.TypeElementsScanner;
+import org.reflections.scanners.TypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.springframework.beans.BeanUtils;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.github.lancethomps.lava.common.collections.FastHashMap;
 import com.github.lancethomps.lava.common.logging.Logs;
 import com.github.lancethomps.lava.common.ser.Serializer;
 import com.github.lancethomps.lava.common.string.StringUtil;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -73,6 +85,30 @@ public class Reflections {
 
 	/** The Constant MAX_TRIED_SUPERS. */
 	private static final int MAX_TRIED_SUPERS = 5;
+
+	public static org.reflections.Reflections createFullReflectionsInstance(String... packages) {
+		ConfigurationBuilder builder = new ConfigurationBuilder()
+				.addScanners(
+						new FieldAnnotationsScanner(),
+						new MemberUsageScanner(),
+						new MethodAnnotationsScanner(),
+						new MethodParameterNamesScanner(),
+						new MethodParameterScanner(),
+						new ResourcesScanner(),
+						new SubTypesScanner(),
+						new TypeAnnotationsScanner(),
+						new TypeElementsScanner(),
+						new TypesScanner()
+				);
+		if (Checks.isNotEmpty(packages)) {
+			for (String pack : packages) {
+				builder.addUrls(ClasspathHelper.forPackage(pack));
+			}
+		} else {
+			builder.addUrls(ClasspathHelper.forClassLoader());
+		}
+		return new org.reflections.Reflections(builder);
+	}
 
 	/**
 	 * Call method unsafe.
