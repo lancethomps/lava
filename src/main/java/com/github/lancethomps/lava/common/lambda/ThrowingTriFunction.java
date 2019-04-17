@@ -2,6 +2,8 @@ package com.github.lancethomps.lava.common.lambda;
 
 import java.util.Objects;
 
+import com.github.lancethomps.lava.common.Exceptions;
+
 @FunctionalInterface
 public interface ThrowingTriFunction<T, U, W, R> {
 
@@ -22,6 +24,14 @@ public interface ThrowingTriFunction<T, U, W, R> {
       return apply(t, u, w);
     } catch (Exception e) {
       return null;
+    }
+  }
+
+  default R applyWithSneakyThrow(T t, U u, W w) {
+    try {
+      return apply(t, u, w);
+    } catch (Exception e) {
+      return Exceptions.sneakyThrow(e);
     }
   }
 
