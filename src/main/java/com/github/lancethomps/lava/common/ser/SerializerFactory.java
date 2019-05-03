@@ -491,7 +491,7 @@ public class SerializerFactory {
 
   public static PrettyPrinter getPrettyPrinter() {
     CustomPrettyPrinter pp = new CustomPrettyPrinter();
-    DefaultIndenter indenter = new DefaultIndenter("\t", DefaultIndenter.SYS_LF);
+    DefaultIndenter indenter = new DefaultIndenter("  ", DefaultIndenter.SYS_LF);
     return pp
       .withObjectIndenter(indenter)
       .withArrayIndenter(indenter);

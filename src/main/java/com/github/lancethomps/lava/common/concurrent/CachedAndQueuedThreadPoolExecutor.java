@@ -80,7 +80,7 @@ public class CachedAndQueuedThreadPoolExecutor extends java.util.concurrent.Thre
     int savedCorePoolSize = getCorePoolSize();
     TaskQueue taskQueue = getQueue() instanceof TaskQueue ? (TaskQueue) getQueue() : null;
     if (taskQueue != null) {
-      taskQueue.setForcedRemainingCapacity(Integer.valueOf(0));
+      taskQueue.setForcedRemainingCapacity(0);
     }
 
     setCorePoolSize(0);
