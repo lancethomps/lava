@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.std.MapProperty;
+import com.github.lancethomps.lava.common.lambda.ThrowingFunction;
 import com.github.lancethomps.lava.common.lambda.ThrowingTriFunction;
 import com.github.lancethomps.lava.common.merge.Merges;
 
@@ -50,6 +51,14 @@ public class JacksonUtils {
       return (T) pojo;
     }
     return null;
+  }
+
+  public static void transformFieldValues(
+      JsonNode node,
+      String fieldName,
+      ThrowingFunction<JsonNode, Object> transform
+  ) {
+    transformFieldValues(node, Collections.singleton(fieldName), (field, parent, fieldNode) -> transform.apply(fieldNode));
   }
 
   public static void transformFieldValues(
