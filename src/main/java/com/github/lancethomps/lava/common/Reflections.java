@@ -131,9 +131,12 @@ public class Reflections {
   }
 
   public static Set<Class<?>> getClassesInPackage(String pkg) {
+    return getClassesInPackage(pkg, Object.class);
+  }
 
+  public static <T> Set<Class<? extends T>> getClassesInPackage(String pkg, Class<T> subTypesOf) {
     org.reflections.Reflections reflections = new org.reflections.Reflections(pkg);
-    return reflections.getSubTypesOf(Object.class);
+    return reflections.getSubTypesOf(subTypesOf);
   }
 
   public static Object[] getCorrectArgs(Method method, Object... possibleArgs) {
@@ -373,6 +376,19 @@ public class Reflections {
     }
     if (clazz.getSuperclass() != Object.class) {
       Optional.ofNullable(getFieldsWithAnnotation(clazz.getSuperclass(), annotationType)).ifPresent(fields::addAll);
+    }
+    return fields;
+  }
+
+  public static List<Field> getFields(Class<?> clazz) {
+    List<Field> fields = new ArrayList<>();
+    for (Field field : clazz.getDeclaredFields()) {
+      if (!Modifier.isStatic(field.getModifiers())) {
+        fields.add(field);
+      }
+    }
+    if (clazz.getSuperclass() != Object.class) {
+      Optional.ofNullable(getFields(clazz.getSuperclass())).ifPresent(fields::addAll);
     }
     return fields;
   }

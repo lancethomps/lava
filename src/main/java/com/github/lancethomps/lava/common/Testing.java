@@ -1,5 +1,6 @@
 package com.github.lancethomps.lava.common;
 
+import static com.github.lancethomps.lava.common.format.Formatting.getMessage;
 import static com.github.lancethomps.lava.common.logging.Logs.println;
 import static com.github.lancethomps.lava.common.ser.OutputFormat.json;
 import static java.io.File.separator;
@@ -9,6 +10,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -377,6 +379,26 @@ public class Testing {
       }
     }
     return bean;
+  }
+
+  public static void printFields(Class<?> type, Class<? extends Annotation> optionalAnnotationType) {
+    printFields(type, optionalAnnotationType, null);
+  }
+
+  public static void printFields(Class<?> type, Class<? extends Annotation> optionalAnnotationType, Function<Field, String> addInfo) {
+    println(createFieldsInfo(type, optionalAnnotationType, addInfo));
+  }
+
+  public static String createFieldsInfo(Class<?> type, Class<? extends Annotation> optionalAnnotationType, Function<Field, String> addInfo) {
+    List<String> infos = new ArrayList<>();
+    (optionalAnnotationType == null ? Reflections.getFields(type) : Reflections.getFieldsWithAnnotation(type, optionalAnnotationType)).stream()
+        .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
+        .forEach(field -> {
+          String info = addInfo == null ? "" : addInfo.apply(field);
+          String fmt = addInfo == null ? "%-50s %s%s" : "%-40s %-30s %s";
+          infos.add(getMessage(fmt, Reflections.getFieldDisplay(field, type), field.getName(), info));
+        });
+    return StringUtils.join(infos, "\n");
   }
 
   public static void printJson(Object obj) {

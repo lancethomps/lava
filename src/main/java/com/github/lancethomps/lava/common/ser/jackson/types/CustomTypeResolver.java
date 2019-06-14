@@ -27,6 +27,7 @@ public class CustomTypeResolver extends DefaultTypeResolverBuilder {
 
   public static final Set<String> INCLUDE_PACKAGES = Sets.newHashSet(
     "com.github.lancethomps.lava",
+    "graphql",
     "org.apache.commons.math3.linear"
   );
 
