@@ -442,6 +442,7 @@ public class Merges {
         if (firstObject && (config.getRootType() != null)) {
           reader = reader.forType(config.getRootType());
         }
+        updateVals.remove("@type");
         returnVal = reader.readValue(updateVals);
 
       }

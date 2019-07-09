@@ -18,7 +18,6 @@ import static org.apache.commons.text.StringEscapeUtils.escapeCsv;
 import java.time.temporal.Temporal;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -496,7 +495,7 @@ public class CsvSerializer {
         } else if (!cell.startsWith("=")) {
           if (params.testCsvAlwaysQuote()) {
             cell = "\"" + StringUtils.replace(cell, "\"", "\"\"") + "\"";
-          } else {
+          } else if (!params.testCsvNeverQuote()) {
             cell = escapeCsv(cell);
           }
         }
@@ -642,12 +641,11 @@ public class CsvSerializer {
   private List<String> getSortedHeaders() {
     List<String> sortedHeaders = headers
       .stream()
-      .map(asFlattenedObjects ? Function.identity() : asHtml ? StringEscapeUtils::escapeXml11 : StringEscapeUtils::escapeCsv)
+      .map((asFlattenedObjects || params.testCsvNeverQuote()) ? Function.identity() : asHtml ? StringEscapeUtils::escapeXml11 : StringEscapeUtils::escapeCsv)
+      .sorted()
       .collect(Collectors.toList());
-    Collections.sort(sortedHeaders);
     if (CollectionUtils.isNotEmpty(headersOrder)) {
-      Collections.reverse(headersOrder);
-      headersOrder.forEach(h -> {
+      Lists.reverse(headersOrder).forEach(h -> {
         if (sortedHeaders.contains(h)) {
           sortedHeaders.remove(h);
           sortedHeaders.add(0, h);

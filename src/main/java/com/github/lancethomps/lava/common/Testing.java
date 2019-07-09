@@ -56,6 +56,7 @@ import com.github.lancethomps.lava.common.logging.Logs;
 import com.github.lancethomps.lava.common.merge.Merges;
 import com.github.lancethomps.lava.common.os.OsUtil;
 import com.github.lancethomps.lava.common.properties.PropertyParserHelper;
+import com.github.lancethomps.lava.common.ser.OutputFormat;
 import com.github.lancethomps.lava.common.ser.OutputParams;
 import com.github.lancethomps.lava.common.ser.Serializer;
 import com.github.lancethomps.lava.common.testing.SpeedTest;
@@ -395,7 +396,7 @@ public class Testing {
         .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
         .forEach(field -> {
           String info = addInfo == null ? "" : addInfo.apply(field);
-          String fmt = addInfo == null ? "%-50s %s%s" : "%-40s %-30s %s";
+          String fmt = addInfo == null ? "%-50s %s%s" : "%-50s %-30s %s";
           infos.add(getMessage(fmt, Reflections.getFieldDisplay(field, type), field.getName(), info));
         });
     return StringUtils.join(infos, "\n");
@@ -403,6 +404,10 @@ public class Testing {
 
   public static void printJson(Object obj) {
     printJson(obj, (OutputParams) null);
+  }
+
+  public static void printYaml(Object obj) {
+    printSerialized(obj, new OutputParams().setOutputFormat(OutputFormat.yaml));
   }
 
   public static void printJson(Object obj, File writeToFile, OutputParams addParams) {

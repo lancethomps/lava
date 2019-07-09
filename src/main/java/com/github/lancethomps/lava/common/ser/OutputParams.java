@@ -32,6 +32,9 @@ public class OutputParams extends ExternalizableBean {
   private Boolean csvAlwaysQuote;
 
   @RequestField
+  private Boolean csvNeverQuote;
+
+  @RequestField
   private Boolean csvAsFlatObjs;
 
   @RequestField
@@ -264,6 +267,16 @@ public class OutputParams extends ExternalizableBean {
   public OutputParams setCsvAlwaysQuote(Boolean csvAlwaysQuote) {
     checkModificationsDisabled();
     this.csvAlwaysQuote = csvAlwaysQuote;
+    return this;
+  }
+
+  public Boolean getCsvNeverQuote() {
+    return csvNeverQuote;
+  }
+
+  public OutputParams setCsvNeverQuote(Boolean csvNeverQuote) {
+    checkModificationsDisabled();
+    this.csvNeverQuote = csvNeverQuote;
     return this;
   }
 
@@ -692,6 +705,10 @@ public class OutputParams extends ExternalizableBean {
 
   public boolean testCsvAlwaysQuote() {
     return (csvAlwaysQuote != null) && csvAlwaysQuote.booleanValue();
+  }
+
+  public boolean testCsvNeverQuote() {
+    return (csvNeverQuote != null) && csvNeverQuote.booleanValue();
   }
 
   public boolean testCsvAsFlatObjs() {
