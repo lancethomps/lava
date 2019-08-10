@@ -2270,13 +2270,16 @@ public class Serializer {
   }
 
   public static SchemaWithDefinitions toJsonSchema(Class<?> type) {
+    return toJsonSchema(type, JSON_MAPPER);
+  }
+
+  public static SchemaWithDefinitions toJsonSchema(Class<?> type, ObjectMapper mapper) {
     try {
       DefinitionsSchemaFactory visitor = new DefinitionsSchemaFactory();
-      JSON_MAPPER.acceptJsonFormatVisitor(JSON_MAPPER.constructType(type), visitor);
+      mapper.acceptJsonFormatVisitor(mapper.constructType(type), visitor);
       return new SchemaWithDefinitions((ObjectSchema) visitor.finalSchema(), visitor.getDefinitions());
-
     } catch (JsonMappingException e) {
-      logError(LOG, e, "Issue generating JSON schema for type [%s]", type);
+      logError(LOG, e, "Issue generating JSON schema: type=%s", type);
       return null;
     }
   }

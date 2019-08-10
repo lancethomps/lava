@@ -82,6 +82,7 @@ import com.fasterxml.jackson.dataformat.smile.SmileGenerator;
 import com.fasterxml.jackson.dataformat.smile.SmileParser;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import com.github.lancethomps.lava.common.Checks;
 import com.github.lancethomps.lava.common.collections.FastHashMap;
@@ -222,6 +223,8 @@ public class SerializerFactory {
 
     mapper.addMixIn(StringBuffer.class, StringBufferMixIn.class);
     mapper.addMixIn(QName.class, QnameMixIn.class);
+
+    mapper.registerModule(new Jdk8Module());
 
     return mapper;
   }

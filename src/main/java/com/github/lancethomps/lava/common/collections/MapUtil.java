@@ -74,6 +74,14 @@ public class MapUtil {
     return map;
   }
 
+  public static <K, V> LinkedHashMap<K, V> reverseMap(Map<K, V> map) {
+    LinkedHashMap<K, V> reversed = new LinkedHashMap<>();
+    for (K key : Lists.reverse(new ArrayList<>(map.keySet()))) {
+      reversed.put(key, map.get(key));
+    }
+    return reversed;
+  }
+
   public static Map<String, Object> addToMapIfUniqueObject(Map<String, Object> map, Set<Object> objects) {
     Map<String, Object> result = Maps.newLinkedHashMap();
     for (Entry<String, Object> entry : map.entrySet()) {

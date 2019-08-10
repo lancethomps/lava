@@ -8,20 +8,13 @@ import com.fasterxml.jackson.module.jsonSchema.factories.WrapperFactory;
 public class DefinitionsSchemaFactoryWrapperFactory extends WrapperFactory {
 
   @Override
-  public SchemaFactoryWrapper getWrapper(SerializerProvider p) {
-    SchemaFactoryWrapper wrapper = new DefinitionsSchemaFactory();
-    if (p != null) {
-      wrapper.setProvider(p);
-    }
-    return wrapper;
+  public SchemaFactoryWrapper getWrapper(SerializerProvider provider) {
+    return new DefinitionsSchemaFactory(provider);
   }
 
   @Override
-  public SchemaFactoryWrapper getWrapper(SerializerProvider p, VisitorContext rvc) {
-    SchemaFactoryWrapper wrapper = new DefinitionsSchemaFactory();
-    if (p != null) {
-      wrapper.setProvider(p);
-    }
+  public SchemaFactoryWrapper getWrapper(SerializerProvider provider, VisitorContext rvc) {
+    SchemaFactoryWrapper wrapper = new DefinitionsSchemaFactory(provider);
     wrapper.setVisitorContext(rvc);
     return wrapper;
   }

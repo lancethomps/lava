@@ -3,6 +3,7 @@ package com.github.lancethomps.lava.common.ser.jackson.schema;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
@@ -14,7 +15,11 @@ import com.fasterxml.jackson.module.jsonSchema.types.ReferenceSchema;
 public class DefinitionsSchemaFactory extends SchemaFactoryWrapper {
 
   public DefinitionsSchemaFactory() {
-    super(new DefinitionsSchemaFactoryWrapperFactory());
+    this(null);
+  }
+
+  public DefinitionsSchemaFactory(SerializerProvider provider) {
+    super(provider, new DefinitionsSchemaFactoryWrapperFactory());
     visitorContext = new VisitorContextWithDefinitions();
   }
 

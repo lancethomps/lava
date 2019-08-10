@@ -1,20 +1,35 @@
 package com.github.lancethomps.lava.common;
 
+import static com.github.lancethomps.lava.common.Randoms.getRandomFromCollection;
+import static org.jeasy.random.util.ReflectionUtils.isAbstract;
+import static org.jeasy.random.util.ReflectionUtils.isInterface;
+
+import java.lang.reflect.Constructor;
+import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.log4j.Logger;
+import org.jeasy.random.EasyRandomParameters;
+import org.jeasy.random.ObjectCreationException;
+import org.jeasy.random.api.ObjectFactory;
+import org.jeasy.random.api.RandomizerContext;
 import org.junit.Assert;
 import org.junit.internal.TextListener;
 import org.junit.runner.Computer;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
+import org.reflections.Reflections;
 
 import com.github.lancethomps.lava.common.compare.Compare;
 import com.github.lancethomps.lava.common.lambda.ThrowingBiConsumer;
@@ -59,7 +74,7 @@ public class TestingCommon {
   }
 
   public static void assertEqualsViaJsonDiff(String message, Object expected, Object actual, OutputParams outputParams) {
-    String diff = "";
+    String diff;
     if (outputParams == null) {
       diff = Compare.diffAsJson(expected, actual);
     } else {
@@ -71,6 +86,18 @@ public class TestingCommon {
     String json1 = Serializer.output(expected, Compare.DEFAULT_DIFF_AS_JSON_PARAMS);
     String json2 = Serializer.output(actual, Compare.DEFAULT_DIFF_AS_JSON_PARAMS);
     Assert.assertEquals(message + '\n' + diff, json1, json2);
+  }
+
+  public static EasyRandomParameters createEasyRandomParameters(
+      String scanPackagePrefix,
+      Collection<Pattern> scanConcreteTypeBlackList,
+      Collection<Pattern> scanConcreteTypeWhiteList
+  ) {
+    return new EasyRandomParameters()
+        .collectionSizeRange(1, 3)
+        .objectFactory(new CustomObjectFactory(scanPackagePrefix, scanConcreteTypeBlackList, scanConcreteTypeWhiteList))
+        .overrideDefaultInitialization(true)
+        .scanClasspathForConcreteTypes(false);
   }
 
   public static long getWaitDefaultIncrement() {
@@ -222,6 +249,65 @@ public class TestingCommon {
     if (timerId != null) {
       TIMERS.addTimer("waitForUpdates." + timerId, sleepTime);
     }
+  }
+
+  public static class CustomObjectFactory implements ObjectFactory {
+
+    private final Collection<Pattern> concreteTypeBlackList;
+    private final Collection<Pattern> concreteTypeWhiteList;
+    private final Objenesis objenesis = new ObjenesisStd();
+    private final String packagePrefix;
+    private final org.reflections.Reflections reflections;
+
+    public CustomObjectFactory(
+        String packagePrefix,
+        Collection<Pattern> concreteTypeBlackList,
+        Collection<Pattern> concreteTypeWhiteList
+    ) {
+      this.packagePrefix = packagePrefix;
+      this.concreteTypeBlackList = concreteTypeBlackList;
+      this.concreteTypeWhiteList = concreteTypeWhiteList;
+      reflections = new Reflections(packagePrefix);
+    }
+
+    @Override
+    public <T> T createInstance(Class<T> type, RandomizerContext context) throws ObjectCreationException {
+      if (isAbstract(type) || isInterface(type)) {
+        Set<Class<? extends T>> subTypes = reflections.getSubTypesOf(type);
+        Class<? extends T> subType;
+        if (subTypes.isEmpty()) {
+          throw new InstantiationError("Unable to find a matching concrete subtype of type: " + type + " in the classpath");
+        } else if (subTypes.size() == 1) {
+          subType = subTypes.iterator().next();
+        } else {
+          subType = getRandomFromCollection(subTypes);
+          int attempts = 0;
+          while (attempts <= 50 && !Checks.passesWhiteAndBlackListCheck(subType.getName(), concreteTypeWhiteList, concreteTypeBlackList).getLeft()) {
+            subType = getRandomFromCollection(subTypes);
+            attempts++;
+          }
+        }
+        return createInstance(subType, context);
+      }
+      try {
+        return createNewInstance(type);
+      } catch (Error e) {
+        throw new ObjectCreationException("Unable to create an instance of type: " + type, e);
+      }
+    }
+
+    private <T> T createNewInstance(final Class<T> type) {
+      try {
+        Constructor<T> noArgConstructor = type.getDeclaredConstructor();
+        if (!noArgConstructor.isAccessible()) {
+          noArgConstructor.setAccessible(true);
+        }
+        return noArgConstructor.newInstance();
+      } catch (Exception exception) {
+        return objenesis.newInstance(type);
+      }
+    }
+
   }
 
 }
