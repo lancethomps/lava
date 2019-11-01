@@ -57,6 +57,14 @@ public class MacOs {
     return Processes.run(getGuiPromptCommand(message));
   }
 
+  public static String getKeychainInternetPassword(@Nonnull String domain) {
+    return getKeychainInternetPassword(domain, System.getProperty("user.name"));
+  }
+
+  public static String getKeychainInternetPassword(@Nonnull String domain, @Nonnull String user) {
+    return getKeychainInternetPassword(domain, user, true);
+  }
+
   public static String getKeychainInternetPassword(@Nonnull String domain, @Nonnull String user, boolean askAndAddIfMissing) {
     if (!isMac()) {
       throw new RuntimeException("This method can only be called on macOS");
@@ -74,6 +82,20 @@ public class MacOs {
       }
     } catch (Throwable e) {
       Logs.logError(LOG, e, "Issue getting macOS Keychain password for [%s]", domain);
+    }
+    return pass;
+  }
+
+  public static String getKeychainGenericPassword(@Nonnull String id) {
+    if (!isMac()) {
+      throw new RuntimeException("This method can only be called on macOS");
+    }
+    String pass = null;
+    try {
+      List<String> command = Lists.newArrayList("security", "find-generic-password", "-ws", id);
+      pass = StringUtils.trim(OsUtil.runAndGetOutput(command, false));
+    } catch (Throwable e) {
+      Logs.logError(LOG, e, "Issue getting macOS Keychain password for [%s]", id);
     }
     return pass;
   }
