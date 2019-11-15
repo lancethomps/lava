@@ -104,6 +104,19 @@ public class Dates {
     .optionalStart()
     .appendOffset("+HHMMss", "Z")
     .toFormatter();
+  public static final DateTimeFormatter ISO_BASIC_FORMAT = new DateTimeFormatterBuilder()
+      .parseCaseInsensitive()
+      .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+      .appendPattern("'Z'")
+      .toFormatter();
+  public static final DateTimeFormatter ISO_FORMAT = new DateTimeFormatterBuilder()
+      .parseCaseInsensitive()
+      .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+      .optionalStart()
+      .appendPattern(".SSS")
+      .optionalEnd()
+      .appendPattern("'Z'")
+      .toFormatter();
   public static final LocalDate JULIAN_BASE = LocalDate.of(1950, 01, 01);
   public static final Logger LOG = Logger.getLogger(Dates.class);
   public static final DateTimeFormatter LOG4J_FORMAT = formatterFromPattern("yyyy-MM-dd HH:mm:ss,SSS");

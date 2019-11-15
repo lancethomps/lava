@@ -705,7 +705,15 @@ public class Testing {
   }
 
   public static void writeTempJson(Object obj, @Nullable String fileName, @Nullable OutputParams addParams) {
-    FileUtil.writeFile(new File(TMP, Checks.defaultIfBlank(fileName, "test.json")), obj instanceof String ? obj.toString() : getJson(obj, addParams));
+    writeJson(obj, new File(TMP, Checks.defaultIfBlank(fileName, "test.json")), addParams);
+  }
+
+  public static void writeJson(Object obj, File file) {
+    writeJson(obj, file, null);
+  }
+
+  public static void writeJson(Object obj, File file, @Nullable OutputParams addParams) {
+    FileUtil.writeFile(file, obj instanceof String ? obj.toString() : getJson(obj, addParams));
   }
 
   public static void writeToHomeFile(String path, String output) {
