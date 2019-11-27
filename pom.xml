@@ -31,7 +31,7 @@
   </scm>
 
   <properties>
-    <java.level>1.8</java.level>
+    <java.level>11</java.level>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <tests.timeout>500</tests.timeout>
@@ -536,12 +536,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.0.0</version><!--$NO-MVN-MAN-VER$ -->
+          <version>3.1.0</version>
           <dependencies>
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>8.10.1</version>
+              <version>8.14</version>
             </dependency>
           </dependencies>
           <executions>
@@ -798,7 +798,7 @@
             <dependency>
               <groupId>org.aspectj</groupId>
               <artifactId>aspectjtools</artifactId>
-              <version>1.8.11</version>
+              <version>1.9.4</version>
             </dependency>
           </dependencies>
           <configuration>
@@ -839,7 +839,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version><!--$NO-MVN-MAN-VER$ -->
+        <version>3.8.1</version>
         <configuration>
           <debug>true</debug>
           <encoding>UTF-8</encoding>
