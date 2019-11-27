@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 import com.fasterxml.jackson.databind.annotation.NoClass;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.google.common.collect.Sets;
@@ -45,7 +46,7 @@ public class CustomTypeResolver extends DefaultTypeResolverBuilder {
   }
 
   public TypeDeserializer buildTypeDes(DeserializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
-    TypeIdResolver idRes = idResolver(config, baseType, subtypes, false, true);
+    TypeIdResolver idRes = idResolver(config, baseType, null, subtypes, false, true);
     JavaType defaultImpl;
 
     if (_defaultImpl == null) {
@@ -86,7 +87,14 @@ public class CustomTypeResolver extends DefaultTypeResolverBuilder {
   }
 
   @Override
-  protected TypeIdResolver idResolver(MapperConfig<?> config, JavaType baseType, Collection<NamedType> subtypes, boolean forSer, boolean forDeser) {
+  protected TypeIdResolver idResolver(
+      MapperConfig<?> config,
+      JavaType baseType,
+      PolymorphicTypeValidator subtypeValidator,
+      Collection<NamedType> subtypes,
+      boolean forSer,
+      boolean forDeser
+  ) {
     return new CustomTypeIdResolver(baseType, config.getTypeFactory(), shortenedTypeOverride);
   }
 
