@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper.DefaultTypeResolverBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 
 public class NoopTypeResolver extends DefaultTypeResolverBuilder {
@@ -23,7 +24,14 @@ public class NoopTypeResolver extends DefaultTypeResolverBuilder {
   }
 
   @Override
-  protected TypeIdResolver idResolver(MapperConfig<?> config, JavaType baseType, Collection<NamedType> subtypes, boolean forSer, boolean forDeser) {
+  protected TypeIdResolver idResolver(
+      MapperConfig<?> config,
+      JavaType baseType,
+      PolymorphicTypeValidator subtypeValidator,
+      Collection<NamedType> subtypes,
+      boolean forSer,
+      boolean forDeser
+  ) {
     return new NoopTypeIdResolver(baseType, config.getTypeFactory());
   }
 
