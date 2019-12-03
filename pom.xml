@@ -31,7 +31,7 @@
   </scm>
 
   <properties>
-    <java.level>11</java.level>
+    <java.level>1.8</java.level>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <tests.timeout>500</tests.timeout>
@@ -855,7 +855,6 @@
           <debug>true</debug>
           <encoding>UTF-8</encoding>
           <fork>true</fork>
-          <release>${java.level}</release>
           <source>${java.level}</source>
           <target>${java.level}</target>
           <showDeprecation>false</showDeprecation>
@@ -1196,6 +1195,12 @@
       <properties>
         <skip.tests.unit>false</skip.tests.unit>
         <skip.tests.integration>true</skip.tests.integration>
+      </properties>
+    </profile>
+    <profile>
+      <id>java11</id>
+      <properties>
+        <java.level>11</java.level>
       </properties>
     </profile>
   </profiles>

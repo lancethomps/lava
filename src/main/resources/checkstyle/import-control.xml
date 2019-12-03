@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE import-control PUBLIC "-//Puppy Crawl//DTD Import Control 1.2//EN" "http://checkstyle.sourceforge.net/dtds/import_control_1_3.dtd">
+<!DOCTYPE import-control PUBLIC "-//Checkstyle//DTD ImportControl Configuration 1.4//EN" "https://checkstyle.org/dtds/import_control_1_4.dtd">
 <import-control pkg="com.github.lancethomps.lava">
 
   <!-- The 'javax.annotation.Nullable' and 'javax.annotation.Nonnnull' annotations should be used instead of annotations from the 'javax.validation.constraints' package -->
