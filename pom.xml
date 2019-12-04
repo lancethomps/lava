@@ -5,8 +5,10 @@
   <groupId>com.lancethomps</groupId>
   <artifactId>lava</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <name>com.lancethomps:lava</name>
   <packaging>jar</packaging>
+
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Core libraries for Java</description>
   <url>https://github.com/lancethomps/lava</url>
 
   <licenses>
@@ -36,8 +38,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <tests.timeout>500</tests.timeout>
 
-    <skip.compile.aspectj>true</skip.compile.aspectj>
-    <skip.compile.standard>false</skip.compile.standard>
     <skip.tests.integration>false</skip.tests.integration>
     <skip.tests.unit>false</skip.tests.unit>
 
@@ -473,13 +473,18 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.1.0</version>
           <configuration>
             <doclint>none</doclint>
             <failOnError>false</failOnError>
             <quiet>true</quiet>
             <useStandardDocletOptions>true</useStandardDocletOptions>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -504,7 +509,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
-          <version>2.5</version>
+          <version>2.7</version>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
@@ -516,7 +521,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>${version.maven-plugins}</version>
+          <version>3.1.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
@@ -533,7 +538,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <version>3.10.0</version>
+          <version>3.12.0</version>
           <configuration>
             <analysisCache>true</analysisCache>
             <minimumPriority>2</minimumPriority>
@@ -620,7 +625,7 @@
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.4</version>
+          <version>0.8.5</version>
           <executions>
             <execution>
               <!-- Prepares a property pointing to the JaCoCo runtime agent -->
@@ -757,12 +762,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jxr-plugin</artifactId>
-          <version>2.5</version>
+          <version>3.0.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>2.9</version>
+          <version>3.0.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -799,29 +804,6 @@
                 </tagClass>
               </tagClasses>
             </tagListOptions>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>aspectj-maven-plugin</artifactId>
-          <version>1.11</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.aspectj</groupId>
-              <artifactId>aspectjtools</artifactId>
-              <version>1.9.4</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <complianceLevel>${java.level}</complianceLevel>
-            <source>${java.level}</source>
-            <target>${java.level}</target>
-            <!--<useIncrementalCompilation>false</useIncrementalCompilation>-->
-            <Xlint>ignore</Xlint>
-            <showWeaveInfo>true</showWeaveInfo>
-            <verbose>true</verbose>
-            <forceAjcCompile>false</forceAjcCompile>
-            <skip>${skip.compile.aspectj}</skip>
           </configuration>
         </plugin>
       </plugins>
@@ -863,68 +845,7 @@
             <arg>-Xlint:classfile</arg>
           </compilerArgs>
         </configuration>
-        <executions>
-          <execution>
-            <id>compile-main</id>
-            <configuration>
-              <skip>${skip.compile.standard}</skip>
-              <skipMain>${skip.compile.standard}</skipMain>
-              <outputDirectory>${project.build.directory}/classes</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>compile-for-aspectj</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <configuration>
-              <skipMain>${skip.compile.aspectj}</skipMain>
-              <excludes>
-                <exclude>com/lancethomps/lava/common/aop/**</exclude>
-              </excludes>
-              <outputDirectory>${project.build.directory}/unwoven-classes</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
-     <!-- <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>aspectj-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>compile-with-aspectj</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <configuration>
-              <skip>${skip.compile.aspectj}</skip>
-              <aspectLibraries>
-                <aspectLibrary>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-aspects</artifactId>
-                </aspectLibrary>
-              </aspectLibraries>
-              <sources>
-                <source>
-                  <basedir>${project.basedir}/src/main/java</basedir>
-                  <includes>
-                    <include>com/lancethomps/lava/common/aop/**</include>
-                  </includes>
-                  <excludes>
-                    <exclude>**/.DS_Store</exclude>
-                  </excludes>
-                </source>
-              </sources>
-              <weaveDirectories>
-                <weaveDirectory>${project.build.directory}/unwoven-classes</weaveDirectory>
-              </weaveDirectories>
-              <showWeaveInfo>false</showWeaveInfo>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -1177,13 +1098,6 @@
       </properties>
     </profile>
     <profile>
-      <id>aspectj</id>
-      <properties>
-        <skip.compile.aspectj>false</skip.compile.aspectj>
-        <skip.compile.standard>true</skip.compile.standard>
-      </properties>
-    </profile>
-    <profile>
       <id>integration-tests</id>
       <properties>
         <skip.tests.unit>true</skip.tests.unit>
@@ -1202,6 +1116,64 @@
       <properties>
         <java.level>11</java.level>
       </properties>
+    </profile>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                  <goal>test-jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar</goal>
+                  <goal>test-jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.8</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
