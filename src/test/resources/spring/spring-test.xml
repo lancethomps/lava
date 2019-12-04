@@ -19,9 +19,9 @@
 
   <!-- Spring will fail if an Autowired field is not satisfied -->
   <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
-  <context:component-scan base-package="com.github.lancethomps.lava.common"/>
+  <context:component-scan base-package="com.lancethomps.lava.common"/>
 
-  <bean id="requestThrottle" class="com.github.lancethomps.lava.common.web.throttle.RequestThrottle"/>
+  <bean id="requestThrottle" class="com.lancethomps.lava.common.web.throttle.RequestThrottle"/>
 
   <mvc:annotation-driven/>
   <mvc:interceptors>

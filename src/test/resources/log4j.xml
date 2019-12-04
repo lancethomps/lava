@@ -24,11 +24,11 @@
     <priority value="FATAL"/>
   </category>
 
-  <category name="com.github.lancethomps.lava">
+  <category name="com.lancethomps.lava">
     <priority value="DEBUG"/>
   </category>
 
-  <category name="com.github.lancethomps.lava.common.date">
+  <category name="com.lancethomps.lava.common.date">
     <priority value="INFO"/>
   </category>
 
