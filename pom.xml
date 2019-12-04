@@ -32,6 +32,13 @@
     <url>https://github.com/lancethomps/lava</url>
   </scm>
 
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <properties>
     <java.level>1.8</java.level>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
@@ -1141,8 +1148,8 @@
               <execution>
                 <id>attach-sources</id>
                 <goals>
-                  <goal>jar</goal>
-                  <goal>test-jar</goal>
+                  <goal>jar-no-fork</goal>
+                  <goal>test-jar-no-fork</goal>
                 </goals>
               </execution>
             </executions>
