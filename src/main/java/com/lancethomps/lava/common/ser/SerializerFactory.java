@@ -2,8 +2,6 @@ package com.lancethomps.lava.common.ser;
 
 import static com.fasterxml.jackson.core.JsonParser.NumberType.DOUBLE;
 import static com.lancethomps.lava.common.Checks.isNotEmpty;
-import static com.lancethomps.lava.common.logging.Logs.logError;
-import static com.lancethomps.lava.common.logging.Logs.logWarn;
 import static com.lancethomps.lava.common.ser.Serializer.CSV_MAPPER;
 import static com.lancethomps.lava.common.ser.jackson.filter.FieldsFilter.FIELDS_FILTER_ID;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;

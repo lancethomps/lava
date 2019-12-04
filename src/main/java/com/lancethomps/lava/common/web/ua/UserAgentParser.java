@@ -1,6 +1,5 @@
 package com.lancethomps.lava.common.web.ua;
 
-import static com.lancethomps.lava.common.Checks.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 import java.util.regex.Matcher;

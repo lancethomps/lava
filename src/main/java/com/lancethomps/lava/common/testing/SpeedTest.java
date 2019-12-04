@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Maps;
 import com.lancethomps.lava.common.collections.MapUtil;
 import com.lancethomps.lava.common.lambda.ThrowingFunction;
 import com.lancethomps.lava.common.lambda.ThrowingIntConsumer;
@@ -34,7 +35,6 @@ import com.lancethomps.lava.common.sorting.Sorting;
 import com.lancethomps.lava.common.string.StringUtil;
 import com.lancethomps.lava.common.time.Stopwatch;
 import com.lancethomps.lava.common.time.Timing;
-import com.google.common.collect.Maps;
 
 public class SpeedTest {
 

@@ -4,8 +4,8 @@ import java.io.File;
 
 import org.junit.Rule;
 
-import com.lancethomps.lava.common.ser.jackson.CustomDeserializationProblemHandler;
 import com.google.common.collect.Sets;
+import com.lancethomps.lava.common.ser.jackson.CustomDeserializationProblemHandler;
 
 public class BaseTest {
 

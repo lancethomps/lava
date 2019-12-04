@@ -8,8 +8,8 @@ import java.util.logging.SimpleFormatter;
 
 import org.apache.log4j.Logger;
 
-import com.lancethomps.lava.common.Checks;
 import com.google.common.collect.Lists;
+import com.lancethomps.lava.common.Checks;
 
 public class Log4jHandler extends Handler {
 

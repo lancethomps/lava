@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lancethomps.lava.common.ser.ExternalizableBean;
 import com.google.common.collect.Lists;
+import com.lancethomps.lava.common.ser.ExternalizableBean;
 
 public class DiffFile extends ExternalizableBean {
 

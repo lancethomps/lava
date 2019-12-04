@@ -39,11 +39,11 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.CommonConstants;
 import com.lancethomps.lava.common.lambda.Lambdas;
 import com.lancethomps.lava.common.logging.Logs;
 import com.lancethomps.lava.common.sorting.CaseInsensitiveStringSort;
-import com.google.common.collect.Lists;
 
 public class StringUtil {
 

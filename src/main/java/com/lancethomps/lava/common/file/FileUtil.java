@@ -1,11 +1,6 @@
 // CHECKSTYLE.OFF: OpenCSV
 package com.lancethomps.lava.common.file;
 
-import static com.lancethomps.lava.common.Checks.isNotEmpty;
-import static com.lancethomps.lava.common.ContextUtil.getFile;
-import static com.lancethomps.lava.common.logging.Logs.logError;
-import static com.lancethomps.lava.common.logging.Logs.logTrace;
-import static com.lancethomps.lava.common.ser.Serializer.fromCsv;
 import static java.io.File.separator;
 import static java.io.File.separatorChar;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -96,6 +91,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.Collect;
 import com.lancethomps.lava.common.ContextUtil;
@@ -108,8 +105,6 @@ import com.lancethomps.lava.common.ser.Serializer;
 import com.lancethomps.lava.common.string.StringUtil;
 import com.lancethomps.lava.common.time.Stopwatch;
 import com.lancethomps.lava.common.time.Timing;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.opencsv.CSVReader;
 
 public class FileUtil {

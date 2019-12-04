@@ -23,9 +23,9 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.github.bohnman.squiggly.context.provider.SimpleSquigglyContextProvider;
 import com.github.bohnman.squiggly.filter.SquigglyPropertyFilter;
 import com.github.bohnman.squiggly.parser.SquigglyParser;
+import com.google.common.collect.Sets;
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.web.requests.MissingRequestParameter;
-import com.google.common.collect.Sets;
 
 public class FieldsFilter extends SimpleBeanPropertyFilter implements Serializable {
 

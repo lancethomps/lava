@@ -20,9 +20,9 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.logging.Logs;
 import com.lancethomps.lava.common.web.BaseSpringTest;
-import com.google.common.collect.Lists;
 
 public class RequestThrottleTest extends BaseSpringTest {
 

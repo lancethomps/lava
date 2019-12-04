@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.util.ClassUtil;
+import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.Enums;
 import com.lancethomps.lava.common.Exceptions;
@@ -38,7 +39,6 @@ import com.lancethomps.lava.common.lambda.ThrowingTriFunction;
 import com.lancethomps.lava.common.logging.Logs;
 import com.lancethomps.lava.common.ser.Serializer;
 import com.lancethomps.lava.common.string.WordUtil;
-import com.google.common.collect.Lists;
 
 @SuppressWarnings("unchecked")
 public class RequestFieldInfo<V> {

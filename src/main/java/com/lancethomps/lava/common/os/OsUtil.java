@@ -1,6 +1,5 @@
 package com.lancethomps.lava.common.os;
 
-import static com.lancethomps.lava.common.lambda.Lambdas.functionIfTrue;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -27,8 +26,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import com.lancethomps.lava.common.file.FileUtil;
-import com.lancethomps.lava.common.logging.Logs;
 import com.lancethomps.lava.common.lambda.Lambdas;
+import com.lancethomps.lava.common.logging.Logs;
 
 public class OsUtil {
 

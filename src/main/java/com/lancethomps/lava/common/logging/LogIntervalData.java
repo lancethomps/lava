@@ -9,12 +9,12 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nonnull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.util.concurrent.AtomicDouble;
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.time.Stopwatch;
 import com.lancethomps.lava.common.time.TimerEnabledBean;
 import com.lancethomps.lava.common.time.TimerHandlingBean;
 import com.lancethomps.lava.common.time.Timing;
-import com.google.common.util.concurrent.AtomicDouble;
 
 public class LogIntervalData implements TimerEnabledBean, TimerHandlingBean {
 

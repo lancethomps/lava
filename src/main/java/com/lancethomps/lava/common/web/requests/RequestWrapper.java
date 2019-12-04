@@ -30,6 +30,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.CompressionUtil;
 import com.lancethomps.lava.common.Enums;
@@ -40,7 +41,6 @@ import com.lancethomps.lava.common.ser.OutputFormat;
 import com.lancethomps.lava.common.ser.OutputParams;
 import com.lancethomps.lava.common.ser.Serializer;
 import com.lancethomps.lava.common.web.WebRequests;
-import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.web.requests.parsers.RequestFactory;
 
 public class RequestWrapper extends HttpServletRequestWrapper {

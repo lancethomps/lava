@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.Collect;
 import com.lancethomps.lava.common.diff.DiffToHtml;
@@ -41,7 +42,6 @@ import com.lancethomps.lava.common.ser.OutputParams;
 import com.lancethomps.lava.common.ser.Serializer;
 import com.lancethomps.lava.common.ser.SerializerFactory;
 import com.lancethomps.lava.common.string.StringUtil;
-import com.google.common.collect.Lists;
 
 import difflib.DiffUtils;
 

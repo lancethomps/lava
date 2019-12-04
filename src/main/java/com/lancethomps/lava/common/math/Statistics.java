@@ -1,6 +1,5 @@
 package com.lancethomps.lava.common.math;
 
-import static com.lancethomps.lava.common.logging.Logs.logWarn;
 import static com.lancethomps.lava.common.math.MathUtil.MC;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;

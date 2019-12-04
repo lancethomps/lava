@@ -1,6 +1,5 @@
 package com.lancethomps.lava.common.logging;
 
-import static com.lancethomps.lava.common.format.Formatting.bytesToMegaBytes;
 import static com.lancethomps.lava.common.time.Timing.NANO_2_MILLIS;
 import static com.lancethomps.lava.common.time.Timing.formatMillis;
 import static java.lang.String.format;

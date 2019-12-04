@@ -3,8 +3,8 @@ package com.lancethomps.lava.common.diff.domain;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.lancethomps.lava.common.ser.ExternalizableBean;
 import com.google.common.collect.Lists;
+import com.lancethomps.lava.common.ser.ExternalizableBean;
 
 public class DiffBlock extends ExternalizableBean {
 

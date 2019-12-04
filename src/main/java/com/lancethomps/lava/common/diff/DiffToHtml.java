@@ -1,10 +1,10 @@
 // CHECKSTYLE.OFF: .*
 package com.lancethomps.lava.common.diff;
 
+import static com.google.common.collect.Maps.newHashMap;
 import static com.lancethomps.lava.common.Checks.isEmpty;
 import static com.lancethomps.lava.common.Checks.isNotEmpty;
 import static com.lancethomps.lava.common.ContextUtil.getCpFile;
-import static com.google.common.collect.Maps.newHashMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.apache.commons.io.FilenameUtils.getExtension;
@@ -34,7 +34,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.CommonConstants;
+import com.lancethomps.lava.common.collections.MapUtil;
 import com.lancethomps.lava.common.diff.DiffMatchPatch.DiffOperation;
 import com.lancethomps.lava.common.diff.domain.DiffBlock;
 import com.lancethomps.lava.common.diff.domain.DiffFile;
@@ -50,11 +55,6 @@ import com.lancethomps.lava.common.logging.Logs;
 import com.lancethomps.lava.common.os.OsUtil;
 import com.lancethomps.lava.common.ser.Serializer;
 import com.lancethomps.lava.common.string.StringUtil;
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-import com.google.common.collect.Lists;
-import com.lancethomps.lava.common.collections.MapUtil;
 
 public class DiffToHtml {
 

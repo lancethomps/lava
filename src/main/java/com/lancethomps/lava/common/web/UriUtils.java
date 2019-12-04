@@ -27,8 +27,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.lancethomps.lava.common.logging.Logs;
 import com.google.common.collect.ImmutableMap;
+import com.lancethomps.lava.common.logging.Logs;
 
 public class UriUtils {
 

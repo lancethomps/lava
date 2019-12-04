@@ -2,7 +2,6 @@
 package com.lancethomps.lava.common.collections;
 
 import static com.lancethomps.lava.common.Checks.isNotEmpty;
-import static com.lancethomps.lava.common.logging.Logs.logError;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -38,6 +37,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.Collect;
 import com.lancethomps.lava.common.Reflections;
@@ -45,9 +47,6 @@ import com.lancethomps.lava.common.file.FileUtil;
 import com.lancethomps.lava.common.lambda.Lambdas;
 import com.lancethomps.lava.common.logging.Logs;
 import com.lancethomps.lava.common.ser.Serializer;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.opencsv.CSVParser;
 
 public class MapUtil {

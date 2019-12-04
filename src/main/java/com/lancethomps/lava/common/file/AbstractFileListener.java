@@ -1,7 +1,5 @@
 package com.lancethomps.lava.common.file;
 
-import static com.lancethomps.lava.common.logging.Logs.logWarn;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

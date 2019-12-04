@@ -22,6 +22,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 
+import com.google.common.collect.Iterables;
 import com.lancethomps.lava.common.expr.ExprFactory;
 import com.lancethomps.lava.common.expr.ExpressionEvalException;
 import com.lancethomps.lava.common.expr.ExpressionsMatchResult;
@@ -30,7 +31,6 @@ import com.lancethomps.lava.common.logging.Logs;
 import com.lancethomps.lava.common.ser.MissingRequiredFieldException;
 import com.lancethomps.lava.common.ser.OutputExpression;
 import com.lancethomps.lava.common.ser.OutputExpressionRoot;
-import com.google.common.collect.Iterables;
 
 public class Checks {
 

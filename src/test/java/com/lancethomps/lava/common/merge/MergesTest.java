@@ -7,11 +7,11 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.BaseTest;
 import com.lancethomps.lava.common.Randoms;
 import com.lancethomps.lava.common.TestingCommon;
 import com.lancethomps.lava.common.collections.MapUtil;
-import com.google.common.collect.Lists;
 
 public class MergesTest extends BaseTest {
 

@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.ClassUtil;
-import com.lancethomps.lava.common.collections.MapUtil;
 import com.google.common.collect.Sets;
+import com.lancethomps.lava.common.collections.MapUtil;
 
 public class CustomTypeIdResolver extends TypeIdResolverBase {
 

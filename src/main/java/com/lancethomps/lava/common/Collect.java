@@ -1,8 +1,8 @@
 // CHECKSTYLE.OFF: OpenCSV
 package com.lancethomps.lava.common;
 
-import static com.lancethomps.lava.common.Checks.isNotEmpty;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.lancethomps.lava.common.Checks.isNotEmpty;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -30,11 +30,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.util.ClassUtil;
+import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.logging.Logs;
 import com.lancethomps.lava.common.ser.Serializer;
 import com.lancethomps.lava.common.sorting.CaseInsensitiveStringSort;
 import com.lancethomps.lava.common.sorting.Sorting;
-import com.google.common.collect.Lists;
 import com.opencsv.CSVParser;
 
 public class Collect {

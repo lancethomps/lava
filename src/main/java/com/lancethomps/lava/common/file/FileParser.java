@@ -1,9 +1,6 @@
 // CHECKSTYLE.OFF: OpenCSV
 package com.lancethomps.lava.common.file;
 
-import static com.lancethomps.lava.common.Checks.isEmpty;
-import static com.lancethomps.lava.common.Checks.isNotEmpty;
-import static com.lancethomps.lava.common.logging.Logs.logError;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
@@ -29,13 +26,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.Collect;
 import com.lancethomps.lava.common.expr.ExpressionsMatchResult;
 import com.lancethomps.lava.common.logging.Logs;
 import com.lancethomps.lava.common.ser.Serializer;
 import com.lancethomps.lava.common.string.StringUtil;
-import com.google.common.collect.Lists;
 import com.opencsv.CSVParser;
 
 public class FileParser<T> {
