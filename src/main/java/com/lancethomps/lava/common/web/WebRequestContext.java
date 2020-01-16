@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lancethomps.lava.common.CommonConstants;
@@ -30,7 +31,7 @@ public class WebRequestContext extends ExternalizableBean implements TimerEnable
 
   public static final String REQUEST_CONTEXT_KEY = "_zzRequestContext";
 
-  private static final Logger LOG = Logger.getLogger(WebRequestContext.class);
+  private static final Logger LOG = LogManager.getLogger(WebRequestContext.class);
 
   private Map<String, Object> attributes;
 

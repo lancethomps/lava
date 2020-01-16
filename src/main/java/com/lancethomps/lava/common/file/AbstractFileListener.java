@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.lambda.ThrowingConsumer;
@@ -14,7 +15,7 @@ import com.lancethomps.lava.common.logging.Logs;
 
 public abstract class AbstractFileListener implements Listener {
 
-  private static final Logger LOG = Logger.getLogger(AbstractFileListener.class);
+  private static final Logger LOG = LogManager.getLogger(AbstractFileListener.class);
 
   private String baseDir;
 

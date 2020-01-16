@@ -31,7 +31,8 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,7 +141,7 @@ public class Testing {
       }
       return diffFile;
     } catch (Throwable e) {
-      Logs.logError(Logger.getLogger(Testing.class), e, "Error");
+      Logs.logError(LogManager.getLogger(Testing.class), e, "Error");
       return diffFile;
     }
   }
@@ -164,7 +165,7 @@ public class Testing {
         bashEnv.put(matcher.group(1), matcher.group(2));
       }
     } catch (Throwable e) {
-      Logs.logError(Logger.getLogger(Testing.class), e, "Issue getting bash env!");
+      Logs.logError(LogManager.getLogger(Testing.class), e, "Issue getting bash env!");
     }
     return bashEnv;
   }
@@ -218,7 +219,7 @@ public class Testing {
       projRoot = Testing.projRootPath;
     } else if (Checks.isNotBlank(System.getenv("PROJ_DIR")) && new File(System.getenv("PROJ_DIR")).isDirectory()) {
       projRoot = System.getenv("PROJ_DIR") + File.separatorChar;
-      Logs.logDebug(Logger.getLogger(Testing.class), "Using PROJ_DIR env variable for project root: %s", projRoot);
+      Logs.logDebug(LogManager.getLogger(Testing.class), "Using PROJ_DIR env variable for project root: %s", projRoot);
       setProjRootPath(projRoot);
     } else {
       projRoot = getProjRootPath();
@@ -232,7 +233,7 @@ public class Testing {
         URI rootUri = Testing.class.getResource("/").toURI();
         File root = new File(rootUri).getParentFile().getParentFile().getParentFile();
         String projRoot = root.getPath() + File.separatorChar;
-        Logs.logDebug(Logger.getLogger(Testing.class), "Guessed project root from Testing.class: %s", projRoot);
+        Logs.logDebug(LogManager.getLogger(Testing.class), "Guessed project root from Testing.class: %s", projRoot);
         Testing.setProjRootPath(projRoot);
       } catch (Throwable e) {
       }
@@ -339,7 +340,7 @@ public class Testing {
           Class<?> staticFieldType = staticField.getType();
           if (!beanFieldType.isAssignableFrom(staticFieldType)) {
             Logs.logWarn(
-              Logger.getLogger(Testing.class),
+              LogManager.getLogger(Testing.class),
               "Types not compatible: field=%s testingClass=%s beanClass=%s beanFieldType=%s staticFieldType=%s",
               name,
               testingClass.getName(),
@@ -359,7 +360,7 @@ public class Testing {
         }
       } catch (NoSuchFieldException | NoSuchMethodException e) {
         Logs.logTrace(
-          Logger.getLogger(Testing.class),
+          LogManager.getLogger(Testing.class),
           e,
           "Standard field/method missing: name=%s testingClass=%s beanClass=%s",
           name,
@@ -368,7 +369,7 @@ public class Testing {
         );
       } catch (Exception e) {
         Logs.logError(
-          Logger.getLogger(Testing.class),
+          LogManager.getLogger(Testing.class),
           e,
           "Issue overwriting standard field: name=%s testingClass=%s beanClass=%s",
           name,
@@ -485,7 +486,7 @@ public class Testing {
     try {
       return FileUtil.readFile(file);
     } catch (Throwable e) {
-      Logger log = Logger.getLogger(Testing.class);
+      Logger log = LogManager.getLogger(Testing.class);
       Logs.logError(log, e, "Could not read file [%s] to string!", file);
     }
     return null;
@@ -513,7 +514,7 @@ public class Testing {
           Exceptions.sneakyThrow(e);
         }
         allSuccess = false;
-        Logs.logError(Logger.getLogger(Testing.class), e, "Error running test method [%s]", method);
+        Logs.logError(LogManager.getLogger(Testing.class), e, "Error running test method [%s]", method);
       }
     }
     return allSuccess;
@@ -542,11 +543,11 @@ public class Testing {
           Object val = envValInit.invoke(null, v.getBytes());
           putMethod.invoke(envMap, key, val);
         } catch (Exception e) {
-          Logs.logError(Logger.getLogger(Testing.class), e, "Issue setting env var with key [%s] and val [%s]!", k, v);
+          Logs.logError(LogManager.getLogger(Testing.class), e, "Issue setting env var with key [%s] and val [%s]!", k, v);
         }
       });
     } catch (Throwable e) {
-      Logs.logError(Logger.getLogger(Testing.class), e, "Issue setting bash env!");
+      Logs.logError(LogManager.getLogger(Testing.class), e, "Issue setting bash env!");
     }
   }
 
@@ -672,7 +673,7 @@ public class Testing {
     while (stopAfter >= (System.currentTimeMillis() - startTime)) {
       if (file.lastModified() != fileTimestamp) {
         Logs.logWarn(
-          Logger.getLogger(Testing.class),
+          LogManager.getLogger(Testing.class),
           "File modified! previous=%s updated=%s",
           Dates.fromMillis(fileTimestamp),
           Dates.fromMillis(file.lastModified())

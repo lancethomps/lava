@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,14 +40,14 @@ import javax.management.NotificationEmitter;
 import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
 
-import org.apache.commons.collections4.EnumerationUtils;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.Patterns;
@@ -76,8 +76,8 @@ public final class Logs {
   private static final List<SavedErrorMessage> ERROR_MESSAGES = new ArrayList<>();
 
   private static final List<Pair<NotificationEmitter, NotificationListener>> GC_MONITORS = new ArrayList<>();
-  private static final Logger LOG = Logger.getLogger(Logs.class);
-  private static final Map<Logger, Level> LOGGER_RESET_MAP = new HashMap<>();
+  private static final Logger LOG = LogManager.getLogger(Logs.class);
+  private static final Map<LoggerConfig, Level> LOGGER_RESET_MAP = new HashMap<>();
   private static final DecimalFormat MILLIS_FORMAT = new DecimalFormat("#,###");
   private static final String TIMER_MSG_SHELL = "TIMER - %s completed in %sms. %s";
   private static final DecimalFormat TIME_FORMAT = new DecimalFormat("#,###");
@@ -357,7 +357,7 @@ public final class Logs {
   }
 
   public static void logEnd(final Logger logger, final Level level, final String message, final Object... formatArgs) {
-    if (logger.isEnabledFor(level)) {
+    if (logger.isEnabled(level)) {
       logger.log(level, Formatting.getMessage("END - " + message, formatArgs));
     }
   }
@@ -432,7 +432,7 @@ public final class Logs {
     if (level == Level.ERROR) {
       String msg = "SPLUNK@" + (Checks.isBlank(message) ? splunkId.toString() : (splunkId.toString() + '|' + message));
       logError(logger, t, msg, formatArgs);
-    } else if (logger.isEnabledFor(level)) {
+    } else if (logger.isEnabled(level)) {
       String msg = "SPLUNK@" + Formatting.getMessage(Checks.isBlank(message) ? splunkId.toString() : (splunkId.toString() + '|' + message), formatArgs);
       logger.log(level, msg, t);
     }
@@ -533,7 +533,7 @@ public final class Logs {
   public static void logLevel(final Logger logger, final Level level, final Throwable t, final String message, final Object... formatArgs) {
     if (level == Level.ERROR) {
       logError(logger, t, message, formatArgs);
-    } else if (logger.isEnabledFor(level)) {
+    } else if (logger.isEnabled(level)) {
       String msg = Formatting.getMessage(message, formatArgs);
       logger.log(level, msg, t);
     }
@@ -556,7 +556,7 @@ public final class Logs {
   }
 
   public static void logStart(final Logger logger, final Level level, final String message, final Object... formatArgs) {
-    if (logger.isEnabledFor(level)) {
+    if (logger.isEnabled(level)) {
       logger.log(level, Formatting.getMessage("START - " + message, formatArgs));
     }
   }
@@ -695,6 +695,7 @@ public final class Logs {
       if (!LOGGER_RESET_MAP.isEmpty()) {
         LOGGER_RESET_MAP.forEach((logger, level) -> logger.setLevel(level));
         LOGGER_RESET_MAP.clear();
+        getLoggerContext().updateLoggers();
       }
       tempAllLogLevel = null;
     }
@@ -714,12 +715,12 @@ public final class Logs {
         LOGGER_RESET_MAP.forEach((logger, level) -> logger.setLevel(level));
         LOGGER_RESET_MAP.clear();
       }
-      List<Logger> loggers = ListUtils
-        .union(
-          Arrays.asList(LogManager.getRootLogger()),
-          EnumerationUtils.toList((Enumeration<Logger>) LogManager.getLoggerRepository().getCurrentLoggers())
+      LoggerContext context = getLoggerContext();
+      List<LoggerConfig> loggers = Stream
+        .concat(
+          Stream.of(context.getConfiguration().getRootLogger()),
+          context.getConfiguration().getLoggers().values().stream()
         )
-        .stream()
         .filter(logger -> logger.getLevel() != null)
         .collect(Collectors.toList());
       if (temp) {
@@ -727,12 +728,16 @@ public final class Logs {
         tempAllLogLevel = newLevel;
       }
       loggers.forEach(logger -> logger.setLevel(newLevel));
+      context.updateLoggers();
     }
   }
 
+  public static LoggerContext getLoggerContext() {
+    return (LoggerContext) LogManager.getContext(false);
+  }
+
   public static LogIntervalData startLogInterval(final Logger logger, final long total, final String msg) {
-    LogIntervalData data = new LogIntervalData(total, msg);
-    return data;
+    return new LogIntervalData(total, msg);
   }
 
   public static void uninstallGcMonitoring() {

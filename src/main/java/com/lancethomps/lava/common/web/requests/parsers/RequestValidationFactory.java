@@ -5,13 +5,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.logging.Logs;
 
 public class RequestValidationFactory {
 
-  private static final Logger LOG = Logger.getLogger(RequestValidationFactory.class);
+  private static final Logger LOG = LogManager.getLogger(RequestValidationFactory.class);
 
   public static <T> List<String> validateFieldList(
     T request,

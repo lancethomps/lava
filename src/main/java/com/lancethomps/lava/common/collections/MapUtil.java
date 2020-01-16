@@ -35,7 +35,8 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -51,7 +52,7 @@ import com.opencsv.CSVParser;
 
 public class MapUtil {
 
-  private static final Logger LOG = Logger.getLogger(MapUtil.class);
+  private static final Logger LOG = LogManager.getLogger(MapUtil.class);
 
   public static <K, V> void addNullSafeToMap(Map<K, V> map, K key, V value) {
     if ((key != null) && (value != null)) {

@@ -3,7 +3,8 @@ package com.lancethomps.lava.common.ser.jackson.serialize;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -24,7 +25,7 @@ import com.lancethomps.lava.common.logging.Logs;
 
 public class NumberWithLimitSerializer<T> extends StdScalarSerializer<T> implements ContextualSerializer {
 
-  private static final Logger LOG = Logger.getLogger(NumberWithLimitSerializer.class);
+  private static final Logger LOG = LogManager.getLogger(NumberWithLimitSerializer.class);
 
   private static final long serialVersionUID = -9123969819834800797L;
 

@@ -11,7 +11,8 @@ import java.util.Collection;
 import javax.annotation.Nonnull;
 
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.logging.Logs;
@@ -22,7 +23,7 @@ public class MathUtil {
 
   public static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
 
-  private static final Logger LOG = Logger.getLogger(MathUtil.class);
+  private static final Logger LOG = LogManager.getLogger(MathUtil.class);
 
   public static BigDecimal calculateHarmonicMean(Collection<BigDecimal> values) {
     if (Checks.isEmpty(values)) {

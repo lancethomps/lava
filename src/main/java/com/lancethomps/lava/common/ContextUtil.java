@@ -26,7 +26,8 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.context.ContextLoader;
@@ -46,7 +47,7 @@ public final class ContextUtil {
   public static final String UNKNOWN_USER = "Unknown";
   public static final String UNKNOWN_USER_THREAD_SUFFIX = String.format("_%s", UNKNOWN_USER);
   public static final boolean WILDFLY = SERVER_TYPE.equalsIgnoreCase("wildfly");
-  private static final Logger LOG = Logger.getLogger(ContextUtil.class);
+  private static final Logger LOG = LogManager.getLogger(ContextUtil.class);
   private static Set<String> adminUserIds;
   private static String rootPath;
   private static Properties serverProperties;

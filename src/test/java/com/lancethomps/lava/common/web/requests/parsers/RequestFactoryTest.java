@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -18,7 +19,7 @@ import com.lancethomps.lava.common.ser.Serializer;
 // TODO: add test for fields with prefix
 public class RequestFactoryTest extends BaseTest {
 
-  private static final Logger LOG = Logger.getLogger(RequestFactoryTest.class);
+  private static final Logger LOG = LogManager.getLogger(RequestFactoryTest.class);
 
   @Test
   public void createFromPathKeyParamsTest() throws Exception {

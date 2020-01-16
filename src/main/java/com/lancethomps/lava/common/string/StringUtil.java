@@ -37,7 +37,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.CommonConstants;
@@ -68,7 +69,7 @@ public class StringUtil {
   public static final String TRUNCATE_STRING_ELLIPSIS = "...";
   public static final String VOWELS = "AEIOU";
   public static final String VOWELS_ALL = VOWELS + VOWELS.toLowerCase();
-  private static final Logger LOG = Logger.getLogger(StringUtil.class);
+  private static final Logger LOG = LogManager.getLogger(StringUtil.class);
   private static final String RANDOM_ALPHA_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   private static final Random RANDOM_GEN;
   private static final String RANDOM_ID_CHARS = RANDOM_ALPHA_CHARS + "0123456789";

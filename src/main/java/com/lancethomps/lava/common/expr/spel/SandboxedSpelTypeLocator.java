@@ -1,6 +1,7 @@
 package com.lancethomps.lava.common.expr.spel;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.spel.support.StandardTypeLocator;
@@ -9,7 +10,7 @@ import com.lancethomps.lava.common.logging.Logs;
 
 public class SandboxedSpelTypeLocator extends StandardTypeLocator {
 
-  private static final Logger LOG = Logger.getLogger(SandboxedContextConfig.class);
+  private static final Logger LOG = LogManager.getLogger(SandboxedContextConfig.class);
 
   private SandboxedContextConfig config;
 

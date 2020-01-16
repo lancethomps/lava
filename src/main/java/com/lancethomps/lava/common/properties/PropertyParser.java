@@ -32,7 +32,8 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.Checks;
@@ -48,7 +49,7 @@ public class PropertyParser {
 
   public static final String CLIENT_AWARE_SUFFIX = "clientAware";
   public static final char DEFAULT_OVERRIDES_SEP = '.';
-  public static final Logger LOG = Logger.getLogger(PropertyParser.class);
+  public static final Logger LOG = LogManager.getLogger(PropertyParser.class);
   public static final String PROP_ENV_OVERRIDES_SYSTEM_PROP_KEY = "com.lancethomps.lava.common.properties.PropertyParser.propEnvOverrides";
   private static final ConcurrentHashMap<String, BiFunction<String, PropertyResolverConfig, String>> PROPERTY_REPLACERS = new ConcurrentHashMap<>();
   private static PropertyParserHelper defaultPropertyParserHelper;

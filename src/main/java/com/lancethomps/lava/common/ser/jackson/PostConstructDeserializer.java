@@ -2,7 +2,8 @@ package com.lancethomps.lava.common.ser.jackson;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -15,7 +16,7 @@ import com.lancethomps.lava.common.ser.PostConstructor;
 
 public class PostConstructDeserializer extends BeanDeserializer {
 
-  private static final Logger LOG = Logger.getLogger(PostConstructDeserializer.class);
+  private static final Logger LOG = LogManager.getLogger(PostConstructDeserializer.class);
 
   private static final long serialVersionUID = 8436965950483899743L;
 

@@ -28,7 +28,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import org.apache.commons.collections4.iterators.IteratorEnumeration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.Checks;
@@ -51,7 +52,7 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 
   private static final String JSON_PARAM_NAME = "_zzJsonData";
 
-  private static final Logger LOG = Logger.getLogger(RequestWrapper.class);
+  private static final Logger LOG = LogManager.getLogger(RequestWrapper.class);
 
   private static final String PARENT_REQUEST_PARAM = "_zzParentRequest";
 

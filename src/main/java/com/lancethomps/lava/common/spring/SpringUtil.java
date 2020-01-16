@@ -12,7 +12,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -36,7 +37,7 @@ public final class SpringUtil {
 
   public static final String USER_ID_KEY = "_zzUserId";
 
-  private static final Logger LOG = Logger.getLogger(SpringUtil.class);
+  private static final Logger LOG = LogManager.getLogger(SpringUtil.class);
 
   public static Object execSpringMethodReflection(ApplicationContext springContext, String expr, Object... args) {
     Object result = null;

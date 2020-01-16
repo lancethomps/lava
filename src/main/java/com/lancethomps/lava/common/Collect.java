@@ -27,7 +27,8 @@ import javax.annotation.Nonnull;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.google.common.collect.Lists;
@@ -49,7 +50,7 @@ public class Collect {
 
   public static final char DEFAULT_SEP = ',';
 
-  private static final Logger LOG = Logger.getLogger(Collect.class);
+  private static final Logger LOG = LogManager.getLogger(Collect.class);
 
   public static <C extends Collection<E>, E> C addAll(final C collection, final C other) {
     if (other != null) {

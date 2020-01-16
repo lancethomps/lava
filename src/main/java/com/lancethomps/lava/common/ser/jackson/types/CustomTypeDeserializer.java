@@ -2,7 +2,8 @@ package com.lancethomps.lava.common.ser.jackson.types;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.core.JsonParser;
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.databind.util.TokenBuffer;
 
 public class CustomTypeDeserializer extends AsPropertyTypeDeserializer {
 
-  private static final Logger LOG = Logger.getLogger(CustomTypeDeserializer.class);
+  private static final Logger LOG = LogManager.getLogger(CustomTypeDeserializer.class);
 
   private static final long serialVersionUID = 1L;
 

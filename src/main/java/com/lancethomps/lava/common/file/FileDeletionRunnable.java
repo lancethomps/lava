@@ -4,13 +4,14 @@ import java.io.File;
 import java.util.TimerTask;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.logging.Logs;
 
 public class FileDeletionRunnable extends TimerTask {
 
-  private static final Logger LOG = Logger.getLogger(FileDeletionRunnable.class);
+  private static final Logger LOG = LogManager.getLogger(FileDeletionRunnable.class);
   private String keepFile;
   private String moveToDir;
   private String path;

@@ -12,7 +12,8 @@ import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.Reflections;
@@ -21,7 +22,7 @@ import com.lancethomps.lava.common.ser.Serializer;
 
 public class Sorting {
 
-  private static final Logger LOG = Logger.getLogger(Sorting.class);
+  private static final Logger LOG = LogManager.getLogger(Sorting.class);
 
   public static <T> Comparator<T> createComparator(final List<SortClause> sorts) {
     return createComparator(sorts, true, null, null);

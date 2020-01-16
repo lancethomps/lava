@@ -10,7 +10,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,7 +22,7 @@ import com.lancethomps.lava.common.logging.Logs;
 
 public class ExprFactoryTest extends BaseTest {
 
-  private static final Logger LOG = Logger.getLogger(ExprFactoryTest.class);
+  private static final Logger LOG = LogManager.getLogger(ExprFactoryTest.class);
 
   private static double mathFunctionsAllowedDelta = 0.5d;
 

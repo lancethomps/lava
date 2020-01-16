@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -22,7 +23,7 @@ public class GenericKeySerializer extends StdSerializer<Object> {
 
   private static final Map<Class<?>, List<ThrowingTriFunction<Object, JsonGenerator, SerializerProvider, String>>> FUNCTIONS = new HashMap<>();
 
-  private static final Logger LOG = Logger.getLogger(GenericKeySerializer.class);
+  private static final Logger LOG = LogManager.getLogger(GenericKeySerializer.class);
 
   private static final long serialVersionUID = 8654920808877349523L;
 

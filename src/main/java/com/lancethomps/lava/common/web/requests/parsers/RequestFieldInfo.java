@@ -23,7 +23,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.util.ClassUtil;
@@ -43,7 +44,7 @@ import com.lancethomps.lava.common.string.WordUtil;
 @SuppressWarnings("unchecked")
 public class RequestFieldInfo<V> {
 
-  private static final Logger LOG = Logger.getLogger(RequestFieldInfo.class);
+  private static final Logger LOG = LogManager.getLogger(RequestFieldInfo.class);
   private RequestField annotation;
   private boolean customPojoField;
   private ThrowingFunction<Object, V> defaultValueFunction;

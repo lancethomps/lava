@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.util.function.Function;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -15,7 +16,7 @@ import com.lancethomps.lava.common.date.Dates;
 
 public class TemporalAccessorDeserializer<T extends TemporalAccessor> extends StdScalarDeserializer<T> {
 
-  private static final Logger LOG = Logger.getLogger(TemporalAccessorDeserializer.class);
+  private static final Logger LOG = LogManager.getLogger(TemporalAccessorDeserializer.class);
 
   private static final long serialVersionUID = -8299359543429836350L;
   private final boolean defaultAsInt;

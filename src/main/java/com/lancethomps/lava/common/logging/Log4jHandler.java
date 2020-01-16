@@ -6,7 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.Checks;
@@ -50,7 +51,7 @@ public class Log4jHandler extends Handler {
   @Override
   public void publish(LogRecord record) {
     Logger log =
-      Logger.getLogger(Checks.defaultIfNull(Checks.defaultIfNull(record.getLoggerName(), record.getSourceClassName()), getClass().getName()));
+      LogManager.getLogger(Checks.defaultIfNull(Checks.defaultIfNull(record.getLoggerName(), record.getSourceClassName()), getClass().getName()));
     Level level = record.getLevel();
     String message = formatter.formatMessage(record);
 

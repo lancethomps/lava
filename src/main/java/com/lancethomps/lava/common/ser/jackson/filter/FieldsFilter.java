@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -33,7 +34,7 @@ public class FieldsFilter extends SimpleBeanPropertyFilter implements Serializab
 
   private static final Set<String> EMPTY_FIELD_LIST = Collections.unmodifiableSet(new HashSet<String>());
 
-  private static final Logger LOG = Logger.getLogger(FieldsFilter.class);
+  private static final Logger LOG = LogManager.getLogger(FieldsFilter.class);
   private static final long serialVersionUID = 1L;
   private static Set<String> mandatoryFields = Sets.newHashSet(
     "allDataReturned",

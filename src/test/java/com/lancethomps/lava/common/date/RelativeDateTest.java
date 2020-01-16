@@ -10,7 +10,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.hamcrest.collection.IsIterableContainingInOrder;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,7 +23,7 @@ import com.lancethomps.lava.common.logging.Logs;
 
 public class RelativeDateTest extends BaseTest {
 
-  private static final Logger LOG = Logger.getLogger(RelativeDateTest.class);
+  private static final Logger LOG = LogManager.getLogger(RelativeDateTest.class);
 
   @Test
   public void testRandomRelativeDate() throws Exception {

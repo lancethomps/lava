@@ -37,7 +37,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MemberUsageScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -69,7 +70,7 @@ public class Reflections {
 
   private static final Map<String, AccessibleObject> INFO_CACHE = new FastHashMap<>(true);
 
-  private static final Logger LOG = Logger.getLogger(Reflections.class);
+  private static final Logger LOG = LogManager.getLogger(Reflections.class);
 
   private static final int MAX_TRIED_SUPERS = 5;
 

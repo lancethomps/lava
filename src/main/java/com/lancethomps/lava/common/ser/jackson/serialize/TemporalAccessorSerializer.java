@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.time.temporal.TemporalAccessor;
 import java.util.function.Function;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -13,7 +14,7 @@ import com.lancethomps.lava.common.logging.Logs;
 
 public class TemporalAccessorSerializer<T extends TemporalAccessor> extends StdScalarSerializer<T> {
 
-  private static final Logger LOG = Logger.getLogger(TemporalAccessorSerializer.class);
+  private static final Logger LOG = LogManager.getLogger(TemporalAccessorSerializer.class);
 
   private static final long serialVersionUID = -5999799118350670886L;
 

@@ -24,7 +24,8 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.Checks;
@@ -37,7 +38,7 @@ import com.opencsv.CSVParser;
 
 public class FileParser<T> {
 
-  private static final Logger LOG = Logger.getLogger(FileParser.class);
+  private static final Logger LOG = LogManager.getLogger(FileParser.class);
   @Nonnull
   private final FileParserOptions options;
   private String contents;

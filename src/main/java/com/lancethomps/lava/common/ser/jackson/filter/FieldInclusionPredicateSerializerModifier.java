@@ -3,7 +3,8 @@ package com.lancethomps.lava.common.ser.jackson.filter;
 import java.util.Map;
 import java.util.function.BiPredicate;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
@@ -18,7 +19,7 @@ import com.lancethomps.lava.common.logging.Logs;
 
 public class FieldInclusionPredicateSerializerModifier extends BeanSerializerModifier {
 
-  private static final Logger LOG = Logger.getLogger(FieldInclusionPredicateSerializerModifier.class);
+  private static final Logger LOG = LogManager.getLogger(FieldInclusionPredicateSerializerModifier.class);
 
   private final Map<Class<?>, BiPredicate<Object, Object>> predicateByType;
 

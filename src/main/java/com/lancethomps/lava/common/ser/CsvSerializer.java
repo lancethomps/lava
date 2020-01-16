@@ -31,7 +31,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -66,7 +67,7 @@ public class CsvSerializer {
 
   public static final String TR = "<tr class=\"%s\">%s</tr>";
 
-  private static final Logger LOG = Logger.getLogger(CsvSerializer.class);
+  private static final Logger LOG = LogManager.getLogger(CsvSerializer.class);
 
   private static final Set<String> SIMPLE_OUTPUT_CLASSES = Sets.newHashSet();
 

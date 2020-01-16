@@ -8,7 +8,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.file.FileUtil;
 import com.lancethomps.lava.common.lambda.ThrowingConsumer;
@@ -19,7 +20,7 @@ public class Processes {
 
   public static final long DEFAULT_TIMEOUT_SECONDS = 60;
 
-  private static final Logger LOG = Logger.getLogger(Processes.class);
+  private static final Logger LOG = LogManager.getLogger(Processes.class);
 
   public static ProcessResult run(@Nonnull List<String> commands) {
     return run(commands, DEFAULT_TIMEOUT_SECONDS);

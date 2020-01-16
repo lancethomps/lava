@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -18,7 +19,7 @@ import com.lancethomps.lava.common.ser.Serializer;
 
 public class CsvPropertyFilter extends SimpleBeanPropertyFilter {
 
-  private static final Logger LOG = Logger.getLogger(CsvPropertyFilter.class);
+  private static final Logger LOG = LogManager.getLogger(CsvPropertyFilter.class);
 
   @Override
   public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {

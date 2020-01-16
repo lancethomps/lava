@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns="http://logging.apache.org/log4j/2.0/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://logging.apache.org/log4j/2.0/config https://raw.githubusercontent.com/apache/logging-log4j2/master/log4j-core/src/main/resources/Log4j-config.xsd"
+               status="WARN">
+  <Appenders>
+    <Console name="CONSOLE" target="SYSTEM_OUT">
+      <!-- <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}\t[%t]\t%p\t%c\t%m%n"/> -->
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%p] (%t) [%c] %m%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="com.mchange" level="INFO"/>
+    <Logger name="org" level="INFO"/>
+    <Logger name="org.apache.commons.jcs.auxiliary.disk.jdbc.JDBCDiskCacheFactory" level="FATAL"/>
+    <Logger name="com.lancethomps.lava" level="DEBUG"/>
+    <Logger name="com.lancethomps.lava.common.date" level="INFO"/>
+    <Root level="DEBUG">
+      <AppenderRef ref="CONSOLE"/>
+    </Root>
+  </Loggers>
+</Configuration>

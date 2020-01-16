@@ -3,7 +3,8 @@ package com.lancethomps.lava.common.ser.jackson.deserialize;
 import java.io.IOException;
 import java.time.ZoneOffset;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -15,7 +16,7 @@ import com.lancethomps.lava.common.logging.Logs;
 @SuppressWarnings("serial")
 public class ZoneOffsetDeserializer extends StdScalarDeserializer<ZoneOffset> {
 
-  private static final Logger LOG = Logger.getLogger(ZoneOffsetDeserializer.class);
+  private static final Logger LOG = LogManager.getLogger(ZoneOffsetDeserializer.class);
 
   public ZoneOffsetDeserializer() {
     super(ZoneOffset.class);

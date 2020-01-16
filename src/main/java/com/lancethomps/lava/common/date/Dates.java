@@ -52,7 +52,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.Enums;
@@ -117,7 +118,7 @@ public class Dates {
       .appendPattern("'Z'")
       .toFormatter();
   public static final LocalDate JULIAN_BASE = LocalDate.of(1950, 01, 01);
-  public static final Logger LOG = Logger.getLogger(Dates.class);
+  public static final Logger LOG = LogManager.getLogger(Dates.class);
   public static final DateTimeFormatter LOG4J_FORMAT = formatterFromPattern("yyyy-MM-dd HH:mm:ss,SSS");
   public static final LocalDate MAX_DATE = LocalDate.of(2222, 12, 31);
   public static final int MAX_DAY_INT = 22221231;

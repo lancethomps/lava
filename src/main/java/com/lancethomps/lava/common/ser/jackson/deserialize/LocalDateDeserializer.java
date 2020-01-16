@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -19,7 +20,7 @@ public class LocalDateDeserializer extends StdScalarDeserializer<LocalDate> {
 
   public static final int MAX_NON_MILLIS_DATE = 22221231;
 
-  private static final Logger LOG = Logger.getLogger(LocalDateDeserializer.class);
+  private static final Logger LOG = LogManager.getLogger(LocalDateDeserializer.class);
 
   private static final long serialVersionUID = -6356065359683945861L;
 

@@ -80,7 +80,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.net.util.Base64;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFDataFormatter;
 import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.usermodel.Cell;
@@ -162,7 +163,7 @@ public class Serializer {
   public static final ObjectMapper JSON_MAPPER = SerializerFactory.getJsonMapper();
   public static final ObjectMapper JSON_OUTPUT_MAPPER = SerializerFactory.addNoopTyping(SerializerFactory.getJsonMapper(false));
   public static final Pattern LIST_KEY_REGEX = Pattern.compile("^(\\w+)\\[(\\d+|\\*)(?:\\**)]$");
-  public static final Logger LOG = Logger.getLogger(Serializer.class);
+  public static final Logger LOG = LogManager.getLogger(Serializer.class);
   @SuppressWarnings("PMD.LooseCoupling")
   public static final JavaType MAP_TYPE = JSON_MAPPER.getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class);
   public static final Pattern PATH_KEY_ARRAY_POS_REGEX = Pattern.compile("\\[\\d+\\]");

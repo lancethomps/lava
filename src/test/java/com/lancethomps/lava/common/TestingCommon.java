@@ -17,7 +17,8 @@ import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.jeasy.random.EasyRandomParameters;
 import org.jeasy.random.ObjectCreationException;
 import org.jeasy.random.api.ObjectFactory;
@@ -49,7 +50,7 @@ public class TestingCommon {
 
   public static final GenericAtomicTimerHandlingBean TIMERS = new GenericAtomicTimerHandlingBean();
 
-  private static final Logger LOG = Logger.getLogger(TestingCommon.class);
+  private static final Logger LOG = LogManager.getLogger(TestingCommon.class);
 
   private static long waitDefaultIncrement = 100L;
 
