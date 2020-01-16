@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -39,7 +40,7 @@ public class Merges {
   public static final MergeConfig NO_OVERWRITE_MERGE_CONFIG_WITH_ARRAY_SKIPPING = getNoOverwriteMergeConfigWithArraySkipping().disableModifications();
   public static final MergeConfig OVERWRITE_MERGE_CONFIG = getOverwriteMergeConfig().disableModifications();
   private static final MergeConfig DEFAULT_MERGE_CONFIG = getDefaultMergeConfig().disableModifications();
-  private static final Logger LOG = Logger.getLogger(Merges.class);
+  private static final Logger LOG = LogManager.getLogger(Merges.class);
 
   static {
     ignoreTypesWhenMerging(ObjectMapper.class);

@@ -16,7 +16,8 @@ import java.util.zip.GZIPOutputStream;
 import java.util.zip.InflaterOutputStream;
 
 import org.apache.commons.net.util.Base64;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.logging.Logs;
 
@@ -27,7 +28,7 @@ public class CompressionUtil {
 
   private static final LZ4FastDecompressor DECOMPRESSOR = LZ4Factory.fastestInstance().fastDecompressor();
 
-  private static final Logger LOG = Logger.getLogger(CompressionUtil.class);
+  private static final Logger LOG = LogManager.getLogger(CompressionUtil.class);
 
   public static byte[] bytesToBase64(byte[] bytes) {
     return Base64.encodeBase64(bytes, true);

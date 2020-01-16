@@ -23,7 +23,8 @@ import javax.annotation.Nonnull;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.file.FileUtil;
 import com.lancethomps.lava.common.lambda.Lambdas;
@@ -33,7 +34,7 @@ public class OsUtil {
 
   private static final List<String> GIT_COMMIT_COMMAND = Collections.unmodifiableList(Arrays.asList("git", "rev-parse", "HEAD"));
 
-  private static final Logger LOG = Logger.getLogger(OsUtil.class);
+  private static final Logger LOG = LogManager.getLogger(OsUtil.class);
 
   private static final String WINDOWS_PROGRAM_FILES = "C:\\Program Files (x86)";
 

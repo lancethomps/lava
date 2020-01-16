@@ -2,7 +2,8 @@ package com.lancethomps.lava.common.ser.jackson;
 
 import static com.lancethomps.lava.common.logging.Logs.logWarn;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
@@ -19,7 +20,7 @@ import com.lancethomps.lava.common.ser.jackson.deserialize.EnumDeserializerWithC
 
 public class CustomBeanDeserializerModifier extends BeanDeserializerModifier {
 
-  private static final Logger LOG = Logger.getLogger(CustomBeanDeserializerModifier.class);
+  private static final Logger LOG = LogManager.getLogger(CustomBeanDeserializerModifier.class);
 
   @Override
   public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {

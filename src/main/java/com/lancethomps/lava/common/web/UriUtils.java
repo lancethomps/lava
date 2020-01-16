@@ -25,7 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.ImmutableMap;
 import com.lancethomps.lava.common.logging.Logs;
@@ -34,7 +35,7 @@ public class UriUtils {
 
   public static final Pattern PAGE_FILE_PATTERN = Pattern.compile("/sites/([^/]+)/(.*?)([.]page)?$");
   public static final Pattern URI_DOMAIN_PATTERN = Pattern.compile("^([\\w.-]+:)?//([^/]*)/?.*");
-  private static final Logger LOG = Logger.getLogger(UriUtils.class);
+  private static final Logger LOG = LogManager.getLogger(UriUtils.class);
   private static final Pattern PAGE_LINK_URL_PATTERN = Pattern.compile("^\\$PAGE_LINK\\[(.*)\\]$");
   private static final Pattern PAGE_URL_PATTERN = Pattern.compile("^/([^/]+)/?(.*?)([.]page)?$");
   private static Map<String, Integer> schemeToPortMappings = new HashMap<>(ImmutableMap.of(

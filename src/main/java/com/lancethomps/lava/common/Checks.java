@@ -19,7 +19,8 @@ import javax.script.ScriptException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 
 import com.google.common.collect.Iterables;
@@ -40,7 +41,7 @@ public class Checks {
 
   public static final Pair<Boolean, Pattern> SUCCESS_PAIR_REGEX = Pair.of(true, null);
 
-  private static final Logger LOG = Logger.getLogger(Checks.class);
+  private static final Logger LOG = LogManager.getLogger(Checks.class);
 
   public static void assertFalse(final boolean test) throws AssertionError {
     assertFalse(test, null);

@@ -10,7 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -24,7 +25,7 @@ import com.lancethomps.lava.common.string.StringUtil;
 
 public class CustomDeserializationProblemHandler extends DeserializationProblemHandler {
 
-  private static final Logger LOG = Logger.getLogger(CustomDeserializationProblemHandler.class);
+  private static final Logger LOG = LogManager.getLogger(CustomDeserializationProblemHandler.class);
   private static Set<Class<?>> ignoreMissingInstantiators;
   private static Set<String> ignorePackages = new HashSet<>();
   private static Set<String> ignoreProperties = new HashSet<>();

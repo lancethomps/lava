@@ -10,7 +10,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.logging.Logs;
 
@@ -23,7 +24,7 @@ public class Enums {
 
   public static final Set<Class<?>> THROWING_ENUMS = new HashSet<>();
 
-  private static final Logger LOG = Logger.getLogger(Enums.class);
+  private static final Logger LOG = LogManager.getLogger(Enums.class);
 
   public static <T extends Enum<?>> Map<String, Enum<?>> createStringToTypeMap(Class<T> type) {
     return createStringToTypeMap(type, null);

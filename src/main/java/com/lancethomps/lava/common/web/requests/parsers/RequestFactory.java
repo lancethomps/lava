@@ -53,7 +53,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.util.ClassUtil;
@@ -99,7 +100,7 @@ public class RequestFactory {
   private static final Set<Class<?>> ALLOW_JSON_PARAM_TYPES = Sets.newConcurrentHashSet();
   private static final FastHashMap<Class<?>, ThrowingBiFunction<Map<String, String[]>, ?, ?>> DEFAULT_POST_PROCESS_METHODS = new FastHashMap<>(true);
   private static final Map<String, RequestParserInfo> INFO_CACHE = new HashMap<>();
-  private static final Logger LOG = Logger.getLogger(RequestFactory.class);
+  private static final Logger LOG = LogManager.getLogger(RequestFactory.class);
   private static final FastHashMap<Class<?>, ThrowingBiFunction<Map<String, String[]>, ?, ?>> POST_PROCESS_METHODS = new FastHashMap<>(true);
   private static final FastHashMap<String, ThrowingBiFunction<Map<String, String[]>, String, ?>> PROCESS_METHODS = new FastHashMap<>(
     ImmutableMap.<String, ThrowingBiFunction<Map<String, String[]>, String, ?>>builder()

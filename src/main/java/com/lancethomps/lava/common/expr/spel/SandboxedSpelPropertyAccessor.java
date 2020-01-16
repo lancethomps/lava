@@ -1,6 +1,7 @@
 package com.lancethomps.lava.common.expr.spel;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
@@ -11,7 +12,7 @@ import com.lancethomps.lava.common.logging.Logs;
 
 public class SandboxedSpelPropertyAccessor implements PropertyAccessor {
 
-  private static final Logger LOG = Logger.getLogger(SandboxedContextConfig.class);
+  private static final Logger LOG = LogManager.getLogger(SandboxedContextConfig.class);
 
   private SandboxedContextConfig config;
 

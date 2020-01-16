@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -35,7 +36,7 @@ import com.opencsv.CSVParser;
 public class ExcelFactory {
 
   private static final String DEFAULT_SHEET_NAME = "data";
-  private static final Logger LOG = Logger.getLogger(ExcelFactory.class);
+  private static final Logger LOG = LogManager.getLogger(ExcelFactory.class);
   private static final int MAX_CELL_CHARS = 32767;
   private static String defaultXlsxBase64;
   private static boolean hasDefaultXlsx = true;

@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -45,7 +46,7 @@ public class RequestThrottle implements HandlerInterceptor {
 
   private static final String IP_PREFIX = "ip.";
 
-  private static final Logger LOG = Logger.getLogger(RequestThrottle.class);
+  private static final Logger LOG = LogManager.getLogger(RequestThrottle.class);
 
   private static final String THROTTLED_USER_KEY = "_zzThrottledUserId";
 

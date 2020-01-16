@@ -22,8 +22,9 @@ import javax.script.ScriptException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -65,7 +66,7 @@ public class ExprFactory {
     new SpelExpressionParser(new SpelParserConfiguration(null, null, true, true, Integer.MAX_VALUE));
   public static final Pattern SPEL_REGEX = Pattern.compile("#\\{(.*)\\}$");
   private static final SimpleLruCache<String, Object> CACHED_EXPRESSIONS = new SimpleLruCache<>(250);
-  private static final Logger LOG = Logger.getLogger(ExprFactory.class);
+  private static final Logger LOG = LogManager.getLogger(ExprFactory.class);
   private static final StandardEvaluationContext NON_SANDBOXED_CONTEXT;
   private static final StandardTypeLocator NON_SANDBOXED_SPEL_TYPE_LOCATOR = registerImports(
     registerDefaultSpringImports(new NonSandboxedSpelTypeLocator()),

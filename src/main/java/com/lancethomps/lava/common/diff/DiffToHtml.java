@@ -32,7 +32,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -88,7 +89,7 @@ public class DiffToHtml {
 
   private static final Pattern INS_REGEX = Pattern.compile("(<ins[^>]*>((.|\\n)*?)<\\/ins>)");
 
-  private static final Logger LOG = Logger.getLogger(DiffToHtml.class);
+  private static final Logger LOG = LogManager.getLogger(DiffToHtml.class);
 
   private static final MustacheFactory MUSTACHE = new DefaultMustacheFactory();
   private static final Pattern NEW_FILE_MODE = Pattern.compile("^new file mode (\\d{6})");

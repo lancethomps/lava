@@ -21,8 +21,9 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
@@ -44,7 +45,7 @@ public class ScriptEngines {
   private static final Timer JS_COMPILE_TIMER =
     StatusMonitor.timer(ExprFactory.METRIC_REGISTRY, ExprParser.JS.name(), ExprFactory.METRIC_REGISTRY_COMPILE);
   private static final Timer JS_EVAL_TIMER = StatusMonitor.timer(ExprFactory.METRIC_REGISTRY, ExprParser.JS.name(), ExprFactory.METRIC_REGISTRY_EVAL);
-  private static final Logger LOG = Logger.getLogger(ScriptEngines.class);
+  private static final Logger LOG = LogManager.getLogger(ScriptEngines.class);
   private static final Timer PY_COMPILE_TIMER =
     StatusMonitor.timer(ExprFactory.METRIC_REGISTRY, ExprParser.PY.name(), ExprFactory.METRIC_REGISTRY_COMPILE);
   private static final Timer PY_EVAL_TIMER = StatusMonitor.timer(ExprFactory.METRIC_REGISTRY, ExprParser.PY.name(), ExprFactory.METRIC_REGISTRY_EVAL);

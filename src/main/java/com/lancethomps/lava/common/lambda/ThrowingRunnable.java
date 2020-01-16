@@ -1,6 +1,7 @@
 package com.lancethomps.lava.common.lambda;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.Exceptions;
 import com.lancethomps.lava.common.logging.Logs;
@@ -32,7 +33,7 @@ public interface ThrowingRunnable {
       try {
         run();
       } catch (Exception e) {
-        Logs.logError(Logger.getLogger(getClass()), e, "Sneaky throw");
+        Logs.logError(LogManager.getLogger(getClass()), e, "Sneaky throw");
         Exceptions.sneakyThrow(e);
       }
     };

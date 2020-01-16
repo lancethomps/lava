@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.util.WebUtils;
 
 import com.lancethomps.lava.common.Checks;
@@ -40,7 +41,7 @@ import com.lancethomps.lava.common.web.config.ResponseHeaderConfig;
 
 public class RequestProcessingManager extends AbstractFileListener {
 
-  private static final Logger LOG = Logger.getLogger(RequestProcessingManager.class);
+  private static final Logger LOG = LogManager.getLogger(RequestProcessingManager.class);
 
   private final List<RequestProcessingConfig> configs = new CopyOnWriteArrayList<>();
 

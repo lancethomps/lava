@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.BiPredicate;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -23,7 +24,7 @@ import com.lancethomps.lava.common.ser.jackson.JacksonUtils;
 
 public class FieldInclusionPredicateCollectionSerializer extends CollectionSerializer {
 
-  private static final Logger LOG = Logger.getLogger(FieldInclusionPredicateCollectionSerializer.class);
+  private static final Logger LOG = LogManager.getLogger(FieldInclusionPredicateCollectionSerializer.class);
 
   private static final long serialVersionUID = 5951376033544930044L;
 

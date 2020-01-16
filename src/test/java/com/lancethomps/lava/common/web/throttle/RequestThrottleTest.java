@@ -6,7 +6,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class RequestThrottleTest extends BaseSpringTest {
 
   private static final String DEFAULT_URI = "/throttle-test";
 
-  private static final Logger LOG = Logger.getLogger(RequestThrottleTest.class);
+  private static final Logger LOG = LogManager.getLogger(RequestThrottleTest.class);
 
   private static final String WHITE_LISTED_URI = "/throttle-white-listed";
 

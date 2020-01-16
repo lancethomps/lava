@@ -3,14 +3,15 @@ package com.lancethomps.lava.common.time;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.logging.Logs;
 
 public class Stopwatch extends StopWatch {
 
-  private static final Logger LOG = Logger.getLogger(Stopwatch.class);
+  private static final Logger LOG = LogManager.getLogger(Stopwatch.class);
   private final Level level;
   private long addTimeNanos;
 

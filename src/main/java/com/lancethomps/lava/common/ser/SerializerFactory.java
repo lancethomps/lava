@@ -38,7 +38,8 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.util.ReflectionUtils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
@@ -133,7 +134,7 @@ public class SerializerFactory {
   public static final String CSV_FILTER = "csvFilter";
 
   public static final String DATE_MODULE_ID = "WTPDateModule";
-  private static final Logger LOG = Logger.getLogger(SerializerFactory.class);
+  private static final Logger LOG = LogManager.getLogger(SerializerFactory.class);
   private static final FastHashMap<String, ObjectMapper> OBJECT_MAPPER_CACHE = new FastHashMap<>();
   private static final List<ObjectMapper> REGISTERED_MAPPERS = new ArrayList<>();
   private static final List<Consumer<ObjectMapper>> REGISTERED_MODIFIERS = new ArrayList<>();

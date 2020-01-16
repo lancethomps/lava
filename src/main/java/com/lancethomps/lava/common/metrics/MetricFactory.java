@@ -11,14 +11,15 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.lambda.Lambdas;
 
 public final class MetricFactory {
 
-  private static final Logger LOG = Logger.getLogger(MetricFactory.class);
+  private static final Logger LOG = LogManager.getLogger(MetricFactory.class);
   private static DependencyTreeConfigs dependecyTreeConfigs;
   private static Map<String, HierarchyTree> parsedDependencyTree;
 

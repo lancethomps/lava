@@ -9,7 +9,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.expression.AccessException;
 
 import com.lancethomps.lava.common.Checks;
@@ -19,7 +20,7 @@ import com.lancethomps.lava.common.logging.Logs;
 
 public class SandboxedContextConfig extends SimpleDomainObject {
 
-  private static final Logger LOG = Logger.getLogger(SandboxedContextConfig.class);
+  private static final Logger LOG = LogManager.getLogger(SandboxedContextConfig.class);
   private static final long serialVersionUID = -7384574349724321652L;
   private final Set<String> blackList;
 

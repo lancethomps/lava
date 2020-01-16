@@ -7,7 +7,7 @@ import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class SavedErrorMessage {
 

@@ -17,7 +17,8 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -52,7 +53,7 @@ public class Compare {
 
   private static final CompareConfig DEFAULT_COMPARE_CONFIG = new CompareConfig().setDeep(true);
 
-  private static final Logger LOG = Logger.getLogger(Compare.class);
+  private static final Logger LOG = LogManager.getLogger(Compare.class);
 
   public static CompareResult compare(@Nullable final Object original, @Nullable final Object revised) {
     return compare(original, revised, null);

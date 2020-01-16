@@ -2,23 +2,27 @@ package com.lancethomps.lava.common;
 
 import java.util.function.Consumer;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 
-public class FailOnLogErrorAppender extends AppenderSkeleton {
+import com.google.common.base.Preconditions;
+import com.lancethomps.lava.common.logging.Logs;
+
+public class FailOnLogErrorAppender extends AbstractAppender {
 
   private static FailOnLogErrorAppender attached;
-
-  private final Consumer<LoggingEvent> consumer;
+  private final Consumer<LogEvent> consumer;
 
   public FailOnLogErrorAppender() {
     this(null);
   }
 
-  public FailOnLogErrorAppender(Consumer<LoggingEvent> consumer) {
-    super();
+  public FailOnLogErrorAppender(Consumer<LogEvent> consumer) {
+    super("FailOnLogError", null, PatternLayout.createDefaultLayout(), true, Property.EMPTY_ARRAY);
     this.consumer = consumer;
   }
 
@@ -26,19 +30,23 @@ public class FailOnLogErrorAppender extends AppenderSkeleton {
     attach(null);
   }
 
-  public static synchronized void attach(Consumer<LoggingEvent> consumer) {
-    assert attached == null;
+  public static synchronized void attach(Consumer<LogEvent> consumer) {
+    Preconditions.checkArgument(attached == null);
     attached = new FailOnLogErrorAppender(consumer);
-    Logger.getRootLogger().addAppender(attached);
+    LoggerContext context = Logs.getLoggerContext();
+    context.getConfiguration().addAppender(attached);
+    context.getConfiguration().getRootLogger().addAppender(attached, null, null);
+    context.updateLoggers();
   }
 
   public static synchronized void detach() {
-    assert attached != null;
-    Logger.getRootLogger().removeAppender(attached);
+    Preconditions.checkArgument(attached != null);
+    LoggerContext context = Logs.getLoggerContext();
+    context.getConfiguration().getRootLogger().removeAppender(attached.getName());
   }
 
   @Override
-  public void append(LoggingEvent event) {
+  public void append(LogEvent event) {
     if (event.getLevel() == Level.ERROR) {
       if (consumer != null) {
         consumer.accept(event);
@@ -46,15 +54,6 @@ public class FailOnLogErrorAppender extends AppenderSkeleton {
         throw new AssertionError("logged an error: " + event.getMessage());
       }
     }
-  }
-
-  @Override
-  public void close() {
-  }
-
-  @Override
-  public boolean requiresLayout() {
-    return false;
   }
 
 }

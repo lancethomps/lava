@@ -3,7 +3,8 @@ package com.lancethomps.lava.common.ser.jackson.deserialize;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -13,7 +14,7 @@ import com.lancethomps.lava.common.logging.Logs;
 @SuppressWarnings("serial")
 public class PatternDeserializer extends StdScalarDeserializer<Pattern> {
 
-  private static final Logger LOG = Logger.getLogger(PatternDeserializer.class);
+  private static final Logger LOG = LogManager.getLogger(PatternDeserializer.class);
 
   public PatternDeserializer() {
     super(Pattern.class);

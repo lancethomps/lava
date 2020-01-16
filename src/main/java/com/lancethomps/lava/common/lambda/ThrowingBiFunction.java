@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.lancethomps.lava.common.Exceptions;
 import com.lancethomps.lava.common.logging.Logs;
@@ -32,7 +32,7 @@ public interface ThrowingBiFunction<T, U, R> {
       try {
         return apply(t, u);
       } catch (Exception e) {
-        Logs.logError(Logger.getLogger(getClass()), e, "Sneaky throw");
+        Logs.logError(LogManager.getLogger(getClass()), e, "Sneaky throw");
         return Exceptions.sneakyThrow(e);
       }
     };

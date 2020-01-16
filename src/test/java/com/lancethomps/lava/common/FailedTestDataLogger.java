@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
@@ -16,7 +17,7 @@ import com.lancethomps.lava.common.ser.Serializer;
 
 public class FailedTestDataLogger extends TestWatcher {
 
-  private static final Logger LOG = Logger.getLogger(FailedTestDataLogger.class);
+  private static final Logger LOG = LogManager.getLogger(FailedTestDataLogger.class);
 
   private final Map<Object, Object> data = new LinkedHashMap<>();
 

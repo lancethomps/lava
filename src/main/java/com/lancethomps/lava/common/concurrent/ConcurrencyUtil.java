@@ -8,7 +8,8 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.Collect;
 import com.lancethomps.lava.common.lambda.ThrowingConsumer;
@@ -18,7 +19,7 @@ import com.lancethomps.lava.common.logging.Logs;
 
 public class ConcurrencyUtil {
 
-  private static final Logger LOG = Logger.getLogger(ConcurrencyUtil.class);
+  private static final Logger LOG = LogManager.getLogger(ConcurrencyUtil.class);
 
   public static <T, K, V> T execWithMax(
     Map<K, Object> synchObjects,

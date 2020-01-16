@@ -11,7 +11,8 @@ import org.apache.commons.jcs.admin.JCSAdminBean;
 import org.apache.commons.jcs.engine.control.CompositeCache;
 import org.apache.commons.jcs.engine.control.CompositeCacheManager;
 import org.apache.commons.jcs.engine.stats.behavior.ICacheStats;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.logging.Logs;
 
@@ -22,7 +23,7 @@ import io.dropwizard.metrics5.MetricSet;
 
 public class JcsCacheMetricSet implements MetricSet {
 
-  private static final Logger LOG = Logger.getLogger(JcsCacheMetricSet.class);
+  private static final Logger LOG = LogManager.getLogger(JcsCacheMetricSet.class);
 
   public static CacheRegionInfo getCacheRegion(String cacheName) {
     if (cacheName != null) {

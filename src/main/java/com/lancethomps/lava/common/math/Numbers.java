@@ -7,14 +7,15 @@ import java.util.Collection;
 
 import javax.annotation.Nonnull;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.logging.Logs;
 
 public class Numbers {
 
-  private static final Logger LOG = Logger.getLogger(Numbers.class);
+  private static final Logger LOG = LogManager.getLogger(Numbers.class);
 
   public static BigDecimal calculateAverage(@Nonnull Collection<BigDecimal> values) {
     return values.isEmpty() ? null :

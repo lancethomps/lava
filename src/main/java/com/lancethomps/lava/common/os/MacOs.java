@@ -11,14 +11,15 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
 import com.lancethomps.lava.common.logging.Logs;
 
 public class MacOs {
 
-  private static final Logger LOG = Logger.getLogger(MacOs.class);
+  private static final Logger LOG = LogManager.getLogger(MacOs.class);
 
   private static final String PASSWORD_GUI_PROMPT_MESSAGE = "Please enter your internet password for your account '%s' on the domain '%s'.\n\n" +
     "It will then be added to your keychain for future use (and this prompt will be skipped). You may delete or edit it later through the Keychain " +

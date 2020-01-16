@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lancethomps.lava.common.Checks;
@@ -53,7 +54,7 @@ public final class StatusMonitor {
   public static final String HEALTHY = "HEALTHY";
   public static final String PROFILING = "profiling";
   public static final MetricRegistry PROFILING_REGISTRY = registry(PROFILING);
-  private static final Logger LOG = Logger.getLogger(StatusMonitor.class);
+  private static final Logger LOG = LogManager.getLogger(StatusMonitor.class);
   private static Slf4jReporter logReporter;
 
   static {

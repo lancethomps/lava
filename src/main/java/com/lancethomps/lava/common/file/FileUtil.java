@@ -88,7 +88,8 @@ import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.google.common.collect.Lists;
@@ -124,7 +125,7 @@ public class FileUtil {
 
   private static final Pattern IMPORTS_REGEX = Pattern.compile("^\\/\\*\\s*import:(.*?)\\s*\\*\\/$", Pattern.MULTILINE);
 
-  private static final Logger LOG = Logger.getLogger(FileUtil.class);
+  private static final Logger LOG = LogManager.getLogger(FileUtil.class);
 
   private static final Pattern LOG4J_LOG =
     compile("^(\\d{4}-\\d{2}-\\d{2})\\s+(\\d{2}:\\d{2}:\\d{2},\\d{3})\\s+\\((.*?)\\)\\s+([^ ]*)\\s+\\[(.*?)\\]\\s+(.*)$");

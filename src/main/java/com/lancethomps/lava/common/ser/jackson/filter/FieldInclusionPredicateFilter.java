@@ -4,7 +4,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiPredicate;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -16,7 +17,7 @@ import com.lancethomps.lava.common.ser.jackson.JacksonUtils;
 
 public class FieldInclusionPredicateFilter extends SimpleBeanPropertyFilter {
 
-  private static final Logger LOG = Logger.getLogger(FieldInclusionPredicateFilter.class);
+  private static final Logger LOG = LogManager.getLogger(FieldInclusionPredicateFilter.class);
 
   private final Map<Class<?>, BiPredicate<Object, Object>> predicateByType;
 

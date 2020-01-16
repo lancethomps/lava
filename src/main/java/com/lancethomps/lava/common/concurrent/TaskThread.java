@@ -1,12 +1,13 @@
 package com.lancethomps.lava.common.concurrent;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.logging.Logs;
 
 public class TaskThread extends Thread {
 
-  private static final Logger LOG = Logger.getLogger(TaskThread.class);
+  private static final Logger LOG = LogManager.getLogger(TaskThread.class);
 
   private final long creationTime = System.currentTimeMillis();
 

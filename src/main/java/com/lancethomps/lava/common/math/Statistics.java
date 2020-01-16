@@ -11,7 +11,8 @@ import javax.annotation.Nonnull;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.correlation.Covariance;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lancethomps.lava.common.logging.Logs;
 
@@ -21,7 +22,7 @@ public class Statistics {
 
   private static final Covariance COVARIANCE = new Covariance();
 
-  private static final Logger LOG = Logger.getLogger(Statistics.class);
+  private static final Logger LOG = LogManager.getLogger(Statistics.class);
 
   public static BigDecimal calculateBattingAverage(double[] portReturns, double[] benchReturns) {
     BigDecimal battingAvg = null;
