@@ -732,6 +732,16 @@ public final class Logs {
     }
   }
 
+  public static void setLogLevel(Logger logger, Level level) {
+    setLogLevel(logger.getName(), level);
+  }
+
+  public static void setLogLevel(String name, Level level) {
+    LoggerContext context = getLoggerContext();
+    context.getConfiguration().getLoggerConfig(name).setLevel(level);
+    context.updateLoggers();
+  }
+
   public static LoggerContext getLoggerContext() {
     return (LoggerContext) LogManager.getContext(false);
   }
