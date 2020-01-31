@@ -24,13 +24,18 @@
     <property name="max" value="3000"/>
   </module>
 
+  <module name="LineLength">
+    <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
+    <property name="max" value="201"/>
+  </module>
+
   <module name="TreeWalker">
     <property name="tabWidth" value="2"/>
 
     <module name="SuppressionCommentFilter">
       <property name="offCommentFormat" value="CHECKSTYLE\.OFF\: ([\w\|\.\*]+)"/>
       <property name="onCommentFormat" value="CHECKSTYLE\.ON\: ([\w\|\.\*]+)"/>
-      <property name="checkFormat" value="$1"/>
+      <property name="idFormat" value="$1"/>
     </module>
 
     <module name="AvoidStarImport"/>
@@ -90,10 +95,6 @@
     <module name="JavadocVariable">
       <message key="javadoc.missing" value="Missing a Javadoc variable comment - use JAutodoc or supply manually."/>
     </module>-->
-    <module name="LineLength">
-      <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
-      <property name="max" value="201"/>
-    </module>
     <module name="LocalFinalVariableName"/>
     <module name="LocalVariableName">
       <property name="id" value="LocalVariableNameCase"/>
