@@ -1,0 +1,12 @@
+[
+  {
+    "description": "Single Line Value",
+    "key": "KEY-123",
+    "lastColumn": "lastColumn"
+  },
+  {
+    "description": "Multi Line Value\n\n# with potential comment prefix",
+    "key": "KEY-456",
+    "lastColumn": "lastColumn"
+  }
+]

@@ -1744,7 +1744,7 @@ public class Serializer {
     Pattern onlySepsRegex = Pattern.compile("^" + Pattern.quote(String.valueOf(parser.getSeparator())) + "+$");
     String line = currentLine == null ? br.readLine() : currentLine;
     while ((line != null) && (parser.isPending() || isNotBlank(line)) && ((options.getMaxLines() == null) || (count < options.getMaxLines()))) {
-      if (line.startsWith("#") || (!options.testAllowBlanks() && onlySepsRegex.matcher(line).matches())) {
+      if (!parser.isPending() && (shouldSkipCsvLine(line, options) || (!options.testAllowBlanks() && onlySepsRegex.matcher(line).matches()))) {
         line = br.readLine();
         continue;
       }
@@ -2132,6 +2132,11 @@ public class Serializer {
         );
     }
     return src;
+  }
+
+  public static boolean shouldSkipCsvLine(String line, FileParserOptions options) {
+    return isNotEmpty(options.getRemoveLinesWithPrefixes()) && line != null &&
+        options.getRemoveLinesWithPrefixes().stream().anyMatch(line::startsWith);
   }
 
   public static <T> List<T> splitCsvAsListAndParseElements(final String csv, @Nonnull Class<T> type) {

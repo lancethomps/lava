@@ -1,0 +1,5 @@
+key,description,lastColumn
+KEY-123,Single Line Value,lastColumn
+KEY-456,"Multi Line Value
+
+# with potential comment prefix",lastColumn
