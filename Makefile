@@ -19,7 +19,7 @@ VERSION_MAJOR_NEXT := $(shell echo $$(($(VERSION_MAJOR) + 1)))
 VERSION_MINOR_NEXT := $(shell echo $$(($(VERSION_MINOR) + 1)))
 VERSION_PATCH_NEXT := $(shell echo $$(($(VERSION_PATCH) + 1)))
 
-.PHONY: echo-version
+.PHONY: echo-version echo-version-current
 .PHONY: deploy deploy-snapshot deploy-release
 
 ####
@@ -32,6 +32,9 @@ echo-version:
 	@echo "VERSION_MINOR                  -> $(VERSION_MINOR)"
 	@echo "VERSION_PATCH                  -> $(VERSION_PATCH)"
 	@echo "VERSION_PRERELEASE             -> $(VERSION_PRERELEASE)"
+
+echo-version-current:
+	@echo "$(VERSION_CURRENT)"
 
 version-bump-major:
 	@$(EXIT_ON_ERROR) mvn versions:set $(NO_GENERATE_BACKUP_POMS) -DnewVersion=$(VERSION_MAJOR_NEXT).0.0$(VERSION_PRERELEASE)

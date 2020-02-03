@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+################################################################### SETUP ########################################################################
+if ! _SCRIPT_DIR="$(get_script_dir "${BASH_SOURCE[0]}")"; then echo "Error while running: _SCRIPT_DIR=\"\$(get_script_dir \"${BASH_SOURCE[0]}\")\"" && exit 1; fi
+set -o errexit -o errtrace -o nounset
+##################################################################################################################################################
+
+function exiting() {
+  echo "Exiting..."
+  exit "${1:-1}"
+}
+function confirm() {
+  local response=""
+  read -r -p "${1:-Are you sure?}"$'\n'"[Y/n]> " response
+  case $response in
+    [yY][eE][sS] | [yY] | "") true ;;
+    [nN][oO] | [nN]) false ;;
+    *)
+      echo "Incorrect value entered... Try again."
+      confirm "$@"
+      ;;
+  esac
+}
+function confirm_with_auto() {
+  if test "${auto_confirm:-}" = 'true'; then
+    echo "AUTO CONFIRMED: ${1:-}"
+    return 0
+  fi
+  confirm "$@"
+}
+
+cd "$_SCRIPT_DIR"
+
+if git is-dirty; then
+  echo "Git repo is dirty!"
+  git status
+  exit 1
+fi
+
+make version-release
+VERS="v$(make echo-version-current)"
+
+if ! confirm_with_auto "Commit, tag, and deploy version ${VERS}?"; then
+  exiting 1
+fi
+
+git commit -m "$VERS" -- pom.xml
+git tag "$VERS"
+
+make deploy
+
+if ! confirm_with_auto "Push updates for version ${VERS}?"; then
+  exiting 1
+fi
+
+git push
+git push --tags
+
+if ! confirm_with_auto "Bump ${VERS} to next minor version?"; then
+  exiting 0
+fi
+
+make version-bump-minor
+make version-snapshot
+SNAPSHOT_VERS="v$(make echo-version-current)"
+
+if ! confirm_with_auto "Push updates for next minor version ${SNAPSHOT_VERS}?"; then
+  exiting 1
+fi
+
+git commit -m "Prepare next version" -- pom.xml
+git push
