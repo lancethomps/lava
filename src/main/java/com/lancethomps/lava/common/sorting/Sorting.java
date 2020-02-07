@@ -1,6 +1,8 @@
 package com.lancethomps.lava.common.sorting;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.Reflections;
 import com.lancethomps.lava.common.expr.ExprFactory;
+import com.lancethomps.lava.common.lambda.ThrowingSupplier;
 import com.lancethomps.lava.common.ser.Serializer;
 
 public class Sorting {
@@ -50,8 +53,27 @@ public class Sorting {
           o2 = m2 == null ? null : ((Map) m2).get(clause.getField());
         } else {
           Method getter = Reflections.getGetterForField(type, clause.getField());
-          o1 = Reflections.invokeSafely(getter, m1);
-          o2 = Reflections.invokeSafely(getter, m2);
+          if (getter == null) {
+            if (m1 == null && m2 == null) {
+              o1 = null;
+              o2 = null;
+            } else {
+              Class<?> elementType = (m1 == null ? m2 : m1).getClass();
+              Field field = Reflections.getField(elementType, clause.getField());
+              if (field == null || !Modifier.isPublic(field.getModifiers())) {
+                throw new IllegalArgumentException(String.format(
+                    "SortClause.field is invalid - must exist and be public or have a getter method: field=%s type=%s",
+                    clause.getField(),
+                    elementType
+                ));
+              }
+              o1 = m1 == null ? null : ((ThrowingSupplier) () -> field.get(m1)).getWithSneakyThrow();
+              o2 = m2 == null ? null : ((ThrowingSupplier) () -> field.get(m2)).getWithSneakyThrow();
+            }
+          } else {
+            o1 = Reflections.invokeSafely(getter, m1);
+            o2 = Reflections.invokeSafely(getter, m2);
+          }
         }
         int index1 = (clause.getPredefinedOrder() != null) && (o1 != null) ? clause.getPredefinedOrder().indexOf(o1) : -1;
         int index2 = (clause.getPredefinedOrder() != null) && (o2 != null) ? clause.getPredefinedOrder().indexOf(o2) : -1;
