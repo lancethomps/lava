@@ -704,7 +704,7 @@ public class Testing {
   }
 
   public static List<Map<String, Object>> threadLocalInfoForType(boolean useToStringOnValues, Class<? extends ThreadLocal> type) throws Exception {
-    Field threadLocalsField = Thread.class.getDeclaredField(StringUtils.uncapitalize(type.getSimpleName()) + "s");
+    Field threadLocalsField = Thread.class.getDeclaredField(StringUtils.uncapitalize(type.getSimpleName()) + 's');
     threadLocalsField.setAccessible(true);
     Class threadLocalMapKlazz = Class.forName("java.lang.ThreadLocal$ThreadLocalMap");
     Field tableField = threadLocalMapKlazz.getDeclaredField("table");
