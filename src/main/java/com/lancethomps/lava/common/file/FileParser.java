@@ -132,10 +132,9 @@ public class FileParser<T> {
           FileUtil.goToLine(br, startPos);
         }
       }
-      int count = 0;
       if (options.testTranspose()) {
         List<String[]> allData = new ArrayList<>();
-        count = Serializer.parseCsvLines(options, br, parser, line, allData::add);
+        Serializer.parseCsvLines(options, br, parser, line, allData::add);
         List<String[]> transposedLines = Stream.of(Collect.transpose(allData.toArray(new String[][]{}))).collect(Collectors.toList());
         String[] headersLine = transposedLines.remove(0);
         headers = new HashMap<>();
@@ -149,7 +148,7 @@ public class FileParser<T> {
           consumeLine(data);
         }
       } else {
-        count = Serializer.parseCsvLines(options, br, parser, line, this::consumeLine);
+        Serializer.parseCsvLines(options, br, parser, line, this::consumeLine);
       }
     } catch (FileParsingException e) {
       throw e;
@@ -200,6 +199,9 @@ public class FileParser<T> {
         String key = entry.getKey();
         Object value = data[entry.getValue()];
         if (isNotBlank((String) value) && shouldUseFieldValue(key, (String) value)) {
+          if (options.testTrimValues()) {
+            value = ((String) value).trim();
+          }
           if (options.getFieldConverter() != null) {
             try {
               value = options.getFieldConverter().convertObject(value, key);

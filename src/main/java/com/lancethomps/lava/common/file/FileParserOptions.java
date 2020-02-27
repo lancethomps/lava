@@ -94,6 +94,9 @@ public class FileParserOptions extends ExternalizableBean {
   private Boolean transpose;
 
   @RequestField
+  private Boolean trimValues;
+
+  @RequestField
   private Class<?> type;
 
   @RequestField
@@ -393,6 +396,16 @@ public class FileParserOptions extends ExternalizableBean {
     return this;
   }
 
+  public Boolean getTrimValues() {
+    return trimValues;
+  }
+
+  public FileParserOptions setTrimValues(Boolean trimValues) {
+    checkModificationsDisabled();
+    this.trimValues = trimValues;
+    return this;
+  }
+
   public Class<?> getType() {
     return type;
   }
@@ -441,6 +454,10 @@ public class FileParserOptions extends ExternalizableBean {
 
   public boolean testTranspose() {
     return (transpose != null) && transpose;
+  }
+
+  public boolean testTrimValues() {
+    return (trimValues != null) && trimValues;
   }
 
   public boolean testUseExcelFormats() {
