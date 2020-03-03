@@ -508,18 +508,22 @@
           <version>2.7</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
           <version>${version.maven-plugins}</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>3.1.1</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.1.1</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>${version.maven-plugins}</version>
           <configuration>
@@ -540,8 +544,8 @@
             <minimumPriority>2</minimumPriority>
             <printFailingErrors>true</printFailingErrors>
             <rulesets>
-              <ruleset>${project.basedir}/src/main/resources/pmd/non-test-rules.xml</ruleset>
-              <ruleset>${project.basedir}/src/main/resources/pmd/standard-rules.xml</ruleset>
+              <ruleset>${project.basedir}/src/test/resources/pmd/non-test-rules.xml</ruleset>
+              <ruleset>${project.basedir}/src/test/resources/pmd/standard-rules.xml</ruleset>
             </rulesets>
           </configuration>
         </plugin>
@@ -561,8 +565,8 @@
               <id>validate-java</id>
               <phase>validate</phase>
               <configuration>
-                <configLocation>${project.basedir}/src/main/resources/checkstyle/java-checkstyle.xml</configLocation>
-                <suppressionsLocation>${project.basedir}/src/main/resources/checkstyle/java-suppressions.xml</suppressionsLocation>
+                <configLocation>${project.basedir}/src/test/resources/checkstyle/java-checkstyle.xml</configLocation>
+                <suppressionsLocation>${project.basedir}/src/test/resources/checkstyle/java-suppressions.xml</suppressionsLocation>
                 <consoleOutput>true</consoleOutput>
                 <encoding>UTF-8</encoding>
                 <failOnViolation>true</failOnViolation>
@@ -573,7 +577,7 @@
                 <outputFile>${project.build.directory}/checkstyle-report-java.xml</outputFile>
                 <outputFileFormat>xml</outputFileFormat>
                 <propertyExpansion>basedir=${basedir}</propertyExpansion>
-                <propertyExpansion>samedir=${project.basedir}/src/main/resources/checkstyle</propertyExpansion>
+                <propertyExpansion>samedir=${project.basedir}/src/test/resources/checkstyle</propertyExpansion>
               </configuration>
               <goals>
                 <goal>check</goal>
@@ -583,8 +587,8 @@
               <id>validate-non-java</id>
               <phase>validate</phase>
               <configuration>
-                <configLocation>${project.basedir}/src/main/resources/checkstyle/non-java-checkstyle.xml</configLocation>
-                <suppressionsLocation>${project.basedir}/src/main/resources/checkstyle/non-java-suppressions.xml</suppressionsLocation>
+                <configLocation>${project.basedir}/src/test/resources/checkstyle/non-java-checkstyle.xml</configLocation>
+                <suppressionsLocation>${project.basedir}/src/test/resources/checkstyle/non-java-suppressions.xml</suppressionsLocation>
                 <consoleOutput>true</consoleOutput>
                 <encoding>UTF-8</encoding>
                 <failOnViolation>true</failOnViolation>
@@ -594,7 +598,7 @@
                 <outputFile>${project.build.directory}/checkstyle-report-non-java.xml</outputFile>
                 <outputFileFormat>xml</outputFileFormat>
                 <propertyExpansion>basedir=${project.basedir}</propertyExpansion>
-                <propertyExpansion>samedir=${project.basedir}/src/main/resources/checkstyle</propertyExpansion>
+                <propertyExpansion>samedir=${project.basedir}/src/test/resources/checkstyle</propertyExpansion>
                 <sourceDirectories>
                   ${project.basedir}/src
                 </sourceDirectories>
@@ -941,7 +945,7 @@
           <configLocation>checkstyle/java-checkstyle.xml</configLocation>
           <suppressionsLocation>checkstyle/java-suppressions.xml</suppressionsLocation>
           <propertyExpansion>basedir=${basedir}</propertyExpansion>
-          <propertyExpansion>samedir=${project.basedir}/src/main/resources/checkstyle</propertyExpansion>
+          <propertyExpansion>samedir=${project.basedir}/src/test/resources/checkstyle</propertyExpansion>
           <encoding>UTF-8</encoding>
           <consoleOutput>true</consoleOutput>
           <logViolationsToConsole>true</logViolationsToConsole>
@@ -1117,6 +1121,18 @@
       <id>release</id>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-tests</id>
+                <goals>
+                  <goal>test-jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>

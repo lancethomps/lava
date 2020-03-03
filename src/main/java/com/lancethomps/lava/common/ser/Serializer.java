@@ -1654,7 +1654,7 @@ public class Serializer {
       params.updateOutputFormatIfAllowed(OutputFormat.json);
     }
     final OutputFormat format = params.getOutputFormat() == null ? OutputFormat.json : params.getOutputFormat();
-    BiFunction<ObjectMapper, Object, String> firstFunction = null;
+    BiFunction<ObjectMapper, Object, String> firstFunction;
     Function<String, String> wrapperFunction = null;
     switch (format) {
       case csv:
@@ -2053,7 +2053,7 @@ public class Serializer {
 
   public static <T> T readValueWithException(ObjectMapper mapper, InputStream stream, JavaType type)
     throws IOException {
-    T object = null;
+    T object;
     try (InputStream tmp = stream) {
       object = stream == null ? null : mapper.readValue(stream, type);
     }

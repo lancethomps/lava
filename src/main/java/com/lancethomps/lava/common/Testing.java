@@ -8,6 +8,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -41,6 +42,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ClassUtil;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -144,6 +146,18 @@ public class Testing {
       Logs.logError(LogManager.getLogger(Testing.class), e, "Error");
       return diffFile;
     }
+  }
+
+  public static String createFieldsInfo(Class<?> type, Class<? extends Annotation> optionalAnnotationType, Function<Field, String> addInfo) {
+    List<String> infos = new ArrayList<>();
+    (optionalAnnotationType == null ? Reflections.getFields(type) : Reflections.getFieldsWithAnnotation(type, optionalAnnotationType)).stream()
+        .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
+        .forEach(field -> {
+          String info = addInfo == null ? "" : addInfo.apply(field);
+          String fmt = addInfo == null ? "%-50s %s%s" : "%-50s %-30s %s";
+          infos.add(Formatting.getMessage(fmt, Reflections.getFieldDisplay(field, type), field.getName(), info));
+        });
+    return StringUtils.join(infos, "\n");
   }
 
   public static MockHttpServletRequest createMockHttpServletRequest(String method, String uri, String queryString) {
@@ -389,24 +403,8 @@ public class Testing {
     Logs.println(createFieldsInfo(type, optionalAnnotationType, addInfo));
   }
 
-  public static String createFieldsInfo(Class<?> type, Class<? extends Annotation> optionalAnnotationType, Function<Field, String> addInfo) {
-    List<String> infos = new ArrayList<>();
-    (optionalAnnotationType == null ? Reflections.getFields(type) : Reflections.getFieldsWithAnnotation(type, optionalAnnotationType)).stream()
-        .sorted((f1, f2) -> f1.getName().compareTo(f2.getName()))
-        .forEach(field -> {
-          String info = addInfo == null ? "" : addInfo.apply(field);
-          String fmt = addInfo == null ? "%-50s %s%s" : "%-50s %-30s %s";
-          infos.add(Formatting.getMessage(fmt, Reflections.getFieldDisplay(field, type), field.getName(), info));
-        });
-    return StringUtils.join(infos, "\n");
-  }
-
   public static void printJson(Object obj) {
     printJson(obj, (OutputParams) null);
-  }
-
-  public static void printYaml(Object obj) {
-    printSerialized(obj, new OutputParams().setOutputFormat(OutputFormat.yaml));
   }
 
   public static void printJson(Object obj, File writeToFile, OutputParams addParams) {
@@ -473,6 +471,25 @@ public class Testing {
 
   public static void printTest(Class<?> parent, String test) {
     Logs.println("Running test %s.%s...", parent.getSimpleName(), test);
+  }
+
+  public static void printThreadLocalInfo(boolean useToStringOnValues) throws Exception {
+    printlnWithSeparator("THREAD_LOCAL_INFO");
+    printJson(threadLocalInfo(useToStringOnValues));
+  }
+
+  public static void printThreadLocalInfoAll(boolean useToStringOnValues) throws Exception {
+    printlnWithSeparator("THREAD_LOCAL_INFO_ALL");
+    printJson(threadLocalInfoAll(useToStringOnValues));
+  }
+
+  public static void printThreadLocalInfoInheritable(boolean useToStringOnValues) throws Exception {
+    printlnWithSeparator("THREAD_LOCAL_INFO_INHERITABLE");
+    printJson(threadLocalInfoInheritable(useToStringOnValues));
+  }
+
+  public static void printYaml(Object obj) {
+    printSerialized(obj, new OutputParams().setOutputFormat(OutputFormat.yaml));
   }
 
   public static void printlnWithSeparator(final Object message, final Object... formatArgs) {
@@ -548,6 +565,16 @@ public class Testing {
       });
     } catch (Throwable e) {
       Logs.logError(LogManager.getLogger(Testing.class), e, "Issue setting bash env!");
+    }
+  }
+
+  public static void sleep(long millis) {
+    try {
+      // CHECKSTYLE.OFF: .*
+      Thread.sleep(millis);
+      // CHECKSTYLE.ON: .*
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -658,13 +685,77 @@ public class Testing {
     @Nonnull ThrowingFunction<Integer, Long>... functions
   ) throws Exception {
     return new SpeedTest()
-      .setBetweenFunction(betweenFunction)
-      .setIterations(iterations)
-      .setRepeatCount(repeatCount)
-      .setReverse(reverse)
-      .setWarmup(warmup)
-      .addTests(functions)
-      .run();
+        .setBetweenFunction(betweenFunction)
+        .setIterations(iterations)
+        .setRepeatCount(repeatCount)
+        .setReverse(reverse)
+        .setWarmup(warmup)
+        .addTests(functions)
+        .run();
+  }
+
+  public static List<Map<String, Object>> threadLocalInfo(boolean useToStringOnValues) throws Exception {
+    return threadLocalInfoForType(useToStringOnValues, ThreadLocal.class);
+  }
+
+  public static Map<String, List<Map<String, Object>>> threadLocalInfoAll(boolean useToStringOnValues) throws Exception {
+    return ImmutableMap.of("ThreadLocal", threadLocalInfo(useToStringOnValues), "InheritableThreadLocal", threadLocalInfoInheritable(
+        useToStringOnValues));
+  }
+
+  public static List<Map<String, Object>> threadLocalInfoForType(boolean useToStringOnValues, Class<? extends ThreadLocal> type) throws Exception {
+    Field threadLocalsField = Thread.class.getDeclaredField(StringUtils.uncapitalize(type.getSimpleName()) + 's');
+    threadLocalsField.setAccessible(true);
+    Class threadLocalMapKlazz = Class.forName("java.lang.ThreadLocal$ThreadLocalMap");
+    Field tableField = threadLocalMapKlazz.getDeclaredField("table");
+    tableField.setAccessible(true);
+
+    List<Map<String, Object>> infos = new ArrayList<>();
+    List<String> noValuesThreads = new ArrayList<>();
+    Map<String, Object> noValuesInfo = ImmutableMap.of(
+        "missing", noValuesThreads
+    );
+    infos.add(noValuesInfo);
+
+    Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+    for (Thread thread : threadSet) {
+      Object threadLocals = threadLocalsField.get(thread);
+      if (threadLocals != null) {
+        List<String> types = new ArrayList<>();
+        int leakCount = 0;
+        Object table = tableField.get(threadLocals);
+        int threadLocalCount = Array.getLength(table);
+
+        for (int i = 0; i < threadLocalCount; i++) {
+          Object entry = Array.get(table, i);
+          if (entry != null) {
+            Field valueField = entry.getClass().getDeclaredField("value");
+            valueField.setAccessible(true);
+            Object value = valueField.get(entry);
+            if (value != null) {
+              types.add(value.getClass().getName() + (useToStringOnValues ? String.format("[%s]", value.toString()) : ""));
+            } else {
+              types.add("null");
+            }
+            leakCount++;
+          }
+        }
+        Map<String, Object> info = ImmutableMap.of(
+            "thread", thread.toString(),
+            "leakCount", leakCount,
+            "count", threadLocalCount,
+            "types", types
+        );
+        infos.add(info);
+      } else {
+        noValuesThreads.add(thread.toString());
+      }
+    }
+    return infos;
+  }
+
+  public static List<Map<String, Object>> threadLocalInfoInheritable(boolean useToStringOnValues) throws Exception {
+    return threadLocalInfoForType(useToStringOnValues, InheritableThreadLocal.class);
   }
 
   public static void watchFile(@Nonnull File file, long stopAfter, @Nonnull ThrowingRunnable action) throws Exception {
@@ -673,22 +764,28 @@ public class Testing {
     while (stopAfter >= (System.currentTimeMillis() - startTime)) {
       if (file.lastModified() != fileTimestamp) {
         Logs.logWarn(
-          LogManager.getLogger(Testing.class),
-          "File modified! previous=%s updated=%s",
-          Dates.fromMillis(fileTimestamp),
+            LogManager.getLogger(Testing.class),
+            "File modified! previous=%s updated=%s",
+            Dates.fromMillis(fileTimestamp),
           Dates.fromMillis(file.lastModified())
         );
         fileTimestamp = file.lastModified();
         action.run();
       }
-      // CHECKSTYLE.OFF: ThreadSleep
-      Thread.sleep(1000);
-      // CHECKSTYLE.ON: ThreadSleep
+      sleep(1000);
     }
   }
 
   public static void watchFile(@Nonnull File file, @Nonnull ThrowingRunnable action) throws Exception {
     watchFile(file, Long.MAX_VALUE, action);
+  }
+
+  public static void writeJson(Object obj, File file) {
+    writeJson(obj, file, null);
+  }
+
+  public static void writeJson(Object obj, File file, @Nullable OutputParams addParams) {
+    FileUtil.writeFile(file, obj instanceof String ? obj.toString() : getJson(obj, addParams));
   }
 
   public static void writeJsonToHomeWtpFile(Object data, String path) {
@@ -705,14 +802,6 @@ public class Testing {
 
   public static void writeTempJson(Object obj, @Nullable String fileName, @Nullable OutputParams addParams) {
     writeJson(obj, new File(TMP, Checks.defaultIfBlank(fileName, "test.json")), addParams);
-  }
-
-  public static void writeJson(Object obj, File file) {
-    writeJson(obj, file, null);
-  }
-
-  public static void writeJson(Object obj, File file, @Nullable OutputParams addParams) {
-    FileUtil.writeFile(file, obj instanceof String ? obj.toString() : getJson(obj, addParams));
   }
 
   public static void writeToHomeFile(String path, String output) {

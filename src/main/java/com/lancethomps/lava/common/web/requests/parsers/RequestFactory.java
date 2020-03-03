@@ -107,6 +107,8 @@ public class RequestFactory {
       .put("BigDecimal", RequestFactory::getBigDecimalParam)
       .put("Boolean", RequestFactory::getBooleanParam)
       .put("boolean", RequestFactory::getBooleanParam)
+      .put("Character", RequestFactory::getCharacterParam)
+      .put("char", RequestFactory::getCharacterParam)
       .put("Class<?>", RequestFactory::getTypeParam)
       .put("Double", RequestFactory::getDoubleParam)
       .put("double", RequestFactory::getDoubleParam)
@@ -689,6 +691,18 @@ public class RequestFactory {
     String param = getRequestParam(request, paramName);
     if (isNotBlank(param)) {
       return BooleanUtils.toBoolean(param);
+    }
+    return defaultValue;
+  }
+
+  public static Character getCharacterParam(Map<String, String[]> request, String paramName) {
+    return getCharacterParam(request, paramName, null);
+  }
+
+  public static Character getCharacterParam(Map<String, String[]> request, String paramName, Character defaultValue) {
+    String param = getRequestParam(request, paramName);
+    if (isNotBlank(param)) {
+      return param.charAt(0);
     }
     return defaultValue;
   }
