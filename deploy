@@ -60,6 +60,7 @@ if ! confirm_with_auto "Bump ${VERS} to next minor version?"; then
 fi
 
 make version-bump-minor
+NEXT_RELEASE_VERS="v$(make echo-version-current)"
 make version-snapshot
 SNAPSHOT_VERS="v$(make echo-version-current)"
 
@@ -69,3 +70,12 @@ fi
 
 git commit -m "Prepare next version" -- pom.xml
 git push
+
+NEXT_BRANCH="dev-${NEXT_RELEASE_VERS}"
+
+if ! confirm_with_auto "Create new development branch for next version: ${NEXT_BRANCH}?"; then
+  exiting 0
+fi
+
+git checkout -b "$NEXT_BRANCH"
+git push --set-upstream origin "$NEXT_BRANCH"
