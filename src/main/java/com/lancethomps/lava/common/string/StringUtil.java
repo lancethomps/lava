@@ -64,7 +64,8 @@ public class StringUtil {
   public static final Pattern NON_ALPHA_NUMERIC_ALL = Pattern.compile("^[^A-Za-z0-9]+$");
   public static final Pattern NON_ALPHA_ONLY = Pattern.compile("[^A-Za-z]");
   public static final Pattern NUMERIC_ONLY = Pattern.compile("[^0-9]");
-  public static final Pattern NUMERIC_STRING_REGEX = Pattern.compile("[0-9\\. \\-e]+", Pattern.CASE_INSENSITIVE);
+  public static final Pattern NUMERIC_STRING_REGEX = Pattern.compile("[0-9. \\-e]+", Pattern.CASE_INSENSITIVE);
+  public static final Pattern NUMBERS_ONLY_REGEX = Pattern.compile("^[0-9]+$");
   public static final Pattern TAB_PATTERN = Pattern.compile("(\\t)+");
   public static final String TRUNCATE_STRING_ELLIPSIS = "...";
   public static final String VOWELS = "AEIOU";
@@ -324,6 +325,10 @@ public class StringUtil {
 
   public static boolean isNumeric(String val) {
     return isNotBlank(val) && NUMERIC_STRING_REGEX.matcher(val).matches();
+  }
+
+  public static boolean isOnlyNumbers(String val) {
+    return isNotBlank(val) && NUMBERS_ONLY_REGEX.matcher(val).matches();
   }
 
   public static String lastChar(String str) {
