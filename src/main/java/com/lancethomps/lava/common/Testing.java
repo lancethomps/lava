@@ -809,6 +809,11 @@ public class Testing {
     FileUtil.writeFile(file, output);
   }
 
+  public static void writeToTempFile(String path, String output) {
+    File file = new File(TMP, path);
+    FileUtil.writeFile(file, output);
+  }
+
   public static void writeToHomeWtpFile(String path, String output) {
     File file = getHomeWtpFile(path);
     FileUtil.writeFile(file, output);

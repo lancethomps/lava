@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,11 +56,16 @@ import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.util.ClassUtil;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.lancethomps.lava.common.collections.FastHashMap;
 import com.lancethomps.lava.common.logging.Logs;
 import com.lancethomps.lava.common.ser.Serializer;
+import com.lancethomps.lava.common.sorting.SortClause;
+import com.lancethomps.lava.common.sorting.SortOrder;
+import com.lancethomps.lava.common.sorting.Sorting;
 import com.lancethomps.lava.common.string.StringUtil;
 
 public class Reflections {
@@ -122,6 +128,31 @@ public class Reflections {
       builder.addUrls(ClasspathHelper.forClassLoader());
     }
     return new org.reflections.Reflections(builder);
+  }
+
+  public static String createToStringWithFields(Class<?> type, Set<String> skipFields, List<String> fieldsOrder) {
+    List<String> formatStrings = new ArrayList<>();
+    List<String> formatArgs = new ArrayList<>();
+    Comparator<Field> comparator = Sorting.createComparator(ImmutableList.of(new SortClause(
+        "name",
+        SortOrder.asc,
+        null,
+        (List) fieldsOrder
+    ).setSortFieldFunction((Field field) -> field.getName())));
+    getFields(type).stream()
+        .filter(field -> Checks.isEmpty(skipFields) || !skipFields.contains(field.getName()))
+        .sorted(comparator)
+        .forEach(field -> {
+          formatStrings.add(field.getName() + "=%s");
+          formatArgs.add(field.getName());
+        });
+    String formatString = String.format(
+        "%s<%s>",
+        type.getSimpleName(),
+        Joiner.on(" ").join(formatStrings)
+    );
+    String code = Joiner.on(",\n  ").join(formatArgs);
+    return String.format("return String.format(\n  \"%s\",\n  %s\n);", formatString, code);
   }
 
   public static URL findClassLoadedFromLocation(@Nonnull Class<?> type) {

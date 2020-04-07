@@ -50,6 +50,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -59,6 +60,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -78,11 +80,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.commons.io.filefilter.AgeFileFilter;
 import org.apache.commons.io.filefilter.AndFileFilter;
+import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.apache.commons.lang3.StringUtils;
@@ -538,6 +542,23 @@ public class FileUtil {
         }
       }
     }
+  }
+
+  public static Set<File> findFiles(Predicate<File> include, boolean recursive, File... dirs) {
+    return findFiles(include, recursive, Arrays.asList(dirs));
+  }
+
+  public static Set<File> findFiles(Predicate<File> include, boolean recursive, Collection<File> dirs) {
+    Set<File> result = new LinkedHashSet<>();
+    PredicateFileFilter fileFilter = new PredicateFileFilter(include);
+    IOFileFilter dirFilter = recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE;
+    for (File dir : dirs) {
+      if (!dir.isDirectory()) {
+        continue;
+      }
+      result.addAll(FileUtils.listFiles(dir, fileFilter, dirFilter));
+    }
+    return result;
   }
 
   public static String fullPath(File file) {
