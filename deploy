@@ -3,6 +3,8 @@
 if ! _SCRIPT_DIR="$(get_script_dir "${BASH_SOURCE[0]}")"; then echo "Error while running: _SCRIPT_DIR=\"\$(get_script_dir \"${BASH_SOURCE[0]}\")\"" && exit 1; fi
 set -o errexit -o errtrace -o nounset
 ##################################################################################################################################################
+# shellcheck disable=SC2155
+export GPG_TTY="$(tty)"
 
 function exiting() {
   echo "Exiting..."
