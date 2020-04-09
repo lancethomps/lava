@@ -6,6 +6,59 @@ set -o errexit -o errtrace -o nounset
 # shellcheck disable=SC2155
 export GPG_TTY="$(tty)"
 
+################################################################### USAGE ########################################################################
+_SCRIPT_NAME="$(basename "$0")"
+
+function _usage() {
+  cat << EOF
+NAME
+       ${_SCRIPT_NAME}
+
+SYNOPSIS
+       ${_SCRIPT_NAME} [--help] [--debug] [--verbose] [--auto-confirm]
+
+EXAMPLES
+       ${_SCRIPT_NAME}
+       ${_SCRIPT_NAME} --auto-confirm
+EOF
+}
+##################################################################################################################################################
+
+################################################################# SCRIPTARGS #####################################################################
+while test $# -gt 0; do
+  case "$1" in
+    -h | --help)
+      _usage
+      exit 0
+      ;;
+    --debug)
+      shift
+      export debug_mode=true
+      ;;
+    --verbose)
+      shift
+      export verbose=true
+      ;;
+    --auto-confirm)
+      shift
+      export auto_confirm=true
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "Unknown option: $1"
+      _usage
+      exit 1
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+##################################################################################################################################################
+
 function exiting() {
   echo "Exiting..."
   exit "${1:-1}"
