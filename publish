@@ -15,12 +15,13 @@ NAME
        ${_SCRIPT_NAME}
 
 SYNOPSIS
-       ${_SCRIPT_NAME} [--auto-confirm]
+       ${_SCRIPT_NAME} [--auto-confirm] [--test]
           [--help] [--debug] [--verbose]
 
 EXAMPLES
        ${_SCRIPT_NAME}
        ${_SCRIPT_NAME} --auto-confirm
+       ${_SCRIPT_NAME} --test
 EOF
 }
 ##################################################################################################################################################
@@ -44,6 +45,10 @@ while test $# -gt 0; do
       shift
       auto_confirm=true
       ;;
+    --test)
+      shift
+      test_mode=true
+      ;;
     --)
       shift
       break
@@ -60,12 +65,63 @@ while test $# -gt 0; do
 done
 ##################################################################################################################################################
 
+#################################################################### CUSTOM ######################################################################
+function __custom_clean_local() {
+  git clean -Xd --force -- target
+}
+
+function __custom_store_versions() {
+  VERSION_FILE="pom.xml"
+  CURR_VERS="$(make echo-version-current-release)"
+  if test -z "${NEXT_VERS-}"; then
+    NEXT_VERS="$(make echo-version-next-minor)"
+  fi
+  export VERSION_FILE CURR_VERS NEXT_VERS
+}
+
+function __custom_publish() {
+  if check_debug; then
+    ! check_test && echo make version-release || true
+    ! check_test && echo git commit -m "v${CURR_VERS}" -- "$VERSION_FILE" || true
+    echo make deploy
+    ! check_test && echo git push || true
+  else
+    if ! check_test; then
+      make version-release
+      git commit -m "v${CURR_VERS}" -- "$VERSION_FILE"
+    fi
+    make deploy
+    if ! check_test; then
+      git push
+    fi
+  fi
+}
+
+function __custom_next_version_bump() {
+  if check_debug; then
+    echo make version-bump-minor-snapshot
+  else
+    make version-bump-minor-snapshot
+  fi
+}
+##################################################################################################################################################
+
 function exiting() {
   echo "Exiting..."
   exit "${1:-1}"
 }
 function check_debug() {
   test "${debug_mode:-}" = "true"
+}
+function check_test() {
+  test "${test_mode-}" = "true"
+}
+function exit_if_test() {
+  if check_test; then
+    echo "In test_mode, exiting..."
+    exit 0
+  fi
+  return 0
 }
 function confirm() {
   local response=""
@@ -87,9 +143,24 @@ function confirm_with_auto() {
   confirm "$@"
 }
 
+function continue_because_debug() {
+  if check_debug; then
+    echo "Not exiting, as debug_mode is true..."
+    return 0
+  elif check_test; then
+    echo "Not exiting, as test_mode is true..."
+    return 0
+  else
+    return 1
+  fi
+}
+
 function check_git_default_branch() {
   if git is-side-branch; then
     echo "Git repo not on master branch! Make a PR to master first"
+    if continue_because_debug; then
+      return 0
+    fi
     git status
     exiting 1
   fi
@@ -99,6 +170,9 @@ function check_git_default_branch() {
 function check_git_dirty() {
   if git is-dirty; then
     echo "Git repo is dirty!"
+    if continue_because_debug; then
+      return 0
+    fi
     git status
     exiting 1
   fi
@@ -109,10 +183,16 @@ function check_git_missing_commits() {
   git fetch
   if git has-incoming-commits; then
     echo "Git repo is missing commits from remote!"
+    if continue_because_debug; then
+      return 0
+    fi
     git status
     exiting 1
   elif git has-outgoing-commits; then
     echo "Git repo has local commits!"
+    if continue_because_debug; then
+      return 0
+    fi
     git status
     exiting 1
   fi
@@ -120,7 +200,7 @@ function check_git_missing_commits() {
 }
 
 function check_version_bumped() {
-  if check_debug; then
+  if check_debug || check_test; then
     return 0
   fi
 
@@ -131,39 +211,44 @@ function check_version_bumped() {
   return 0
 }
 
-function __custom_clean_local() {
-  git clean -Xd --force -- target
-}
+function increment_semver() {
+  local version major=0 minor=0 patch=0
+  while test $# -gt 0; do
+    case "$1" in
+      --major)
+        shift
+        major="$1"
+        shift
+        ;;
+      --minor)
+        shift
+        minor="$1"
+        shift
+        ;;
+      --patch)
+        shift
+        patch="$1"
+        shift
+        ;;
+      --)
+        shift
+        break
+        ;;
+      -*)
+        echo "Unknown option: $1"
+        _usage
+        exit 1
+        ;;
+      *)
+        break
+        ;;
+    esac
+  done
 
-function __custom_store_versions() {
-  VERSION_FILE="pom.xml"
-  CURR_VERS="$(make echo-version-current-release)"
-  if test -z "${NEXT_VERS-}"; then
-    NEXT_VERS="$(make echo-version-next-minor)"
-  fi
-  export VERSION_FILE CURR_VERS NEXT_VERS
-}
+  version="$1"
 
-function __custom_publish() {
-  if check_debug; then
-    echo make version-release
-    echo git commit -m "v${CURR_VERS}" -- "$VERSION_FILE"
-    echo make deploy
-    echo git push
-  else
-    make version-release
-    git commit -m "v${CURR_VERS}" -- "$VERSION_FILE"
-    make deploy
-    git push
-  fi
-}
-
-function __custom_next_version_bump() {
-  if check_debug; then
-    echo make version-bump-minor-snapshot
-  else
-    make version-bump-minor-snapshot
-  fi
+  echo "$version" |
+    awk -F. -v a="$major" -v b="$minor" -v c="$patch" '{printf("%d.%d.%d", $1+a, $2+b , $3+c)}'
 }
 
 function clean_local() {
@@ -194,6 +279,7 @@ function publish_command() {
   fi
 
   __custom_publish
+  exit_if_test
 }
 
 function tag_version() {
