@@ -492,6 +492,13 @@ public class Testing {
     printSerialized(obj, new OutputParams().setOutputFormat(OutputFormat.yaml));
   }
 
+  public static void printlnIfNotBlank(final Object message, final Object... formatArgs) {
+    String msg = Formatting.getMessage(message == null ? null : message.toString(), formatArgs);
+    if (Checks.isNotBlank(msg)) {
+      Logs.println(msg);
+    }
+  }
+
   public static void printlnWithSeparator(final Object message, final Object... formatArgs) {
     Logs.println(Testing.PRINT_SEP);
     Logs.println(message, formatArgs);
