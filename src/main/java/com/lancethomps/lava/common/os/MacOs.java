@@ -1,11 +1,13 @@
 package com.lancethomps.lava.common.os;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.lancethomps.lava.common.os.OsUtil.isMac;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 
@@ -30,6 +32,11 @@ public class MacOs {
     "text returned of (display dialog \"%s\" default answer \"\" with hidden answer)" + System.lineSeparator() +
     "end tell";
 
+  private static final String GUI_PROMPT_OSASCRIPT = "tell application \"System Events\"" + System.lineSeparator() +
+      "activate" + System.lineSeparator() +
+      "text returned of (display dialog \"%s\" default answer \"\")" + System.lineSeparator() +
+      "end tell";
+
   public static Pair<String, ProcessResult> addInternetPassword(String domain, String user) {
     String pass = getPasswordFromGui(getPasswordGuiPromptMessage(user, domain), 3);
     ProcessResult addResult = null;
@@ -50,8 +57,16 @@ public class MacOs {
     return Pair.of(pass, addResult);
   }
 
-  public static List<String> getGuiPromptCommand(@Nonnull String message) {
+  public static List<String> getGuiPromptCommandWithHiddenResponse(@Nonnull String message) {
     return Arrays.asList("osascript", "-e", String.format(PASSWORD_GUI_PROMPT_OSASCRIPT, StringUtils.replace(message, "\"", "\\\"")));
+  }
+
+  public static List<String> getGuiPromptCommand(@Nonnull String message) {
+    return Arrays.asList("osascript", "-e", String.format(GUI_PROMPT_OSASCRIPT, StringUtils.replace(message, "\"", "\\\"")));
+  }
+
+  public static ProcessResult getGuiPromptResultWithHiddenResponse(@Nonnull String message) {
+    return Processes.run(getGuiPromptCommandWithHiddenResponse(message));
   }
 
   public static ProcessResult getGuiPromptResult(@Nonnull String message) {
@@ -101,17 +116,47 @@ public class MacOs {
     return pass;
   }
 
+  public static String askForInput(String message) {
+    ProcessResult result = getGuiPromptResult(message);
+    if (!result.wasSuccessful()) {
+      return null;
+    }
+    return StringUtils.trim(result.getOutput());
+  }
+
+  public static String askForInput(String message, Function<String, Pair<Boolean, String>> validator, int maxTries) {
+    checkArgument(maxTries > 0, "maxTries must be greater than 0");
+    int tryCount = 0;
+    String suffix = "";
+    while (tryCount < maxTries) {
+      ProcessResult result = getGuiPromptResult(message + suffix);
+      if (!result.wasSuccessful()) {
+        return null;
+      }
+      String response = StringUtils.trim(result.getOutput());
+      Pair<Boolean, String> valid = validator.apply(response);
+      if (valid.getLeft()) {
+        return response;
+      } else if (valid.getRight() != null) {
+        suffix = "\n\n" + valid.getRight();
+      }
+      tryCount++;
+    }
+    Logs.logInfo(LOG, "User input on GUI max tries reached (%s)", maxTries);
+    return null;
+  }
+
   public static String getPasswordFromGui(String message, int maxTries) {
-    assert maxTries > 0;
+    checkArgument(maxTries > 0, "maxTries must be greater than 0");
     int tryCount = 0;
     while (tryCount < maxTries) {
-      ProcessResult result1 = getGuiPromptResult(message + (tryCount > 0 ? "\n\nYour passwords did not match. Please try again." : ""));
+      ProcessResult result1 = getGuiPromptResultWithHiddenResponse(message + (tryCount > 0 ? "\n\nYour passwords did not match. Please try again." : ""));
       String pass1 = StringUtils.trim(result1.getOutput());
       if (!result1.wasSuccessful() || isBlank(pass1)) {
         Logs.logInfo(LOG, "Password input on GUI canceled.");
         return null;
       }
-      ProcessResult result2 = getGuiPromptResult(message + "\n\nConfirm password.");
+      ProcessResult result2 = getGuiPromptResultWithHiddenResponse(message + "\n\nConfirm password.");
       String pass2 = StringUtils.trim(result2.getOutput());
       if (!result2.wasSuccessful() || isBlank(pass2)) {
         Logs.logInfo(LOG, "Password input on GUI canceled.");

@@ -220,6 +220,10 @@ public class Testing {
     return getJson(obj, null);
   }
 
+  public static String getYaml(Object obj) {
+    return getJson(obj, new OutputParams().setOutputFormat(OutputFormat.yaml));
+  }
+
   public static String getJson(Object obj, @Nullable OutputParams addParams) {
     return Serializer.output(
       obj,
