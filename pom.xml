@@ -4,7 +4,7 @@
   <parent>
     <artifactId>lancethomps-parent</artifactId>
     <groupId>com.lancethomps</groupId>
-    <version>1.2.0</version>
+    <version>1.4.0</version>
     <relativePath />
   </parent>
   <artifactId>lava</artifactId>
@@ -24,56 +24,6 @@
   <properties>
     <java.level>1.8</java.level>
   </properties>
-
-  <repositories>
-    <repository>
-      <id>maven-central</id>
-      <url>https://repo1.maven.org/maven2</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>sonatype-releases</id>
-      <url>https://oss.sonatype.org/content/repositories/releases</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>maven-central</id>
-      <url>https://repo1.maven.org/maven2</url>
-      <layout>default</layout>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-    </pluginRepository>
-    <pluginRepository>
-      <id>maven-central-alt</id>
-      <url>https://repo.maven.apache.org/maven2</url>
-      <layout>default</layout>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
 
   <dependencies>
     <dependency>
