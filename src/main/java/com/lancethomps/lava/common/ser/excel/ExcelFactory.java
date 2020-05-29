@@ -1,5 +1,5 @@
-// CHECKSTYLE.OFF: OpenCSV
 package com.lancethomps.lava.common.ser.excel;
+// CHECKSTYLE.OFF: OpenCSV
 
 import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.StringUtils.substring;

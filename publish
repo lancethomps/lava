@@ -71,7 +71,7 @@ function __custom_clean_local() {
 }
 
 function __custom_store_versions() {
-  VERSION_FILE="pom.xml"
+  VERSION_FILE=':(glob)**/pom.xml'
   CURR_VERS="$(make echo-version-current-release)"
   if test -z "${NEXT_VERS-}"; then
     NEXT_VERS="$(make echo-version-next-minor)"
