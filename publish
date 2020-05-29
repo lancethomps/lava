@@ -67,7 +67,7 @@ done
 
 #################################################################### CUSTOM ######################################################################
 function __custom_clean_local() {
-  git clean -Xd --force -- target
+  git clean -Xd --force -- 'target' '**/target'
 }
 
 function __custom_store_versions() {
