@@ -3,7 +3,7 @@ current_dir := $(shell echo "$(dir $(mkfile_path))" | sed 's,/$$,,g')
 
 SEMVER_REGEX = ^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$$
 EXIT_ON_ERROR = set -e;
-NO_GENERATE_BACKUP_POMS = -DgenerateBackupPoms=false
+NO_GENERATE_BACKUP_POMS = -DgenerateBackupPoms=false -DprocessAllModules=true
 
 UNAME_S := $(shell uname -s 2>/dev/null || echo)
 

@@ -49,7 +49,6 @@ import org.reflections.scanners.ResourcesScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.scanners.TypeElementsScanner;
-import org.reflections.scanners.TypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.springframework.beans.BeanUtils;
@@ -117,8 +116,7 @@ public class Reflections {
         new ResourcesScanner(),
         new SubTypesScanner(),
         new TypeAnnotationsScanner(),
-        new TypeElementsScanner(),
-        new TypesScanner()
+        new TypeElementsScanner()
       );
     if (Checks.isNotEmpty(packages)) {
       for (String pack : packages) {

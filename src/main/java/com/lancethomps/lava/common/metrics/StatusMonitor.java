@@ -253,7 +253,7 @@ public final class StatusMonitor {
     @Nonnull String name,
     @Nonnull ThrowingFunction<Map<String, Object>, Result> checker
   ) {
-    healthRegistry(registry).register(name, () -> checker.apply(getHealthCheckConfig(name)));
+    healthRegistry(registry).register(name, new FunctionalHealthCheck(name, checker));
   }
 
   public static void registerHealthCheck(@Nonnull String name, @Nonnull ThrowingFunction<Map<String, Object>, HealthCheck.Result> checker) {

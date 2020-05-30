@@ -220,6 +220,10 @@ public class Testing {
     return getJson(obj, null);
   }
 
+  public static String getYaml(Object obj) {
+    return getJson(obj, new OutputParams().setOutputFormat(OutputFormat.yaml));
+  }
+
   public static String getJson(Object obj, @Nullable OutputParams addParams) {
     return Serializer.output(
       obj,
@@ -490,6 +494,13 @@ public class Testing {
 
   public static void printYaml(Object obj) {
     printSerialized(obj, new OutputParams().setOutputFormat(OutputFormat.yaml));
+  }
+
+  public static void printlnIfNotBlank(final Object message, final Object... formatArgs) {
+    String msg = Formatting.getMessage(message == null ? null : message.toString(), formatArgs);
+    if (Checks.isNotBlank(msg)) {
+      Logs.println(msg);
+    }
   }
 
   public static void printlnWithSeparator(final Object message, final Object... formatArgs) {

@@ -25,7 +25,35 @@ import com.lancethomps.lava.common.ser.Serializer;
 
 public class Sorting {
 
+  public static final int LEFT_IS_GREATER = 1;
+  public static final int RIGHT_IS_GREATER = -1;
   private static final Logger LOG = LogManager.getLogger(Sorting.class);
+
+  public static <T extends Comparable<T>> int compareToNullsFirst(T left, T right) {
+    if (left == right) {
+      return 0;
+    }
+    if (left == null) {
+      return RIGHT_IS_GREATER;
+    }
+    if (right == null) {
+      return LEFT_IS_GREATER;
+    }
+    return left.compareTo(right);
+  }
+
+  public static <T extends Comparable<T>> int compareToNullsLast(T left, T right) {
+    if (left == right) {
+      return 0;
+    }
+    if (left == null) {
+      return LEFT_IS_GREATER;
+    }
+    if (right == null) {
+      return RIGHT_IS_GREATER;
+    }
+    return left.compareTo(right);
+  }
 
   public static <T> Comparator<T> createComparator(final List<SortClause> sorts) {
     return createComparator(sorts, true, null, null);
@@ -33,9 +61,9 @@ public class Sorting {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public static <T> Comparator<T> createComparator(
-    final List<SortClause> sorts,
-    final boolean defaultAscending,
-    final Class<? extends Comparable<?>> defaultSortAsType,
+      final List<SortClause> sorts,
+      final boolean defaultAscending,
+      final Class<? extends Comparable<?>> defaultSortAsType,
     final Class<?> type
   ) {
     return (T m1, T m2) -> {
@@ -160,24 +188,36 @@ public class Sorting {
   }
 
   public static <T> List<T> sortByField(
-    List<T> list,
-    final String sortingKey,
-    final boolean defaultAscending,
-    final Class<? extends Comparable<?>> sortAsType
+      List<T> list,
+      final String sortingKey,
+      final boolean defaultAscending,
+      final Class<? extends Comparable<?>> sortAsType
   ) {
     List<SortClause> sorts = SortClause.fromMultiString(sortingKey, defaultAscending);
     return sort(list, sorts, defaultAscending, sortAsType);
   }
 
-  public static <T extends Object, U extends Comparable<U>> List<T> sortByFunction(
-    final List<T> list,
-    final Function<T, U> func,
-    final boolean ascending
+  public static <T, U extends Comparable<U>> List<T> sortByFunction(
+      final List<T> list,
+      final Function<T, U> func
+  ) {
+    return sortByFunction(list, func, true);
+  }
+
+  public static <T, U extends Comparable<U>> List<T> sortByFunction(
+      final List<T> list,
+      final Function<T, U> func,
+      final boolean ascending
   ) {
     if (Checks.isEmpty(list)) {
       return list;
     }
-    Comparator<T> comp = (t1, t2) -> ascending ? func.apply(t1).compareTo(func.apply(t2)) : func.apply(t2).compareTo(func.apply(t1));
+    Comparator<T> comp;
+    if (ascending) {
+      comp = (left, right) -> compareToNullsLast(func.apply(left), func.apply(right));
+    } else {
+      comp = (left, right) -> compareToNullsLast(func.apply(right), func.apply(left));
+    }
     Collections.sort(list, comp);
     return list;
   }
