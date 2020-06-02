@@ -5,6 +5,7 @@ set -o errexit -o errtrace -o nounset
 ##################################################################################################################################################
 # shellcheck disable=SC2155
 export GPG_TTY="$(tty)"
+export vers_bump_type="minor"
 
 ################################################################### USAGE ########################################################################
 _SCRIPT_NAME="$(basename "$0")"
@@ -15,13 +16,15 @@ NAME
        ${_SCRIPT_NAME}
 
 SYNOPSIS
-       ${_SCRIPT_NAME} [--auto-confirm] [--test]
+       ${_SCRIPT_NAME} [--auto-confirm] [--bump-major] [--bump-minor] [--bump-patch] [--next-only] [--test] [--next-version <NEXT_VERS>]
           [--help] [--debug] [--verbose]
 
 EXAMPLES
        ${_SCRIPT_NAME}
        ${_SCRIPT_NAME} --auto-confirm
+       ${_SCRIPT_NAME} --bump-patch
        ${_SCRIPT_NAME} --test
+       ${_SCRIPT_NAME} --next-version 3.5.4
 EOF
 }
 ##################################################################################################################################################
@@ -45,21 +48,36 @@ while test $# -gt 0; do
       shift
       auto_confirm=true
       ;;
+    --bump-major)
+      vers_bump_type="major"
+      shift
+      ;;
+    --bump-minor)
+      vers_bump_type="minor"
+      shift
+      ;;
+    --bump-patch)
+      vers_bump_type="patch"
+      shift
+      ;;
+    --next-only)
+      next_only=true
+      shift
+      ;;
     --test)
       shift
       test_mode=true
       ;;
-    --)
+    --next-version)
       shift
-      break
+      export NEXT_VERS="$1"
+      has_custom_next_version=true
+      shift
       ;;
-    -*)
+    *)
       echo "Unknown option: $1"
       _usage
       exit 1
-      ;;
-    *)
-      break
       ;;
   esac
 done
@@ -67,14 +85,25 @@ done
 
 #################################################################### CUSTOM ######################################################################
 function __custom_clean_local() {
-  git clean -Xd --force -- 'target' '**/target'
+  local target_dirs target_dirs_add
+  target_dirs=(target)
+  mapfile -t target_dirs_add < <(git ls-files --others --ignored --exclude-standard --directory -- ':(glob)**/target/**')
+  target_dirs+=("${target_dirs_add[@]}")
+  git clean -Xd --force -- "${target_dirs[@]}"
 }
 
 function __custom_store_versions() {
   VERSION_FILE=':(glob)**/pom.xml'
-  CURR_VERS="$(make echo-version-current-release)"
+  if check_test; then
+    CURR_VERS="$(make echo-version-current)"
+  else
+    CURR_VERS="$(make echo-version-current-release)"
+  fi
   if test -z "${NEXT_VERS-}"; then
-    NEXT_VERS="$(make echo-version-next-minor)"
+    if ! NEXT_VERS="$(make "echo-version-next-${vers_bump_type}")"; then
+      echo "Failed to create NEXT_VERS"
+      exiting
+    fi
   fi
   export VERSION_FILE CURR_VERS NEXT_VERS
 }
@@ -98,10 +127,18 @@ function __custom_publish() {
 }
 
 function __custom_next_version_bump() {
-  if check_debug; then
-    echo make version-bump-minor-snapshot
+  if test "${has_custom_next_version-}" = "true"; then
+    if check_debug; then
+      echo mvn versions:set -DgenerateBackupPoms=false -DprocessAllModules=true -DnewVersion="${NEXT_VERS}-SNAPSHOT"
+    else
+      mvn versions:set -DgenerateBackupPoms=false -DprocessAllModules=true -DnewVersion="${NEXT_VERS}-SNAPSHOT"
+    fi
   else
-    make version-bump-minor-snapshot
+    if check_debug; then
+      echo make "version-bump-${vers_bump_type}-snapshot"
+    else
+      make "version-bump-${vers_bump_type}-snapshot"
+    fi
   fi
 }
 ##################################################################################################################################################
@@ -110,11 +147,22 @@ function exiting() {
   echo "Exiting..."
   exit "${1:-1}"
 }
+function echo_sep() {
+  echo "----------------------------------------------------------------------------------"
+}
+function echo_with_sep() {
+  echo_sep
+  echo "$@"
+  echo_sep
+}
 function check_debug() {
   test "${debug_mode:-}" = "true"
 }
 function check_test() {
   test "${test_mode-}" = "true"
+}
+function check_next_only() {
+  test "${next_only-}" = "true"
 }
 function exit_if_test() {
   if check_test; then
@@ -171,6 +219,8 @@ function check_git_dirty() {
   if git is-dirty; then
     echo "Git repo is dirty!"
     if continue_because_debug; then
+      return 0
+    elif check_next_only; then
       return 0
     fi
     git status
@@ -308,6 +358,33 @@ function store_versions() {
   return 0
 }
 
+function display_info_and_confirm() {
+  local display_infos=(
+    auto_confirm "${auto_confirm:-false}"
+    debug_mode "${debug_mode:-false}"
+    test_mode "${test_mode:-false}"
+    verbose "${verbose:-false}"
+    vers_bump_type "$vers_bump_type"
+    VERSION_FILE "$VERSION_FILE"
+    CURR_VERS "$CURR_VERS"
+    NEXT_VERS "$NEXT_VERS"
+  )
+
+  echo_sep
+
+  while test "${#display_infos[@]}" -gt 0; do
+    printf "%-50s -> %s\n" "${display_infos[0]}" "${display_infos[1]}"
+    display_infos=("${display_infos[@]:2}")
+  done
+
+  echo_sep
+
+  if ! confirm_with_auto "Continue with publish?"; then
+    exiting 1
+  fi
+  return 0
+}
+
 function publish_command() {
   check_git_dirty
 
@@ -384,6 +461,9 @@ check_git_dirty
 check_git_missing_commits
 clean_local
 store_versions
-publish_command
-tag_version
+display_info_and_confirm
+if ! check_next_only; then
+  publish_command
+  tag_version
+fi
 next_version

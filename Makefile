@@ -39,11 +39,20 @@ echo-version-current:
 echo-version-current-release:
 	@echo "$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)"
 
+echo-version-next-major:
+	@echo "$(VERSION_MAJOR_NEXT).0.0"
+
 echo-version-next-minor:
 	@echo "$(VERSION_MAJOR).$(VERSION_MINOR_NEXT).0"
 
+echo-version-next-patch:
+	@echo "$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH_NEXT)"
+
 version-bump-major:
 	@$(EXIT_ON_ERROR) mvn versions:set $(NO_GENERATE_BACKUP_POMS) -DnewVersion=$(VERSION_MAJOR_NEXT).0.0$(VERSION_PRERELEASE)
+
+version-bump-major-snapshot:
+	@$(EXIT_ON_ERROR) mvn versions:set $(NO_GENERATE_BACKUP_POMS) -DnewVersion=$(VERSION_MAJOR_NEXT).0.0-SNAPSHOT
 
 version-bump-minor:
 	@$(EXIT_ON_ERROR) mvn versions:set $(NO_GENERATE_BACKUP_POMS) -DnewVersion=$(VERSION_MAJOR).$(VERSION_MINOR_NEXT).0$(VERSION_PRERELEASE)
@@ -53,6 +62,9 @@ version-bump-minor-snapshot:
 
 version-bump-patch:
 	@$(EXIT_ON_ERROR) mvn versions:set $(NO_GENERATE_BACKUP_POMS) -DnewVersion=$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH_NEXT)$(VERSION_PRERELEASE)
+
+version-bump-patch-snapshot:
+	@$(EXIT_ON_ERROR) mvn versions:set $(NO_GENERATE_BACKUP_POMS) -DnewVersion=$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH_NEXT)-SNAPSHOT
 
 version-snapshot:
 	@$(EXIT_ON_ERROR) mvn versions:set $(NO_GENERATE_BACKUP_POMS) -DnewVersion=$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)-SNAPSHOT
