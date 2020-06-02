@@ -1,3 +1,11 @@
 language: java
 jdk:
+- openjdk8
 - openjdk11
+os:
+- linux
+dist: xenial
+install:
+- mvn --batch-mode --show-version clean install -P quick
+script:
+- mvn --batch-mode --show-version clean verify
