@@ -310,6 +310,10 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
     <!-- TESTS -->
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -330,12 +334,6 @@
       <groupId>org.jeasy</groupId>
       <artifactId>easy-random-core</artifactId>
       <scope>test</scope>
-    </dependency>
-    <!-- PROVIDED -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
   <repositories>
