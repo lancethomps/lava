@@ -2,10 +2,10 @@
 ################################################################### SETUP ########################################################################
 S="${BASH_SOURCE[0]}" && while [ -h "$S" ]; do D="$(cd -P "$(dirname "$S")" && pwd)" && S="$(readlink "$S")" && [[ $S != /* ]] && S="$D/$S"; done && _SCRIPT_DIR="$(cd -P "$(dirname "$S")" && pwd)" && unset S D
 set -o errexit -o errtrace -o nounset
-##################################################################################################################################################
 # shellcheck disable=SC2155
 export GPG_TTY="$(tty)"
 export vers_bump_type="minor"
+##################################################################################################################################################
 
 ################################################################### USAGE ########################################################################
 _SCRIPT_NAME="$(basename "$0")"
@@ -83,72 +83,35 @@ while test $# -gt 0; do
 done
 ##################################################################################################################################################
 
-#################################################################### CUSTOM ######################################################################
-function __custom_clean_local() {
-  local target_dirs target_dirs_add
-  target_dirs=(target)
-  mapfile -t target_dirs_add < <(git ls-files --others --ignored --exclude-standard --directory -- ':(glob)**/target/**')
-  target_dirs+=("${target_dirs_add[@]}")
-  git clean -Xd --force -- "${target_dirs[@]}"
+################################################################# COMMON COPY ####################################################################
+function repeat_char() {
+  head -c "$2" < /dev/zero | tr '\0' "$1"
 }
-
-function __custom_store_versions() {
-  VERSION_FILE=':(glob)**/pom.xml'
-  if check_test; then
-    CURR_VERS="$(make echo-version-current)"
-  else
-    CURR_VERS="$(make echo-version-current-release)"
-  fi
-  if test -z "${NEXT_VERS-}"; then
-    if ! NEXT_VERS="$(make "echo-version-next-${vers_bump_type}")"; then
-      echo "Failed to create NEXT_VERS"
-      exiting
+function get_sep_cols() {
+  local sep_cols=160 term_cols
+  if command -v 'get_terminal_columns' > /dev/null 2>&1; then
+    term_cols="$(get_terminal_columns)"
+    if test -n "$term_cols"; then
+      sep_cols="$term_cols"
     fi
   fi
-  export VERSION_FILE CURR_VERS NEXT_VERS
-}
-
-function __custom_publish() {
-  if check_debug; then
-    ! check_test && echo make version-release || true
-    ! check_test && echo git commit -m "v${CURR_VERS}" -- "$VERSION_FILE" || true
-    echo make deploy
-    ! check_test && echo git push || true
-  else
-    if ! check_test; then
-      make version-release
-      git commit -m "v${CURR_VERS}" -- "$VERSION_FILE"
-    fi
-    make deploy
-    if ! check_test; then
-      git push
-    fi
+  if test -n "${1-}"; then
+    sep_cols="$((sep_cols / $1))"
   fi
+  echo -n "$sep_cols"
 }
-
-function __custom_next_version_bump() {
-  if test "${has_custom_next_version-}" = "true"; then
-    if check_debug; then
-      echo mvn versions:set -DgenerateBackupPoms=false -DprocessAllModules=true -DnewVersion="${NEXT_VERS}-SNAPSHOT"
-    else
-      mvn versions:set -DgenerateBackupPoms=false -DprocessAllModules=true -DnewVersion="${NEXT_VERS}-SNAPSHOT"
-    fi
-  else
-    if check_debug; then
-      echo make "version-bump-${vers_bump_type}-snapshot"
-    else
-      make "version-bump-${vers_bump_type}-snapshot"
-    fi
+function get_terminal_sep() {
+  if [ -z "${TERMINAL_SEP:-}" ]; then
+    local rep_count
+    rep_count=$(get_sep_cols 2)
+    TERMINAL_SEP="$(repeat_char '-' "$rep_count")"
+    export TERMINAL_SEP
   fi
-}
-##################################################################################################################################################
-
-function exiting() {
-  echo "Exiting..."
-  exit "${1:-1}"
+  return 0
 }
 function echo_sep() {
-  echo "----------------------------------------------------------------------------------"
+  get_terminal_sep
+  echo "$TERMINAL_SEP"
 }
 function echo_with_sep() {
   echo_sep
@@ -156,20 +119,14 @@ function echo_with_sep() {
   echo_sep
 }
 function check_debug() {
-  test "${debug_mode:-}" = "true"
+  check_true "${debug_mode:-}"
 }
-function check_test() {
-  test "${test_mode-}" = "true"
-}
-function check_next_only() {
-  test "${next_only-}" = "true"
-}
-function exit_if_test() {
-  if check_test; then
-    echo "In test_mode, exiting..."
-    exit 0
+function check_true() {
+  if test -z "${1:-}"; then
+    return 1
   fi
-  return 0
+  local val="${1,,}"
+  test "$val" = "true" && return 0 || test "$val" = "1" && return 0 || test "$val" = "yes" && return 0 || test "$val" = "y" && return 0 || return 1
 }
 function confirm() {
   local response=""
@@ -189,6 +146,29 @@ function confirm_with_auto() {
     return 0
   fi
   confirm "$@"
+}
+##################################################################################################################################################
+
+#################################################################### MAIN ########################################################################
+function exiting() {
+  echo "Exiting..."
+  exit "${1:-1}"
+}
+
+function check_test() {
+  test "${test_mode-}" = "true"
+}
+
+function check_next_only() {
+  test "${next_only-}" = "true"
+}
+
+function exit_if_test() {
+  if check_test; then
+    echo "In test_mode, exiting..."
+    exit 0
+  fi
+  return 0
 }
 
 function continue_because_debug() {
@@ -454,16 +434,81 @@ function next_version() {
   fi
 }
 
-cd "$_SCRIPT_DIR"
+function main() {
+  cd "$_SCRIPT_DIR"
 
-check_git_default_branch
-check_git_dirty
-check_git_missing_commits
-clean_local
-store_versions
-display_info_and_confirm
-if ! check_next_only; then
-  publish_command
-  tag_version
-fi
-next_version
+  check_git_default_branch
+  check_git_dirty
+  check_git_missing_commits
+  clean_local
+  store_versions
+  display_info_and_confirm
+  if ! check_next_only; then
+    publish_command
+    tag_version
+  fi
+  next_version
+}
+##################################################################################################################################################
+
+#################################################################### CUSTOM ######################################################################
+function __custom_clean_local() {
+  local target_dirs target_dirs_add
+  target_dirs=(target)
+  mapfile -t target_dirs_add < <(git ls-files --others --ignored --exclude-standard --directory -- ':(glob)**/target/**')
+  target_dirs+=("${target_dirs_add[@]}")
+  git clean -Xd --force -- "${target_dirs[@]}"
+}
+
+function __custom_store_versions() {
+  VERSION_FILE=':(glob)**/pom.xml'
+  if check_test; then
+    CURR_VERS="$(make echo-version-current)"
+  else
+    CURR_VERS="$(make echo-version-current-release)"
+  fi
+  if test -z "${NEXT_VERS-}"; then
+    if ! NEXT_VERS="$(make "echo-version-next-${vers_bump_type}")"; then
+      echo "Failed to create NEXT_VERS"
+      exiting
+    fi
+  fi
+  export VERSION_FILE CURR_VERS NEXT_VERS
+}
+
+function __custom_publish() {
+  if check_debug; then
+    ! check_test && echo make version-release || true
+    ! check_test && echo git commit -m "v${CURR_VERS}" -- "$VERSION_FILE" || true
+    echo make deploy
+    ! check_test && echo git push || true
+  else
+    if ! check_test; then
+      make version-release
+      git commit -m "v${CURR_VERS}" -- "$VERSION_FILE"
+    fi
+    make deploy
+    if ! check_test; then
+      git push
+    fi
+  fi
+}
+
+function __custom_next_version_bump() {
+  if test "${has_custom_next_version-}" = "true"; then
+    if check_debug; then
+      echo mvn versions:set -DgenerateBackupPoms=false -DprocessAllModules=true -DnewVersion="${NEXT_VERS}-SNAPSHOT"
+    else
+      mvn versions:set -DgenerateBackupPoms=false -DprocessAllModules=true -DnewVersion="${NEXT_VERS}-SNAPSHOT"
+    fi
+  else
+    if check_debug; then
+      echo make "version-bump-${vers_bump_type}-snapshot"
+    else
+      make "version-bump-${vers_bump_type}-snapshot"
+    fi
+  fi
+}
+##################################################################################################################################################
+
+main
