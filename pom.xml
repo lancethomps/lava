@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.lancethomps</groupId>
     <artifactId>lancethomps-parent</artifactId>
-    <version>1.8.0</version>
+    <version>1.9.1</version>
     <relativePath />
   </parent>
   <artifactId>lava</artifactId>
@@ -59,16 +59,17 @@
       <artifactId>jsr305</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-core</artifactId>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
