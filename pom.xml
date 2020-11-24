@@ -8,7 +8,7 @@
     <relativePath />
   </parent>
   <artifactId>lava</artifactId>
-  <version>1.9.2</version>
+  <version>1.9.3-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Core libraries for Java</description>
@@ -136,7 +136,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13</version>
+      <version>4.13.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
