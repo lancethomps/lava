@@ -63,9 +63,9 @@ public class StringUtil {
   public static final Pattern NON_ALPHA_NUMERIC = Pattern.compile("[^A-Za-z0-9]");
   public static final Pattern NON_ALPHA_NUMERIC_ALL = Pattern.compile("^[^A-Za-z0-9]+$");
   public static final Pattern NON_ALPHA_ONLY = Pattern.compile("[^A-Za-z]");
+  public static final Pattern NUMBERS_ONLY_REGEX = Pattern.compile("^[0-9]+$");
   public static final Pattern NUMERIC_ONLY = Pattern.compile("[^0-9]");
   public static final Pattern NUMERIC_STRING_REGEX = Pattern.compile("[0-9. \\-e]+", Pattern.CASE_INSENSITIVE);
-  public static final Pattern NUMBERS_ONLY_REGEX = Pattern.compile("^[0-9]+$");
   public static final Pattern TAB_PATTERN = Pattern.compile("(\\t)+");
   public static final String TRUNCATE_STRING_ELLIPSIS = "...";
   public static final String VOWELS = "AEIOU";
@@ -84,115 +84,6 @@ public class StringUtil {
       random = new Random();
     }
     RANDOM_GEN = random;
-  }
-
-  public static final String getRandomNumericString(long length) {
-    String val = new Random()
-      .ints(0, RANDOM_NUMERIC_CHARS.length())
-      .mapToObj(i -> RANDOM_NUMERIC_CHARS.charAt(i))
-      .limit(length)
-      .collect(
-        StringBuilder::new,
-        StringBuilder::append,
-        StringBuilder::append
-      )
-      .toString();
-    if ("0".equalsIgnoreCase(val.substring(0, 1))) {
-      val = getRandomNumericString(1) + val.substring(1);
-    }
-    return val;
-  }
-
-  public static final String getRandomVowelConsonantString(long length) {
-    StringBuilder str = new StringBuilder(RandomStringUtils.randomAlphabetic(1));
-    Random random = new Random();
-    while (str.length() < length) {
-      if (CONSONANTS_ALL.contains(new Character(str.charAt(str.length() - 1)).toString())) {
-        str.append(VOWELS_ALL.charAt(random.nextInt(VOWELS_ALL.length())));
-      } else {
-        str.append(CONSONANTS_ALL.charAt(random.nextInt(CONSONANTS_ALL.length())));
-      }
-    }
-    return str.toString();
-  }
-
-  public static final String removeAllLineBreaks(String str) {
-    return replaceAllLineBreaks(str, EMPTY);
-  }
-
-  public static final String replaceAllLineBreaks(String str, String replacement) {
-    return LINE_BREAK_PATTERN.matcher(str).replaceAll(replacement);
-  }
-
-  public static final String replaceAllTabs(String str, String replacement) {
-    return TAB_PATTERN.matcher(str).replaceAll(replacement);
-  }
-
-  public static final List<String> splitLines(String str) {
-    return Lists.newArrayList(LINE_BREAK_PATTERN.split(str));
-  }
-
-  public static final String toCommaSeparatedString(int[] inputList) {
-    return toCommaSeparatedString(inputList, "");
-  }
-
-  public static final String toCommaSeparatedString(int[] inputList, String toRemove) {
-    if (isNotEmpty(inputList)) {
-      final String[] stringArr = new String[inputList.length];
-      for (int i = 0; i < inputList.length; i++) {
-        stringArr[i] = String.valueOf(inputList[i]);
-      }
-      return toCommaSeparatedString(asList(stringArr), toRemove);
-    }
-    return "";
-  }
-
-  public static final String toCommaSeparatedString(List<String> inputList) {
-    return toCommaSeparatedString(inputList, "");
-  }
-
-  public static final String toCommaSeparatedString(List<String> inputList, String toRemove) {
-    if (isNotEmpty(inputList)) {
-      StringBuilder builderString = new StringBuilder();
-      String temp = null;
-      boolean isAdded = false;
-      int listSize = inputList.size();
-      for (int i = 0; i < listSize; i++) {
-        temp = String.valueOf(inputList.get(i));
-        if (isBlank(temp) || temp.equals(toRemove)) {
-          continue;
-        }
-        if (isAdded) {
-          builderString.append(",");
-        }
-        builderString.append(temp);
-        isAdded = true;
-      }
-      return builderString.toString();
-    }
-    return "";
-  }
-
-  public static final String toCommaSeparatedString(Set<String> inputList) {
-    return toCommaSeparatedString(inputList, "");
-  }
-
-  public static final String toCommaSeparatedString(Set<String> inputList, String toRemove) {
-    if (inputList != null) {
-      return toCommaSeparatedString(new ArrayList<String>(inputList), toRemove);
-    }
-    return "";
-  }
-
-  public static final String toCommaSeparatedString(String[] inputList) {
-    return toCommaSeparatedString(inputList, "");
-  }
-
-  public static final String toCommaSeparatedString(String[] inputList, String toRemove) {
-    if (inputList != null) {
-      return toCommaSeparatedString(asList(inputList), toRemove);
-    }
-    return "";
   }
 
   public static StringBuilder append(StringBuilder sb, String str) {
@@ -312,6 +203,36 @@ public class StringUtil {
     return id;
   }
 
+  public static String getRandomNumericString(long length) {
+    String val = new Random()
+      .ints(0, RANDOM_NUMERIC_CHARS.length())
+      .mapToObj(i -> RANDOM_NUMERIC_CHARS.charAt(i))
+      .limit(length)
+      .collect(
+        StringBuilder::new,
+        StringBuilder::append,
+        StringBuilder::append
+      )
+      .toString();
+    if ("0".equalsIgnoreCase(val.substring(0, 1))) {
+      val = getRandomNumericString(1) + val.substring(1);
+    }
+    return val;
+  }
+
+  public static String getRandomVowelConsonantString(long length) {
+    StringBuilder str = new StringBuilder(RandomStringUtils.randomAlphabetic(1));
+    Random random = new Random();
+    while (str.length() < length) {
+      if (CONSONANTS_ALL.contains(Character.toString(str.charAt(str.length() - 1)))) {
+        str.append(VOWELS_ALL.charAt(random.nextInt(VOWELS_ALL.length())));
+      } else {
+        str.append(CONSONANTS_ALL.charAt(random.nextInt(CONSONANTS_ALL.length())));
+      }
+    }
+    return str.toString();
+  }
+
   public static String insertStringAfterChars(String str, String insertStr, int pos) {
     if (isBlank(str)) {
       return str;
@@ -354,6 +275,18 @@ public class StringUtil {
     return String.format("%1$-" + padding + 's', str);
   }
 
+  public static String removeAllLineBreaks(String str) {
+    return replaceAllLineBreaks(str, EMPTY);
+  }
+
+  public static String replaceAllLineBreaks(String str, String replacement) {
+    return LINE_BREAK_PATTERN.matcher(str).replaceAll(replacement);
+  }
+
+  public static String replaceAllTabs(String str, String replacement) {
+    return TAB_PATTERN.matcher(str).replaceAll(replacement);
+  }
+
   public static String replaceNonAlpha(String str) {
     return NON_ALPHA_ONLY.matcher(str).replaceAll(EMPTY);
   }
@@ -372,6 +305,10 @@ public class StringUtil {
     String key = line.substring(0, index);
     String value = line.substring(index + 1);
     return Pair.of(key, value);
+  }
+
+  public static List<String> splitLines(String str) {
+    return Lists.newArrayList(LINE_BREAK_PATTERN.split(str));
   }
 
   public static boolean startsWith(String str, Collection<String> checks) {
@@ -396,6 +333,69 @@ public class StringUtil {
       }
     }
     return str;
+  }
+
+  public static String toCommaSeparatedString(int[] inputList) {
+    return toCommaSeparatedString(inputList, "");
+  }
+
+  public static String toCommaSeparatedString(int[] inputList, String toRemove) {
+    if (isNotEmpty(inputList)) {
+      final String[] stringArr = new String[inputList.length];
+      for (int i = 0; i < inputList.length; i++) {
+        stringArr[i] = String.valueOf(inputList[i]);
+      }
+      return toCommaSeparatedString(asList(stringArr), toRemove);
+    }
+    return "";
+  }
+
+  public static String toCommaSeparatedString(List<String> inputList) {
+    return toCommaSeparatedString(inputList, "");
+  }
+
+  public static String toCommaSeparatedString(List<String> inputList, String toRemove) {
+    if (isNotEmpty(inputList)) {
+      StringBuilder builderString = new StringBuilder();
+      String temp = null;
+      boolean isAdded = false;
+      int listSize = inputList.size();
+      for (String s : inputList) {
+        temp = String.valueOf(s);
+        if (isBlank(temp) || temp.equals(toRemove)) {
+          continue;
+        }
+        if (isAdded) {
+          builderString.append(",");
+        }
+        builderString.append(temp);
+        isAdded = true;
+      }
+      return builderString.toString();
+    }
+    return "";
+  }
+
+  public static String toCommaSeparatedString(Set<String> inputList) {
+    return toCommaSeparatedString(inputList, "");
+  }
+
+  public static String toCommaSeparatedString(Set<String> inputList, String toRemove) {
+    if (inputList != null) {
+      return toCommaSeparatedString(new ArrayList<String>(inputList), toRemove);
+    }
+    return "";
+  }
+
+  public static String toCommaSeparatedString(String[] inputList) {
+    return toCommaSeparatedString(inputList, "");
+  }
+
+  public static String toCommaSeparatedString(String[] inputList, String toRemove) {
+    if (inputList != null) {
+      return toCommaSeparatedString(asList(inputList), toRemove);
+    }
+    return "";
   }
 
   public static String toNameFallback(String str) {
