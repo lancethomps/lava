@@ -3,6 +3,7 @@ package com.lancethomps.lava.common.ser;
 
 import static com.lancethomps.lava.common.Checks.isEmpty;
 import static com.lancethomps.lava.common.Checks.isNotEmpty;
+import static com.lancethomps.lava.common.expr.ExprFactory.isSandboxDefault;
 import static com.lancethomps.lava.common.logging.Logs.logError;
 import static com.lancethomps.lava.common.ser.OutputFormat.csv;
 import static com.lancethomps.lava.common.ser.OutputFormat.jsonCompressed;
@@ -1335,10 +1336,10 @@ public class Serializer {
       return orig;
     }
     if (isNotEmpty(outputParams.getPostProcessExpressions())) {
-      ExprFactory.evaluateOutputExpressions(outputParams.getPostProcessExpressions(), orig, true, exprContext);
+      ExprFactory.evaluateOutputExpressions(outputParams.getPostProcessExpressions(), orig, isSandboxDefault(), exprContext);
     }
     if (isNotEmpty(outputParams.getCreateExpressions())) {
-      Map<String, Object> created = ExprFactory.evaluateOutputExpressions(outputParams.getCreateExpressions(), orig, true, exprContext);
+      Map<String, Object> created = ExprFactory.evaluateOutputExpressions(outputParams.getCreateExpressions(), orig, isSandboxDefault(), exprContext);
       orig = created;
     }
     Collection<Object> objs = Collection.class.isAssignableFrom(orig.getClass()) ? (Collection<Object>) orig : Lists.newArrayList(orig);
@@ -1455,12 +1456,12 @@ public class Serializer {
           obj = outputParams.testOgnl() ? ExprFactory.evalOgnl(obj, expr, true, false) : ExprFactory.getValueFromPath(obj, expr, true, false);
         }
         if (isNotEmpty(outputParams.getPostProcessExpressions())) {
-          ExprFactory.evaluateOutputExpressions(outputParams.getPostProcessExpressions(), obj, true, exprContext);
+          ExprFactory.evaluateOutputExpressions(outputParams.getPostProcessExpressions(), obj, isSandboxDefault(), exprContext);
         }
         if (isNotEmpty(outputParams.getCreateExpressions())) {
           Stopwatch watch = Stopwatch.createAndStart();
           try {
-            Object created = ExprFactory.evaluateOutputExpressions(outputParams.getCreateExpressions(), obj, true, exprContext);
+            Object created = ExprFactory.evaluateOutputExpressions(outputParams.getCreateExpressions(), obj, isSandboxDefault(), exprContext);
             obj = created;
           } finally {
             Logs.logTimer(LOG, watch, "output_create_expressions");

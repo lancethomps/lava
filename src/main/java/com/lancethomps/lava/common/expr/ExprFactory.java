@@ -115,6 +115,7 @@ public class ExprFactory {
     StatusMonitor.timer(ExprFactory.METRIC_REGISTRY, ExprParser.SPEL.name(), ExprFactory.METRIC_REGISTRY_EVAL);
   private static ExprParser defaultExprParser = ExprParser.SPEL;
   private static boolean logMissingOgnlProperties;
+  private static boolean sandboxDefault = Serializer.parseBoolean(System.getenv("EXPR_SANDBOX_DEFAULT"), true);
 
   public static final StandardEvaluationContext createSpelNonSandboxedContext() {
     StandardEvaluationContext context = registerSpelDefaultFunctions(new StandardEvaluationContext());
@@ -371,13 +372,15 @@ public class ExprFactory {
       case JS:
         return ScriptEngines.evalJs(
           val,
-          expr == null ? null : expr instanceof JsEngineExpression ? (JsEngineExpression) expr : ScriptEngines.createJsEngineExpression(expr.toString(), sandbox),
+          expr == null ? null :
+            expr instanceof JsEngineExpression ? (JsEngineExpression) expr : ScriptEngines.createJsEngineExpression(expr.toString(), sandbox),
           verbose
         );
       case PY:
         return ScriptEngines.evalPy(
           val,
-          expr == null ? null : expr instanceof PyEngineExpression ? (PyEngineExpression) expr : ScriptEngines.createPyEngineExpression(expr.toString(), sandbox),
+          expr == null ? null :
+            expr instanceof PyEngineExpression ? (PyEngineExpression) expr : ScriptEngines.createPyEngineExpression(expr.toString(), sandbox),
           verbose
         );
       case SPEL:
@@ -521,13 +524,15 @@ public class ExprFactory {
       case JS:
         return ScriptEngines.evalJsWithException(
           val,
-          expr == null ? null : expr instanceof JsEngineExpression ? (JsEngineExpression) expr : ScriptEngines.createJsEngineExpression(expr.toString(), sandbox),
+          expr == null ? null :
+            expr instanceof JsEngineExpression ? (JsEngineExpression) expr : ScriptEngines.createJsEngineExpression(expr.toString(), sandbox),
           verbose
         );
       case PY:
         return ScriptEngines.evalPyWithException(
           val,
-          expr == null ? null : expr instanceof PyEngineExpression ? (PyEngineExpression) expr : ScriptEngines.createPyEngineExpression(expr.toString(), sandbox),
+          expr == null ? null :
+            expr instanceof PyEngineExpression ? (PyEngineExpression) expr : ScriptEngines.createPyEngineExpression(expr.toString(), sandbox),
           verbose
         );
       case SPEL:
@@ -556,7 +561,7 @@ public class ExprFactory {
   }
 
   public static Map<String, Object> evaluateOutputExpressions(List<OutputExpression> expressions, Object rootObject) {
-    return evaluateOutputExpressions(expressions, rootObject, true);
+    return evaluateOutputExpressions(expressions, rootObject, isSandboxDefault());
   }
 
   public static Map<String, Object> evaluateOutputExpressions(List<OutputExpression> expressions, Object rootObject, boolean sandboxDefault) {
@@ -697,6 +702,14 @@ public class ExprFactory {
     ExprFactory.logMissingOgnlProperties = logMissingOgnlProperties;
   }
 
+  public static boolean isSandboxDefault() {
+    return sandboxDefault;
+  }
+
+  public static void setSandboxDefault(boolean sandboxDefault) {
+    ExprFactory.sandboxDefault = sandboxDefault;
+  }
+
   public static Pair<Boolean, String> isSpelString(String test) {
     if (StringUtils.isBlank(test)) {
       return Pair.of(false, null);
@@ -730,17 +743,17 @@ public class ExprFactory {
     return success.get();
   }
 
-  public static <T extends StandardTypeLocator> T registerImports(T locator, String... imports) {
-    for (String imp : imports) {
-      locator.registerImport(imp);
-    }
-    return locator;
-  }
-
   public static <T extends StandardTypeLocator> T registerDefaultSpringImports(T locator) {
     locator.registerImport("org.apache.commons.collections4");
     locator.registerImport("org.apache.commons.lang3");
     locator.registerImport("org.apache.commons.lang3.math");
+    return locator;
+  }
+
+  public static <T extends StandardTypeLocator> T registerImports(T locator, String... imports) {
+    for (String imp : imports) {
+      locator.registerImport(imp);
+    }
     return locator;
   }
 
