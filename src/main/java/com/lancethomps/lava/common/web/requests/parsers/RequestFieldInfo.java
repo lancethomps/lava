@@ -288,12 +288,12 @@ public class RequestFieldInfo<V> {
           ThrowingFunction elementSupplier = str -> Enums.fromString((Class<? extends Enum>) listType, (String) str);
           processFunction = (request, paramName) -> (V) RequestFactory.getCollectionParam(request, paramName, collType, listType, elementSupplier);
         } else {
-          Logs.logWarn(LOG, "No process method found for [%s] - field [%s] using generic collection processor.", fieldDisplay, field);
+          Logs.logDebug(LOG, "No process method found for [%s] - field [%s] using generic collection processor.", fieldDisplay, field);
           ThrowingFunction elementSupplier = str -> Serializer.fromJson((String) str, listType);
           processFunction = (request, paramName) -> (V) RequestFactory.getCollectionParam(request, paramName, collType, listType, elementSupplier);
         }
       } else if (Map.class.isAssignableFrom(type)) {
-        Logs.logWarn(LOG, "No process method found for [%s] - field [%s] - using generic map processor.", fieldDisplay, field);
+        Logs.logDebug(LOG, "No process method found for [%s] - field [%s] - using generic map processor.", fieldDisplay, field);
         Class<?> mapValueType = field == null ? (Class<?>) ((ParameterizedType) param.getParameterizedType()).getActualTypeArguments()[0]
           : Reflections.getTypeArgument(
           parentClass,
@@ -353,7 +353,7 @@ public class RequestFieldInfo<V> {
           );
         };
       } else {
-        Logs.logWarn(LOG, "No process method found for [%s] - field [%s].", fieldDisplay, field);
+        Logs.logDebug(LOG, "No process method found for [%s] - field [%s].", fieldDisplay, field);
         processFunction = (request, paramName) -> Lambdas
           .functionIfNonNull(RequestFactory.getRequestParam(request, paramName), val -> Serializer.parseString(val, type))
           .orElse(null);
