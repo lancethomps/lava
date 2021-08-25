@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.ClassUtil;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.lancethomps.lava.common.collections.MapUtil;
 
@@ -30,6 +31,20 @@ public class CustomTypeIdResolver extends TypeIdResolverBase {
   public static final String ROOT_PACKAGE = "com.lancethomps.lava.";
 
   public static final Set<String> SHARED_PACKAGE_PREFIXES = Sets.newHashSet("api", "factory", "utils");
+
+  public static final Map<String, String> SHORT_NAME_RESOLVERS = ImmutableMap.<String, String>builder()
+    .put("BigDecimal", "java.math.BigDecimal")
+    .put("Boolean", "java.lang.Boolean")
+    .put("Double", "java.math.BigDecimal")
+    .put("Float", "java.math.BigDecimal")
+    .put("Integer", "java.lang.Integer")
+    .put("String", "java.lang.String")
+    .put("double", "java.math.BigDecimal")
+    .put("float", "java.math.BigDecimal")
+    .put("int", "java.lang.Integer")
+    .put("integer", "java.lang.Integer")
+    .put("string", "java.lang.String")
+    .build();
 
   private static boolean jsonShortenedType;
 
@@ -58,6 +73,8 @@ public class CustomTypeIdResolver extends TypeIdResolverBase {
         ((replacePackage = typeIdPackageFixes.entrySet().stream().filter(e -> id.startsWith(e.getKey())).findAny().orElse(null)) != null)) {
         final String idSuffix = StringUtils.removeStart(id, replacePackage.getKey());
         resolvedId = replacePackage.getValue() + (SHARED_PACKAGE_PREFIXES.stream().anyMatch(idSuffix::startsWith) ? "" : "dtts.") + idSuffix;
+      } else if (!id.contains(".")) {
+        resolvedId = SHORT_NAME_RESOLVERS.getOrDefault(id, id);
       } else {
         resolvedId = id;
       }

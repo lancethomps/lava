@@ -225,6 +225,19 @@ public class FileParser<T> {
       dataMap = Serializer.convertPathKeyMapToPojoMap(dataMap, null, type);
     }
     if (dataMap != null) {
+      if (options.getConvertFields() != null) {
+        for (Entry<Class<?>, Set<String>> convert : options.getConvertFields().entrySet()) {
+          for (String field : convert.getValue()) {
+            Object val = dataMap.get(field);
+            if (val != null) {
+              Object updatedVal = Serializer.convert(val, convert.getKey());
+              if (updatedVal != null) {
+                dataMap.put(field, updatedVal);
+              }
+            }
+          }
+        }
+      }
       if (options.getCopyFields() != null) {
         for (Entry<String, Set<String>> copy : options.getCopyFields().entrySet()) {
           Object val = dataMap.get(copy.getKey());
