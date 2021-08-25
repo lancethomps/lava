@@ -22,6 +22,9 @@ public class FileParserOptions extends ExternalizableBean {
   private Boolean allowBlanks;
 
   @RequestField
+  private Map<Class<?>, Set<String>> convertFields;
+
+  @RequestField
   private Map<String, Set<String>> copyFields;
 
   private CsvFieldConverter fieldConverter;
@@ -143,6 +146,16 @@ public class FileParserOptions extends ExternalizableBean {
   public FileParserOptions setAllowBlanks(Boolean allowBlanks) {
     checkModificationsDisabled();
     this.allowBlanks = allowBlanks;
+    return this;
+  }
+
+  public Map<Class<?>, Set<String>> getConvertFields() {
+    return convertFields;
+  }
+
+  public FileParserOptions setConvertFields(Map<Class<?>, Set<String>> convertFields) {
+    checkModificationsDisabled();
+    this.convertFields = convertFields;
     return this;
   }
 

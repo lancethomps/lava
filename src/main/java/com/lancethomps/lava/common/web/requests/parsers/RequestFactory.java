@@ -130,6 +130,7 @@ public class RequestFactory {
       .put("List<OutputExpression>", RequestFactory::getOutputExpressions)
       .put("List<Pattern>", RequestFactory::getPatternListParam)
       .put("List<String>", RequestFactory::getStringListParam)
+      .put("Map<Class<?>, Set<String>>", RequestFactory::getMapParamClassToSetString)
       .put("Map<String, List<String>>", RequestFactory::getStringListMapParam)
       .put("Map<String, Object>", RequestFactory::getMapParam)
       .put("Map<String, String>", RequestFactory::getStringMapParam)
@@ -770,32 +771,7 @@ public class RequestFactory {
     }
     if (request.containsKey(paramName)) {
       for (String paramVal : request.get(paramName)) {
-        if (StringUtils.isBlank(paramVal)) {
-          ;
-        } else if (Serializer.isJsonList(paramVal)) {
-          Lambdas.consumeIfNonNull(Serializer.readJsonAsList(paramVal, elementType), coll::addAll);
-        } else if (Serializer.isJsonMap(paramVal)) {
-          Lambdas.consumeIfNonNull(Serializer.fromJson(paramVal, elementType), coll::add);
-        } else {
-          for (String paramValSection : Collect.splitCsv(paramVal, sep)) {
-            try {
-              if (multiValueConstructor != null) {
-                Collection<E> vals = multiValueConstructor.apply(paramValSection);
-                if (vals != null) {
-                  coll.addAll(vals);
-                }
-              }
-              if (constructor != null) {
-                E val = constructor.apply(paramValSection);
-                if (val != null) {
-                  coll.add(val);
-                }
-              }
-            } catch (Exception e) {
-              Exceptions.sneakyThrow(e);
-            }
-          }
-        }
+        parseCollectionParamVal(elementType, constructor, multiValueConstructor, sep, coll, paramVal);
       }
     }
     String singleParam = WordUtil.getSingularVersionOfWord(paramName);
@@ -1590,6 +1566,21 @@ public class RequestFactory {
     return map.isEmpty() ? null : map;
   }
 
+  public static Map<Class<?>, Set<String>> getMapParamClassToSetString(Map<String, String[]> request, String paramName) {
+    return getMapParam(
+      request,
+      paramName,
+      LinkedHashMap.class,
+      Class.class,
+      Set.class,
+      typeArg -> Class.forName(CustomTypeIdResolver.getCorrectClassName(typeArg)),
+      paramVal -> {
+        Set<String> coll = new LinkedHashSet<>();
+        return parseCollectionParamVal(String.class, val -> val, null, ',', coll, paramVal);
+      }
+    );
+  }
+
   public static List<String> getStringListParam(Map<String, String[]> request, String paramName) {
     return getCollectionParam(request, paramName, ArrayList.class, String.class, ThrowingFunction.identity());
   }
@@ -1711,6 +1702,45 @@ public class RequestFactory {
         INFO_CACHE.clear();
       }
     }
+  }
+
+  private static <T extends Collection<E>, E> T parseCollectionParamVal(
+    final Class<E> elementType,
+    final ThrowingFunction<String, E> constructor,
+    @Nullable final ThrowingFunction<String, Collection<E>> multiValueConstructor,
+    final char sep,
+    T coll,
+    String paramVal
+  ) {
+    if (StringUtils.isBlank(paramVal)) {
+      return coll;
+    }
+
+    if (Serializer.isJsonList(paramVal)) {
+      Lambdas.consumeIfNonNull(Serializer.readJsonAsList(paramVal, elementType), coll::addAll);
+    } else if (Serializer.isJsonMap(paramVal)) {
+      Lambdas.consumeIfNonNull(Serializer.fromJson(paramVal, elementType), coll::add);
+    } else {
+      for (String paramValSection : Collect.splitCsv(paramVal, sep)) {
+        try {
+          if (multiValueConstructor != null) {
+            Collection<E> vals = multiValueConstructor.apply(paramValSection);
+            if (vals != null) {
+              coll.addAll(vals);
+            }
+          }
+          if (constructor != null) {
+            E val = constructor.apply(paramValSection);
+            if (val != null) {
+              coll.add(val);
+            }
+          }
+        } catch (Exception e) {
+          Exceptions.sneakyThrow(e);
+        }
+      }
+    }
+    return coll;
   }
 
   @RequestField
