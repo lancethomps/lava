@@ -19,11 +19,14 @@ public class CustomOrderedKeysMapSerializer extends MapSerializer {
   private static final long serialVersionUID = 942838694300709663L;
 
   protected CustomOrderedKeysMapSerializer(
-    MapSerializer src, BeanProperty property,
-    JsonSerializer<?> keySerializer, JsonSerializer<?> valueSerializer,
-    Set<String> ignoredEntries
+    MapSerializer src,
+    BeanProperty property,
+    JsonSerializer<?> keySerializer,
+    JsonSerializer<?> valueSerializer,
+    Set<String> ignoredEntries,
+    Set<String> includedEntries
   ) {
-    super(src, property, keySerializer, valueSerializer, ignoredEntries);
+    super(src, property, keySerializer, valueSerializer, ignoredEntries, includedEntries);
   }
 
   protected CustomOrderedKeysMapSerializer(MapSerializer src, Object filterId, boolean sortKeys) {
@@ -74,10 +77,13 @@ public class CustomOrderedKeysMapSerializer extends MapSerializer {
   @Override
   public MapSerializer withResolved(
     BeanProperty property,
-    JsonSerializer<?> keySerializer, JsonSerializer<?> valueSerializer,
-    Set<String> ignored, boolean sortKeys
+    JsonSerializer<?> keySerializer,
+    JsonSerializer<?> valueSerializer,
+    Set<String> ignored,
+    Set<String> included,
+    boolean sortKeys
   ) {
-    CustomOrderedKeysMapSerializer ser = new CustomOrderedKeysMapSerializer(this, property, keySerializer, valueSerializer, ignored);
+    CustomOrderedKeysMapSerializer ser = new CustomOrderedKeysMapSerializer(this, property, keySerializer, valueSerializer, ignored, included);
     if (sortKeys != ser._sortKeys) {
       ser = new CustomOrderedKeysMapSerializer(ser, _filterId, sortKeys);
     }
