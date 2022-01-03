@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.lancethomps</groupId>
     <artifactId>lancethomps-parent</artifactId>
-    <version>1.9.3</version>
+    <version>1.13.0</version>
     <relativePath />
   </parent>
   <artifactId>lava</artifactId>
@@ -136,7 +136,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
