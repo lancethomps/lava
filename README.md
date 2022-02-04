@@ -1,3 +1,3 @@
 # Core libraries for Java
 
-[![Build Status](https://travis-ci.org/lancethomps/lava.svg?branch=main)](https://travis-ci.org/lancethomps/lava)
+[![Build](https://github.com/lancethomps/lava/actions/workflows/build.yml/badge.svg)](https://github.com/lancethomps/lava/actions/workflows/build.yml)
