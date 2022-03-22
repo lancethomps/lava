@@ -4,11 +4,11 @@
   <parent>
     <groupId>com.lancethomps</groupId>
     <artifactId>lancethomps-parent</artifactId>
-    <version>1.13.1</version>
+    <version>1.13.2</version>
     <relativePath />
   </parent>
   <artifactId>lava</artifactId>
-  <version>1.13.0</version>
+  <version>1.13.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Core libraries for Java</description>
@@ -142,6 +142,12 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-jcl</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
