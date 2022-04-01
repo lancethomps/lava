@@ -10,8 +10,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -82,6 +84,9 @@ import com.fasterxml.jackson.dataformat.smile.SmileParser;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.key.DurationKeyDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import com.lancethomps.lava.common.Checks;
 import com.lancethomps.lava.common.collections.FastHashMap;
@@ -403,6 +408,8 @@ public class SerializerFactory {
     Function<LocalDate, String> outDateKey;
     Function<LocalDateTime, Object> outDateTime;
     Function<LocalDateTime, String> outDateTimeKey;
+    Function<OffsetDateTime, Object> outOffsetDateTime;
+    Function<OffsetDateTime, String> outOffsetDateTimeKey;
     Function<ZonedDateTime, Object> outZonedDateTime;
     Function<ZonedDateTime, String> outZonedDateTimeKey;
     if (Checks.isNotBlank(dateFormat)) {
@@ -411,6 +418,8 @@ public class SerializerFactory {
       outDateKey = formatter::format;
       outDateTime = formatter::format;
       outDateTimeKey = formatter::format;
+      outOffsetDateTime = formatter::format;
+      outOffsetDateTimeKey = formatter::format;
       outZonedDateTime = formatter::format;
       outZonedDateTimeKey = formatter::format;
     } else if (datesAsStrings) {
@@ -418,6 +427,8 @@ public class SerializerFactory {
       outDateKey = Dates::toJsonStandardFormat;
       outDateTime = Dates::toJsonStandardFormat;
       outDateTimeKey = Dates::toJsonStandardFormat;
+      outOffsetDateTime = Dates::toJsonStandardFormat;
+      outOffsetDateTimeKey = Dates::toJsonStandardFormat;
       outZonedDateTime = Dates::toJsonStandardFormat;
       outZonedDateTimeKey = Dates::toJsonStandardFormat;
     } else {
@@ -425,11 +436,22 @@ public class SerializerFactory {
       outDateKey = Dates::toIntString;
       outDateTime = Dates::toMillis;
       outDateTimeKey = Dates::toMillisString;
+      outOffsetDateTime = Dates::toMillis;
+      outOffsetDateTimeKey = Dates::toMillisString;
       outZonedDateTime = Dates::toMillis;
       outZonedDateTimeKey = Dates::toMillisString;
     }
     addTemporalConfig(dateModule, LocalDateTime.class, LocalDateTime::from, false, outDateTime, Dates::parseDateTime, outDateTimeKey);
     addTemporalConfig(dateModule, LocalDate.class, LocalDateTime::toLocalDate, true, outDate, Dates::parseDate, outDateKey);
+    addTemporalConfig(
+      dateModule,
+      OffsetDateTime.class,
+      Dates::toOffsetDateTime,
+      false,
+      outOffsetDateTime,
+      Dates::parseOffsetDateTime,
+      outOffsetDateTimeKey
+    );
     addTemporalConfig(
       dateModule,
       ZonedDateTime.class,
@@ -441,6 +463,10 @@ public class SerializerFactory {
     );
     dateModule.addDeserializer(ZoneOffset.class, new ZoneOffsetDeserializer());
     dateModule.addSerializer(ZoneOffset.class, new CustomFunctionalSerializer<>(ZoneOffset.class, zo -> zo.getId()));
+
+    dateModule.addDeserializer(Duration.class, DurationDeserializer.INSTANCE);
+    dateModule.addSerializer(Duration.class, DurationSerializer.INSTANCE);
+    dateModule.addKeyDeserializer(Duration.class, DurationKeyDeserializer.INSTANCE);
 
     if (!(mapper instanceof XmlMapper)) {
       dateModule.addDeserializer(Date.class, new DateDeserializer());

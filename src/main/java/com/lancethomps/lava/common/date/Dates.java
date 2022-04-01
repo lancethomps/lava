@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -793,6 +794,10 @@ public class Dates {
     return ZonedDateTime.now(ZoneId.of(zoneShortIdOrName)).getOffset();
   }
 
+  public static OffsetDateTime parseOffsetDateTime(String val) {
+    return Lambdas.functionIfNonNull(parseDateTime(val), date -> date.atOffset(DEFAULT_ZONE)).orElse(null);
+  }
+
   public static ZonedDateTime parseZonedDateTime(String val) {
     return Lambdas.functionIfNonNull(parseDateTime(val), date -> date.atZone(DEFAULT_ZONE)).orElse(null);
   }
@@ -847,6 +852,10 @@ public class Dates {
 
   public static String toSolrDateFormat(TemporalAccessor date) {
     return toJsonStandardFormat(date);
+  }
+
+  public static OffsetDateTime toOffsetDateTime(TemporalAccessor date) {
+    return OffsetDateTime.of(LocalDateTime.from(date), DEFAULT_ZONE);
   }
 
   public static ZonedDateTime toZonedDateTime(TemporalAccessor date) {
