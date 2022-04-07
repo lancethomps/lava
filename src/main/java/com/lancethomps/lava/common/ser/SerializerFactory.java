@@ -217,7 +217,7 @@ public class SerializerFactory {
         .setSerializerModifier(new CustomBeanSerializerModifier())
     );
 
-    SimpleModule dateModule = getDateModule(mapper, false);
+    SimpleModule dateModule = getDateModule(mapper, true);
     mapper.registerModule(dateModule);
 
     mapper.registerModule(new PairModule());
